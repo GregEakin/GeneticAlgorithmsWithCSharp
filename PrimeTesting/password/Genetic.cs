@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Linq;
 
 namespace PrimeTesting.password
@@ -29,23 +30,30 @@ namespace PrimeTesting.password
         {
             var index = _random.Next(parent.Length);
             var childGenes = parent.ToCharArray();
-            var newGene = RandomSample(geneSet, 1)[0];
-            var alternate = RandomSample(geneSet, 1)[0];
+            var randomSample = RandomSample(geneSet, 2);
+            var newGene = randomSample[0];
+            var alternate = randomSample[1];
             childGenes[index] = newGene == childGenes[index] ? alternate : newGene;
             return new string(childGenes);
         }
 
         public delegate int Fitness(string guess);
 
-        public delegate void Display(string guess);
+        public delegate void Display(string geneSet, string guess, Stopwatch stopwatch);
 
 
-        public void BestFitness(Fitness fitness, int targetLen, int optimalFitness, string geneSet,
+        public string BestFitness(Fitness fitness, int targetLen, int optimalFitness, string geneSet,
             Display display)
         {
+            var watch = new Stopwatch();
+            watch.Start();
+
             var bestParent = GenerateParent(geneSet, targetLen);
             var bestFitness = fitness(bestParent);
-            display(bestParent);
+            display(geneSet, bestParent, watch);
+
+            if (bestFitness >= optimalFitness)
+                return bestParent;
 
             while (true)
             {
@@ -53,9 +61,9 @@ namespace PrimeTesting.password
                 var childFitness = fitness(child);
                 if (bestFitness >= childFitness)
                     continue;
-                display(child);
+                display(geneSet, child, watch);
                 if (childFitness >= optimalFitness)
-                    break;
+                    return child;
                 bestFitness = childFitness;
                 bestParent = child;
             }
