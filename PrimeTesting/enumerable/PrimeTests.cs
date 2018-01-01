@@ -221,8 +221,6 @@ namespace PrimeTesting.enumerable
             while (start * start < value)
                 start++;
             return start;
-
-            // return Convert.ToInt32(Math.Sqrt(value));
         }
 
         [TestMethod]
