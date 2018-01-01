@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace PrimeTesting.primes1
+namespace PrimeTesting.lazy
 {
     public class LazyList<T> : IMyList<T>
     {
@@ -22,7 +24,7 @@ namespace PrimeTesting.primes1
         {
             return Empty
                 ? this
-                : p.Invoke(Head)
+                : p(Head)
                     ? new LazyList<T>(Head, new Lazy<IMyList<T>>(() => Tail.Filter(p)))
                     : Tail.Filter(p);
         }

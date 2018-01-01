@@ -1,7 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace PrimeTesting.primes1
+namespace PrimeTesting.lazy
 {
     [TestClass]
     public class PrimeTests
@@ -48,5 +49,35 @@ namespace PrimeTesting.primes1
                 numbers = numbers.Tail;
             }
         }
+
+        [TestMethod]
+        public void Test2()
+        {
+            var rnd = new Random();
+            var teams = new List<HockeyTeam>();
+            teams.AddRange(new[] { new HockeyTeam("Detroit Red Wings", 1926),
+                new HockeyTeam("Chicago Blackhawks", 1926),
+                new HockeyTeam("San Jose Sharks", 1991),
+                new HockeyTeam("Montreal Canadiens", 1909),
+                new HockeyTeam("St. Louis Blues", 1967) });
+            int[] years = { 1920, 1930, 1980, 2000 };
+            var foundedBeforeYear = years[rnd.Next(0, years.Length)];
+            Console.WriteLine("Teams founded before {0}:", foundedBeforeYear);
+            foreach (var team in teams.FindAll(x => x.Founded <= foundedBeforeYear))
+                Console.WriteLine("{0}: {1}", team.Name, team.Founded);
+        }
+    }
+
+    public class HockeyTeam
+    {
+        public HockeyTeam(string name, int year)
+        {
+            Name = name;
+            Founded = year;
+        }
+
+        public string Name { get; }
+
+        public int Founded { get; }
     }
 }

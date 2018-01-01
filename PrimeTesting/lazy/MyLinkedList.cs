@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace PrimeTesting.primes1
+namespace PrimeTesting.lazy
 {
     public class MyLinkedList<T> : IMyList<T>
     {

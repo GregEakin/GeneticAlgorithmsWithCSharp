@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace PrimeTesting.primes1
+namespace PrimeTesting.lazy
 {
     public interface IMyList<out T>
     {
