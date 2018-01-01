@@ -4,17 +4,42 @@ using System.Linq;
 
 namespace PrimeTesting.password
 {
-    public class Genetic
+    public static class Genetic
     {
-        private readonly Random _random = new Random();
+        public delegate int FitnessFun(string guess);
 
-        public string RandomSample(string input, int k)
+        public delegate void DisplayFun(Chromosome child);
+
+        private static readonly Random RandomGen = new Random();
+
+        public static string RandomSample(string input, int k)
         {
-            var array = input.ToCharArray().OrderBy(x => _random.Next()).Take(k).ToArray();
-            return new string(array);
+            var result = string.Empty;
+            while (true)
+            {
+                var length = Math.Min(input.Length, k - result.Length);
+                var array = input.ToCharArray().OrderBy(x => RandomGen.Next()).Take(length).ToArray();
+                result += new string(array);
+
+                if (result.Length >= k)
+                    return result;
+            }
         }
 
-        public string GenerateParent(string geneSet, int length)
+        public static Chromosome Mutate(string geneSet, Chromosome parent, FitnessFun fitnessFun)
+        {
+            var index = RandomGen.Next(parent.Genes.Length);
+            var childGenes = parent.Genes.ToCharArray();
+            var randomSample = RandomSample(geneSet, 2);
+            var newGene = randomSample[0];
+            var alternate = randomSample[1];
+            childGenes[index] = newGene == childGenes[index] ? alternate : newGene;
+            var genes = new string(childGenes);
+            var fit = fitnessFun(genes);
+            return new Chromosome(genes, fit);
+        }
+
+        public static Chromosome GenerateParent(string geneSet, int length, FitnessFun fitnessFun)
         {
             var genes = string.Empty;
             while (genes.Length < length)
@@ -23,48 +48,27 @@ namespace PrimeTesting.password
                 genes += RandomSample(geneSet, sampleSize);
             }
 
-            return genes;
+            var fit = fitnessFun(geneSet);
+            return new Chromosome(genes, fit);
         }
 
-        public string Mutate(string geneSet, string parent)
+        public static Chromosome BestFitness(FitnessFun fitnessFun, int targetLen, int optimalFitness, string geneSet,
+            DisplayFun displayFun)
         {
-            var index = _random.Next(parent.Length);
-            var childGenes = parent.ToCharArray();
-            var randomSample = RandomSample(geneSet, 2);
-            var newGene = randomSample[0];
-            var alternate = randomSample[1];
-            childGenes[index] = newGene == childGenes[index] ? alternate : newGene;
-            return new string(childGenes);
-        }
+            var bestParent = GenerateParent(geneSet, targetLen, fitnessFun);
+            displayFun(bestParent);
 
-        public delegate int Fitness(string guess);
-
-        public delegate void Display(string geneSet, string guess, Stopwatch stopwatch);
-
-
-        public string BestFitness(Fitness fitness, int targetLen, int optimalFitness, string geneSet,
-            Display display)
-        {
-            var watch = new Stopwatch();
-            watch.Start();
-
-            var bestParent = GenerateParent(geneSet, targetLen);
-            var bestFitness = fitness(bestParent);
-            display(geneSet, bestParent, watch);
-
-            if (bestFitness >= optimalFitness)
+            if (bestParent.Fitness >= optimalFitness)
                 return bestParent;
 
             while (true)
             {
-                var child = Mutate(geneSet, bestParent);
-                var childFitness = fitness(child);
-                if (bestFitness >= childFitness)
+                var child = Mutate(geneSet, bestParent, fitnessFun);
+                if (bestParent.Fitness >= child.Fitness)
                     continue;
-                display(geneSet, child, watch);
-                if (childFitness >= optimalFitness)
+                displayFun(child);
+                if (child.Fitness >= optimalFitness)
                     return child;
-                bestFitness = childFitness;
                 bestParent = child;
             }
         }
