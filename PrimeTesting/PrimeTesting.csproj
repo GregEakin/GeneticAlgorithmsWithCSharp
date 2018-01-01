@@ -48,6 +48,11 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="primes1\EmptyList.cs" />
+    <Compile Include="primes1\LazyList.cs" />
+    <Compile Include="primes1\MyLinkedList.cs" />
+    <Compile Include="primes1\MyList.cs" />
+    <Compile Include="primes1\PrimeTests.cs" />
     <Compile Include="UnitTest1.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
