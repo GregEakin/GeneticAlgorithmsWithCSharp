@@ -22,7 +22,7 @@ namespace PrimeTesting.password
             return sum;
         }
 
-        public void Display(Chromosome candidate, Stopwatch stopwatch)
+        public static void Display(Chromosome candidate, Stopwatch stopwatch)
         {
             Console.WriteLine("{0}\t{1}\t{2} ms", candidate.Genes, candidate.Fitness, stopwatch.ElapsedMilliseconds);
         }
@@ -31,8 +31,8 @@ namespace PrimeTesting.password
         {
             var watch = new Stopwatch();
             int FitnessFun(string guess) => Fitness(target, guess);
-            // void DisplayFun(Chromosome candidate) => Display(candidate, watch);
-            void DisplayFun(Chromosome candidate) { }
+            void DisplayFun(Chromosome candidate) => Display(candidate, watch);
+            // void DisplayFun(Chromosome candidate) { }
             
             watch.Start();
             var answer = Genetic.BestFitness(FitnessFun, target.Length, target.Length, GeneSet, DisplayFun);
@@ -51,7 +51,7 @@ namespace PrimeTesting.password
         }
 
         [TestMethod]
-        public void LognPwTest()
+        public void LongPwTest()
         {
             const string target = "For I am fearfully and wonderfully made.";
             GuessPassword(target);

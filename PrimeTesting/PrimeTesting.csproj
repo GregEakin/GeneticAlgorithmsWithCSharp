@@ -59,6 +59,11 @@
     <Compile Include="password\Chromosome.cs" />
     <Compile Include="password\Genetic.cs" />
     <Compile Include="password\PasswordGenerator.cs" />
+    <Compile Include="queens\Board.cs" />
+    <Compile Include="queens\Chromosome.cs" />
+    <Compile Include="queens\Fitness.cs" />
+    <Compile Include="queens\Genetic.cs" />
+    <Compile Include="queens\QueenTests.cs" />
     <Compile Include="UnitTest1.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="yield\EmptyList.cs" />
