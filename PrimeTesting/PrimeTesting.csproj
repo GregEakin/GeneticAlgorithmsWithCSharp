@@ -64,6 +64,9 @@
     <Compile Include="queens\Fitness.cs" />
     <Compile Include="queens\Genetic.cs" />
     <Compile Include="queens\QueenTests.cs" />
+    <Compile Include="sortedNumbers\Chromosome.cs" />
+    <Compile Include="sortedNumbers\Genetic.cs" />
+    <Compile Include="sortedNumbers\SortedNumbersTests.cs" />
     <Compile Include="UnitTest1.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="yield\EmptyList.cs" />
