@@ -48,6 +48,10 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="cards\CardTests.cs" />
+    <Compile Include="cards\Chromosome.cs" />
+    <Compile Include="cards\Fitness.cs" />
+    <Compile Include="cards\Genetic.cs" />
     <Compile Include="enumerable\DateTimeFixture.cs" />
     <Compile Include="enumerable\PrimeFactorTests.cs" />
     <Compile Include="enumerable\PrimeTests.cs" />
@@ -56,6 +60,12 @@
     <Compile Include="lazy\MyLinkedList.cs" />
     <Compile Include="lazy\MyList.cs" />
     <Compile Include="lazy\PrimeTests.cs" />
+    <Compile Include="mapColors\Chromosome.cs" />
+    <Compile Include="mapColors\Genetic.cs" />
+    <Compile Include="mapColors\MapColorTests.cs" />
+    <Compile Include="mapColors\Prototype.cs" />
+    <Compile Include="mapColors\Rule.cs" />
+    <Compile Include="mapColors\State.cs" />
     <Compile Include="password\Chromosome.cs" />
     <Compile Include="password\Genetic.cs" />
     <Compile Include="password\PasswordGenerator.cs" />
@@ -74,6 +84,9 @@
     <Compile Include="yield\MyList.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="mapColors\adjacent_states.csv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup />
