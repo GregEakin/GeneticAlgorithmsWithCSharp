@@ -26,10 +26,10 @@ namespace PrimeTesting.cards
             {
                 case null:
                     return 1;
-                case Fitness other:
-                    return Duplicate != other.Duplicate
-                        ? -1 * Duplicate.CompareTo(other.Duplicate)
-                        : -1 * Difference.CompareTo(other.Difference);
+                case Fitness that:
+                    return Duplicate != that.Duplicate
+                        ? -1 * Duplicate.CompareTo(that.Duplicate)
+                        : -1 * Difference.CompareTo(that.Difference);
                 default:
                     throw new ArgumentException("Object is not a Fitness");
             }

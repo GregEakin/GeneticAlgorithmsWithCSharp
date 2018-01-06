@@ -1,14 +1,14 @@
 ﻿using System;
 
-namespace PrimeTesting.queens
+namespace PrimeTesting.magicSquare
 {
     public class Fitness : IComparable
     {
-        public int Total { get; }
+        private int SumOfDifferences { get; }
 
-        public Fitness(int total)
+        public Fitness(int sumOfDifferences)
         {
-            Total = total;
+            SumOfDifferences = sumOfDifferences;
         }
 
         public int CompareTo(object obj)
@@ -18,7 +18,7 @@ namespace PrimeTesting.queens
                 case null:
                     return 1;
                 case Fitness that:
-                    return -1 * Total.CompareTo(that.Total);
+                    return -1 * SumOfDifferences.CompareTo(that.SumOfDifferences);
                 default:
                     throw new ArgumentException("Object is not a Fitness");
             }
@@ -26,7 +26,7 @@ namespace PrimeTesting.queens
 
         public override string ToString()
         {
-            return Total.ToString();
+            return SumOfDifferences.ToString();
         }
     }
 }

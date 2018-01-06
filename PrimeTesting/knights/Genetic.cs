@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace PrimeTesting.cards
+namespace PrimeTesting.knights
 {
     public class Genetic<TGene, TFitness>
         where TGene : IComparable
@@ -13,6 +13,12 @@ namespace PrimeTesting.cards
         public delegate void DisplayFun(Chromosome<TGene, TFitness> child);
 
         public delegate void MutateFun(TGene[] genes);
+
+        public delegate Chromosome<TGene, TFitness> MutateDelegate(Chromosome<TGene, TFitness> parent);
+
+        public delegate Chromosome<TGene, TFitness> GenerateParentDelegate();
+
+        public delegate TGene[] CreateFun();
 
         private readonly Random _random = new Random();
 
@@ -60,10 +66,6 @@ namespace PrimeTesting.cards
             return new Chromosome<TGene, TFitness>(childGenes, fitness);
         }
 
-        public delegate Chromosome<TGene, TFitness> MutateDelegate(Chromosome<TGene, TFitness> parent);
-
-        public delegate Chromosome<TGene, TFitness> GenerateParentDelegate();
-
         public Chromosome<TGene, TFitness> BestFitness(FitnessFun fitnessFun, int targetLen, TFitness optimalFitness,
             TGene[] geneSet, DisplayFun displayFun)
         {
@@ -79,7 +81,7 @@ namespace PrimeTesting.cards
                     return improvement;
             }
 
-            throw new NotImplementedException();
+            throw new UnauthorizedAccessException();
         }
 
         public Chromosome<TGene, TFitness> BestFitness(FitnessFun fitnessFun, int targetLen, TFitness optimalFitness,
@@ -97,7 +99,29 @@ namespace PrimeTesting.cards
                     return improvement;
             }
 
-            throw new NotImplementedException();
+            throw new UnauthorizedAccessException();
+        }
+
+        public Chromosome<TGene, TFitness> BestFitness(FitnessFun fitnessFun, int targetLen, TFitness optimalFitness,
+            TGene[] geneSet, DisplayFun displayFun, MutateFun mutateFun, CreateFun createFun)
+        {
+            Chromosome<TGene, TFitness> MutateFn2(Chromosome<TGene, TFitness> parent1) =>
+                MutateCustom(parent1, mutateFun, fitnessFun);
+
+            Chromosome<TGene, TFitness> GenerateParentFn()
+            {
+                var genes = createFun();
+                return new Chromosome<TGene, TFitness>(genes, fitnessFun(genes, genes.Length));
+            }
+
+            foreach (var improvement in GetImprovement(MutateFn2, GenerateParentFn))
+            {
+                displayFun(improvement);
+                if (optimalFitness.CompareTo(improvement.Fitness) <= 0)
+                    return improvement;
+            }
+
+            throw new UnauthorizedAccessException();
         }
 
         public IEnumerable<Chromosome<TGene, TFitness>> GetImprovement(MutateDelegate mutate,
