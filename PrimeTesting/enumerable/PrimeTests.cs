@@ -14,10 +14,8 @@ namespace PrimeTesting.enumerable
 
         public static IEnumerable<int> Primes1()
         {
-            var ints = Enumerable.Range(2, int.MaxValue - 1);
-            return ints.Where(x => !ints
-                .TakeWhile(y => y < x)
-                .Any(y => x % y == 0));
+            var ints = Enumerable.Range(2, int.MaxValue - 10);
+            return ints.Where(x => ints.TakeWhile(y => y < x).All(y => x % y != 0));
         }
 
         [TestMethod]
@@ -29,10 +27,8 @@ namespace PrimeTesting.enumerable
 
         public static IEnumerable<int> Primes2()
         {
-            var ints = Enumerable.Range(2, int.MaxValue - 1);
-            return ints.Where(x => !ints
-                .TakeWhile(y => y <= Math.Sqrt(x))
-                .Any(y => x % y == 0));
+            var ints = Enumerable.Range(2, int.MaxValue - 10);
+            return ints.Where(x => ints.TakeWhile(y => y <= Math.Sqrt(x)).All(y => x % y != 0));
         }
 
         [TestMethod]
@@ -44,13 +40,11 @@ namespace PrimeTesting.enumerable
 
         public static IEnumerable<int> Primes3()
         {
-            var ints = Enumerable.Range(2, int.MaxValue - 1);
+            var ints = Enumerable.Range(2, int.MaxValue - 10);
             return ints.Where(x =>
             {
                 var sqrt = Math.Sqrt(x);
-                return !ints
-                    .TakeWhile(y => y <= sqrt)
-                    .Any(y => x % y == 0);
+                return ints.TakeWhile(y => y <= sqrt).All(y => x % y != 0);
             });
         }
 

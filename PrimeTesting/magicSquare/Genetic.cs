@@ -8,6 +8,14 @@ namespace PrimeTesting.magicSquare
         where TGene : IComparable
         where TFitness : IComparable
     {
+        public class ReverseComparer<T> : IComparer<T>
+        {
+            public int Compare(T x, T y)
+            {
+                return Comparer<T>.Default.Compare(y, x);
+            }
+        }
+
         public delegate TFitness FitnessFun(TGene[] gene);
 
         public delegate void DisplayFun(Chromosome<TGene, TFitness> child);
@@ -183,11 +191,12 @@ namespace PrimeTesting.magicSquare
                     if (maxAge > parent.Age)
                         continue;
 
-                    var index = historicalFitnesses.BinarySearch(child.Fitness);
+                    var index = historicalFitnesses.BinarySearch(child.Fitness, new ReverseComparer<TFitness>());
                     if (index < 0) index = ~index;
                     var difference = historicalFitnesses.Count - index;
-                    var proportionSimilar = difference / historicalFitnesses.Count;
-                    if (_random.NextDouble() < Math.Exp(-proportionSimilar))
+                    var proportionSimilar = (double)difference / historicalFitnesses.Count;
+                    var exp = Math.Exp(-proportionSimilar);
+                    if (_random.NextDouble() < exp)
                     {
                         parent = child;
                         continue;

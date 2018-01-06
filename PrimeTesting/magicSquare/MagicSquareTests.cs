@@ -37,8 +37,6 @@ namespace PrimeTesting.magicSquare
 
         public static Tuple<int[], int[], int, int> Sums(int[] genes, int diagonalSize)
         {
-            //            var rows = Enumerable.Range(0, diagonalSize).ToArray();
-            //            var columns = Enumerable.Range(0, diagonalSize).ToArray();
             var rows = new int[diagonalSize];
             var columns = new int[diagonalSize];
             var northeastDiagonalSum = 0;
@@ -128,5 +126,55 @@ namespace PrimeTesting.magicSquare
             Generate(10, 5000);
         }
 
+        [TestMethod]
+        public void SimulatedAnnealingSearchTestOdd()
+        {
+            var historicalFitnesses = Enumerable.Range(0, 26).Select(n => 50 - 2 * n).ToArray();
+            var index = Array.BinarySearch(historicalFitnesses, 13, new Genetic<int, int>.ReverseComparer<int>());
+            if (index < 0) index = ~index;
+            Assert.AreEqual(19, index);
+        }
+
+        [TestMethod]
+        public void SimulatedAnnealingSearchTestEven()
+        {
+            var historicalFitnesses = Enumerable.Range(0, 26).Select(n => 50 - 2 * n).ToArray();
+            var index = Array.BinarySearch(historicalFitnesses, 12, new Genetic<int, int>.ReverseComparer<int>());
+            if (index < 0) index = ~index;
+            Assert.AreEqual(19, index);
+        }
+
+        public Tuple<int, double, double> SimulatedAnnealingExp(int value)
+        {
+            var historicalFitnesses = Enumerable.Range(0, 51).Select(n => 50 - n).ToList();
+            var index = historicalFitnesses.BinarySearch(value, new Genetic<int, int>.ReverseComparer<int>());
+            if (index < 0) index = ~index;
+            var difference = historicalFitnesses.Count - index;
+            var proportionSimilar = (double) difference / historicalFitnesses.Count;
+            var exp = Math.Exp(-proportionSimilar);
+            return new Tuple<int, double, double>(index, proportionSimilar, exp);
+        }
+
+        [TestMethod]
+        public void SimulatedAnnealingExpTest()
+        {
+            var samples = new[]
+            {
+                new Tuple<int, int, double, double>(0, 50, 0.02, 0.98),
+                new Tuple<int, int, double, double>(5, 45, 0.12, 0.89),
+                new Tuple<int, int, double, double>(10, 40, 0.22, 0.81),
+                new Tuple<int, int, double, double>(40, 10, 0.80, 0.45),
+                new Tuple<int, int, double, double>(45, 5, 0.90, 0.41),
+                new Tuple<int, int, double, double>(50, 0, 1.00, 0.37),
+            };
+
+            foreach (var sample in samples)
+            {
+                var result = SimulatedAnnealingExp(sample.Item1);
+                Assert.AreEqual(sample.Item2, result.Item1);
+                Assert.AreEqual(sample.Item3, result.Item2, 0.01);
+                Assert.AreEqual(sample.Item4, result.Item3, 0.01);
+            }
+        }
     }
 }

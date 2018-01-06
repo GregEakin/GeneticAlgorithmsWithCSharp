@@ -79,7 +79,7 @@ namespace PrimeTesting.cards
                     return improvement;
             }
 
-            throw new NotImplementedException();
+            throw new UnauthorizedAccessException();
         }
 
         public Chromosome<TGene, TFitness> BestFitness(FitnessFun fitnessFun, int targetLen, TFitness optimalFitness,
@@ -97,7 +97,7 @@ namespace PrimeTesting.cards
                     return improvement;
             }
 
-            throw new NotImplementedException();
+            throw new UnauthorizedAccessException();
         }
 
         public IEnumerable<Chromosome<TGene, TFitness>> GetImprovement(MutateDelegate mutate,
