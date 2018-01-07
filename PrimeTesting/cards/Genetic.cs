@@ -12,7 +12,7 @@ namespace PrimeTesting.cards
 
         public delegate void DisplayFun(Chromosome<TGene, TFitness> child);
 
-        public delegate void MutateFun(TGene[] genes);
+        public delegate TGene[] MutateFun(TGene[] genes);
 
         private readonly Random _random = new Random();
 

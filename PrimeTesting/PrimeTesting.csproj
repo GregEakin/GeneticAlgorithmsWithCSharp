@@ -74,6 +74,9 @@
     <Compile Include="lazy\MyLinkedList.cs" />
     <Compile Include="lazy\MyList.cs" />
     <Compile Include="lazy\PrimeTests.cs" />
+    <Compile Include="linearEquation\Chromosome.cs" />
+    <Compile Include="linearEquation\Fitness.cs" />
+    <Compile Include="linearEquation\Genetic.cs" />
     <Compile Include="magicSquare\Chromosome.cs" />
     <Compile Include="magicSquare\Fitness.cs" />
     <Compile Include="magicSquare\Genetic.cs" />

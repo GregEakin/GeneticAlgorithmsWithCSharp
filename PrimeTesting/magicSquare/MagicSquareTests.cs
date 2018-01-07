@@ -57,14 +57,17 @@ namespace PrimeTesting.magicSquare
             return new Tuple<int[], int[], int, int>(rows, columns, northeastDiagonalSum, southeastDiagonalSum);
         }
 
-        public static void Mutate(int[] genes, int[] allPositions)
+        public static int[] Mutate(int[] input, int[] allPositions)
         {
+            var genes = new int[input.Length];
+            Array.Copy(input, genes, input.Length);
             var randomSample = RandomSample(allPositions, 2);
             var indexA = randomSample[0];
             var indexB = randomSample[1];
             var temp = genes[indexA];
             genes[indexA] = genes[indexB];
             genes[indexB] = temp;
+            return genes;
         }
 
         public static int[] RandomSample(int[] geneSet, int length)
@@ -92,7 +95,7 @@ namespace PrimeTesting.magicSquare
 
             Fitness FitnessFun(int[] genes) => Fitness(genes, diagonalSize, expectedSum);
             void DisplayFun(Chromosome<int, Fitness> candidate) => Display(candidate, watch, diagonalSize);
-            void MutateFun(int[] genes) => Mutate(genes, geneIndexes);
+            int[] MutateFun(int[] genes) => Mutate(genes, geneIndexes);
             int[] CreateFun() => geneSet.OrderBy(i => Random.Next(geneSet.Length)).ToArray();
 
             var optimalValue = new Fitness(0);

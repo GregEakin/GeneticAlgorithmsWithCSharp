@@ -12,7 +12,7 @@ namespace PrimeTesting.knights
 
         public delegate void DisplayFun(Chromosome<TGene, TFitness> child);
 
-        public delegate void MutateFun(TGene[] genes);
+        public delegate TGene[] MutateFun(TGene[] genes);
 
         public delegate Chromosome<TGene, TFitness> MutateDelegate(Chromosome<TGene, TFitness> parent);
 

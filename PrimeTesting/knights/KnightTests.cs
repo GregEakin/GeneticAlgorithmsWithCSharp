@@ -40,9 +40,11 @@ namespace PrimeTesting.knights
                 watch.ElapsedMilliseconds);
         }
 
-        public static void Mutate(Position[] genes, int width, int height, Position[] allPositions,
+        public static Position[] Mutate(Position[] input, int width, int height, Position[] allPositions,
             Position[] nonEdgePositions)
         {
+            var genes = new Position[input.Length];
+            Array.Copy(input, genes, input.Length);
             var loops = Random.Next(10) == 0 ? 2 : 1;
             for (var count = 0; count < loops; count++)
             {
@@ -80,6 +82,8 @@ namespace PrimeTesting.knights
                 var position1 = potentialKnightPositions[Random.Next(potentialKnightPositions.Length)];
                 genes[geneIndex] = position1;
             }
+
+            return genes;
         }
 
         public delegate Position RandomPosition();
@@ -203,10 +207,10 @@ namespace PrimeTesting.knights
 
             int FitnessFun(Position[] genes, int size) => Fitness(genes, width, height);
             void DisplayFun(Chromosome<Position, int> candidate) => Display(candidate, watch, width, height);
-            void MutateFun(Position[] genes) => Mutate(genes, width, height, allPositions, nonEdgePositions);
+            Position[] MutateFun(Position[] genes) => Mutate(genes, width, height, allPositions, nonEdgePositions);
             Position RandomPositionFun() => nonEdgePositions[Random.Next(nonEdgePositions.Count())];
             Position[] CreateFun() => Create(RandomPositionFun, expectedKnights);
-            
+
 
             var optimalFitness = width * height;
             watch.Start();

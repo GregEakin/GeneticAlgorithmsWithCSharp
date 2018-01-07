@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace PrimeTesting.magicSquare
+namespace PrimeTesting.linearEquation
 {
     public class Genetic<TGene, TFitness>
         where TGene : IComparable
@@ -69,9 +69,9 @@ namespace PrimeTesting.magicSquare
         {
             var childGenes = new TGene[parent.Genes.Length];
             Array.Copy(parent.Genes, childGenes, parent.Genes.Length);
-            mutateFun(childGenes);
-            var fitness = fitnessFun(childGenes);
-            return new Chromosome<TGene, TFitness>(childGenes, fitness);
+            var genese = mutateFun(childGenes);
+            var fitness = fitnessFun(genese);
+            return new Chromosome<TGene, TFitness>(genese, fitness);
         }
 
         public Chromosome<TGene, TFitness> BestFitness(FitnessFun fitnessFun, int targetLen, TFitness optimalFitness,

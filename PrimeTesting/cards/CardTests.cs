@@ -27,8 +27,10 @@ namespace PrimeTesting.cards
                 candidate.Fitness, watch.ElapsedMilliseconds);
         }
 
-        public static void Mutate(int[] genes, int[] geneSet, Genetic<int, Fitness> genetic)
+        public static int[] Mutate(int[] input, int[] geneSet, Genetic<int, Fitness> genetic)
         {
+            var genes = new int[input.Length];
+            Array.Copy(input, genes, input.Length);
             var duplicate = genes.Length - new HashSet<int>(genes).Count;
             if (duplicate == 0)
             {
@@ -49,6 +51,8 @@ namespace PrimeTesting.cards
                 var indexB = Random.Next(geneSet.Length);
                 genes[indexA] = geneSet[indexB];
             }
+
+            return genes;
         }
 
         [TestMethod]
@@ -80,7 +84,7 @@ namespace PrimeTesting.cards
             var watch = new Stopwatch();
 
             void DisplayFun(Chromosome<int, Fitness> candidate) => Display(candidate, watch);
-            void MutateFun(int[] genes) => Mutate(genes, geneSet, genetic);
+            int[] MutateFun(int[] genes) => Mutate(genes, geneSet, genetic);
 
             var optimalFitness = new Fitness(36, 360, 0);
             watch.Start();
