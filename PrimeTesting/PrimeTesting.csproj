@@ -89,7 +89,7 @@
     <Compile Include="mapColors\State.cs" />
     <Compile Include="password\Chromosome.cs" />
     <Compile Include="password\Genetic.cs" />
-    <Compile Include="password\PasswordGenerator.cs" />
+    <Compile Include="password\PasswordGeneratorTests.cs" />
     <Compile Include="queens\Board.cs" />
     <Compile Include="queens\Chromosome.cs" />
     <Compile Include="queens\Fitness.cs" />

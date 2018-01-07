@@ -5,7 +5,7 @@ using System.Diagnostics;
 namespace PrimeTesting.password
 {
     [TestClass]
-    public class PasswordGenerator
+    public class PasswordGeneratorTests
     {
         public const string GeneSet = " abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!.,";
 
@@ -80,7 +80,7 @@ namespace PrimeTesting.password
         public void GenerateParentTest()
         {
             const string target = "Hello World!";
-            int Fitness(string guess) => PasswordGenerator.Fitness(target, guess);
+            int Fitness(string guess) => PasswordGeneratorTests.Fitness(target, guess);
             var parent = Genetic.GenerateParent(GeneSet, 10, Fitness);
             Console.WriteLine("{0} : {1}", parent.Fitness, parent.Genes);
         }
