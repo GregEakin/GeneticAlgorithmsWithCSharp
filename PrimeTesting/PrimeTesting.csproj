@@ -55,6 +55,15 @@
     <Compile Include="enumerable\DateTimeFixture.cs" />
     <Compile Include="enumerable\PrimeFactorTests.cs" />
     <Compile Include="enumerable\PrimeTests.cs" />
+    <Compile Include="knapsack\Chromosome.cs" />
+    <Compile Include="knapsack\Fitness.cs" />
+    <Compile Include="knapsack\Genetic.cs" />
+    <Compile Include="knapsack\ItemQuantity.cs" />
+    <Compile Include="knapsack\KnapsackProblemData.cs" />
+    <Compile Include="knapsack\KnapsackProblemDataParser.cs" />
+    <Compile Include="knapsack\KnapsackTests.cs" />
+    <Compile Include="knapsack\Resource.cs" />
+    <Compile Include="knapsack\Window.cs" />
     <Compile Include="knights\Board.cs" />
     <Compile Include="knights\Chromosome.cs" />
     <Compile Include="knights\Genetic.cs" />
@@ -96,7 +105,9 @@
     <Content Include="mapColors\adjacent_states.csv">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <None Include="Data\exnsd16.ukp" />
     <None Include="packages.config" />
+    <None Include="Readme.md" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets" Condition="Exists('$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets')" />
