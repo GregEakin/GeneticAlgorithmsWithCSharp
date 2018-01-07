@@ -77,6 +77,8 @@
     <Compile Include="linearEquation\Chromosome.cs" />
     <Compile Include="linearEquation\Fitness.cs" />
     <Compile Include="linearEquation\Genetic.cs" />
+    <Compile Include="linearEquation\LinearEquationTests.cs" />
+    <Compile Include="linearEquation\Window.cs" />
     <Compile Include="magicSquare\Chromosome.cs" />
     <Compile Include="magicSquare\Fitness.cs" />
     <Compile Include="magicSquare\Genetic.cs" />

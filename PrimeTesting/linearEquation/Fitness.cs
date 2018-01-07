@@ -4,17 +4,11 @@ namespace PrimeTesting.linearEquation
 {
     public class Fitness : IComparable
     {
-        public double TotalWeight { get; }
+        public double TotalDifference { get; }
 
-        public double TotalVolume { get; }
-
-        public int TotalValue { get; }
-
-        public Fitness(double totalWeight, double totalVolume, int totalValue)
+        public Fitness(double totalDifference)
         {
-            TotalWeight = totalWeight;
-            TotalVolume = totalVolume;
-            TotalValue = totalValue;
+            TotalDifference = totalDifference;
         }
 
         public int CompareTo(object obj)
@@ -24,7 +18,7 @@ namespace PrimeTesting.linearEquation
                 case null:
                     return 1;
                 case Fitness that:
-                    return TotalValue.CompareTo(that.TotalValue);
+                    return -1 * TotalDifference.CompareTo(that.TotalDifference);
                 default:
                     throw new ArgumentException("Object is not a Fitness");
             }
@@ -32,7 +26,7 @@ namespace PrimeTesting.linearEquation
 
         public override string ToString()
         {
-            return $"wt: {TotalWeight} vol: {TotalVolume} value {TotalValue}";
+            return $"diff: {TotalDifference:F2}";
         }
     }
 }
