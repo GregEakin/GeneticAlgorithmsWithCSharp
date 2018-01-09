@@ -76,6 +76,8 @@
     <Compile Include="lazy\PrimeTests.cs" />
     <Compile Include="linearEquation\Chromosome.cs" />
     <Compile Include="linearEquation\Fitness.cs" />
+    <Compile Include="linearEquation\Fraction.cs" />
+    <Compile Include="linearEquation\FractionTests.cs" />
     <Compile Include="linearEquation\Genetic.cs" />
     <Compile Include="linearEquation\LinearEquationTests.cs" />
     <Compile Include="linearEquation\Window.cs" />
@@ -100,6 +102,9 @@
     <Compile Include="sortedNumbers\Chromosome.cs" />
     <Compile Include="sortedNumbers\Genetic.cs" />
     <Compile Include="sortedNumbers\SortedNumbersTests.cs" />
+    <Compile Include="sudoku\Chromosome.cs" />
+    <Compile Include="sudoku\Genetic.cs" />
+    <Compile Include="sudoku\SudokuTests.cs" />
     <Compile Include="UnitTest1.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="yield\EmptyList.cs" />

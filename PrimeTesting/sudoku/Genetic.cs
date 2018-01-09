@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace PrimeTesting.linearEquation
+namespace PrimeTesting.sudoku
 {
     public class Genetic<TGene, TFitness>
         where TGene : IComparable

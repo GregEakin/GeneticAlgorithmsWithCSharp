@@ -67,11 +67,9 @@ namespace PrimeTesting.knapsack
         public Chromosome<TGene, TFitness> MutateCustom(Chromosome<TGene, TFitness> parent, MutateFun mutateFun,
             FitnessFun fitnessFun)
         {
-            var childGenes = new TGene[parent.Genes.Length];
-            Array.Copy(parent.Genes, childGenes, parent.Genes.Length);
-            var genese = mutateFun(childGenes);
-            var fitness = fitnessFun(genese);
-            return new Chromosome<TGene, TFitness>(genese, fitness);
+            var childGenes = mutateFun(parent.Genes);
+            var fitness = fitnessFun(childGenes);
+            return new Chromosome<TGene, TFitness>(childGenes, fitness);
         }
 
         public Chromosome<TGene, TFitness> BestFitness(FitnessFun fitnessFun, int targetLen, TFitness optimalFitness,
@@ -135,7 +133,8 @@ namespace PrimeTesting.knapsack
         internal Chromosome<TGene, TFitness> BestFitness(FitnessFun fitnessFun, int nSquared, TFitness optimalValue,
             TGene[] geneSet, DisplayFun displayFun, MutateFun mutateFun, CreateFun createFun, int maxAge)
         {
-            Chromosome<TGene, TFitness> FnMutate(Chromosome<TGene, TFitness> parent) => MutateCustom(parent, mutateFun, fitnessFun);
+            Chromosome<TGene, TFitness> FnMutate(Chromosome<TGene, TFitness> parent) =>
+                MutateCustom(parent, mutateFun, fitnessFun);
 
             Chromosome<TGene, TFitness> FnGenerateParent()
             {
@@ -194,7 +193,7 @@ namespace PrimeTesting.knapsack
                     var index = historicalFitnesses.BinarySearch(child.Fitness, new ReverseComparer<TFitness>());
                     if (index < 0) index = ~index;
                     var difference = historicalFitnesses.Count - index;
-                    var proportionSimilar = (double)difference / historicalFitnesses.Count;
+                    var proportionSimilar = (double) difference / historicalFitnesses.Count;
                     var exp = Math.Exp(-proportionSimilar);
                     if (_random.NextDouble() < exp)
                     {

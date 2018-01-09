@@ -53,9 +53,7 @@ namespace PrimeTesting.cards
         public Chromosome<TGene, TFitness> MutateCustom(Chromosome<TGene, TFitness> parent, MutateFun mutateFun,
             FitnessFun fitnessFun)
         {
-            var childGenes = new TGene[parent.Genes.Length];
-            Array.Copy(parent.Genes, childGenes, parent.Genes.Length);
-            mutateFun(childGenes);
+            var childGenes = mutateFun(parent.Genes);
             var fitness = fitnessFun(childGenes, childGenes.Length);
             return new Chromosome<TGene, TFitness>(childGenes, fitness);
         }

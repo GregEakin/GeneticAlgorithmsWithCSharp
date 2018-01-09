@@ -24,7 +24,7 @@ namespace PrimeTesting.knapsack
                 case null:
                     return 1;
                 case Fitness that:
-                    return TotalValue.CompareTo(that.TotalValue);
+                    return -1 * TotalValue.CompareTo(that.TotalValue);
                 default:
                     throw new ArgumentException("Object is not a Fitness");
             }

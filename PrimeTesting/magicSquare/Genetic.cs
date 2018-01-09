@@ -55,7 +55,7 @@ namespace PrimeTesting.magicSquare
         {
             var childGenes = new TGene[parent.Genes.Length];
             Array.Copy(parent.Genes, childGenes, parent.Genes.Length);
-            var index = _random.Next(parent.Genes.Length);
+            var index = _random.Next(childGenes.Length);
             var randomSample = RandomSample(geneSet, 2);
             var newGene = randomSample[0];
             var alternate = randomSample[1];
@@ -67,9 +67,7 @@ namespace PrimeTesting.magicSquare
         public Chromosome<TGene, TFitness> MutateCustom(Chromosome<TGene, TFitness> parent, MutateFun mutateFun,
             FitnessFun fitnessFun)
         {
-            var childGenes = new TGene[parent.Genes.Length];
-            Array.Copy(parent.Genes, childGenes, parent.Genes.Length);
-            mutateFun(childGenes);
+            var childGenes = mutateFun(parent.Genes);
             var fitness = fitnessFun(childGenes);
             return new Chromosome<TGene, TFitness>(childGenes, fitness);
         }

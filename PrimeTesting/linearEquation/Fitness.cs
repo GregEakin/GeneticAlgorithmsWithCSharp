@@ -4,9 +4,9 @@ namespace PrimeTesting.linearEquation
 {
     public class Fitness : IComparable
     {
-        public double TotalDifference { get; }
+        public Fraction TotalDifference { get; }
 
-        public Fitness(double totalDifference)
+        public Fitness(Fraction totalDifference)
         {
             TotalDifference = totalDifference;
         }
@@ -27,6 +27,11 @@ namespace PrimeTesting.linearEquation
         public override string ToString()
         {
             return $"diff: {TotalDifference:F2}";
+        }
+
+        public static explicit operator double(Fitness v)
+        {
+            throw new NotImplementedException();
         }
     }
 }

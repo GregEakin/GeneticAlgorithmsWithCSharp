@@ -31,8 +31,8 @@ namespace PrimeTesting.cards
         {
             var genes = new int[input.Length];
             Array.Copy(input, genes, input.Length);
-            var duplicate = genes.Length - new HashSet<int>(genes).Count;
-            if (duplicate == 0)
+            var duplicates = genes.Length - new HashSet<int>(genes).Count;
+            if (duplicates == 0)
             {
                 var count = Random.Next(1, 4);
                 while (count-- > 0)
