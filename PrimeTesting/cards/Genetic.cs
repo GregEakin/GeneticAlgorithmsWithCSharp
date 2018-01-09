@@ -108,9 +108,9 @@ namespace PrimeTesting.cards
                 var child = mutate(bestParent);
                 if (bestParent.Fitness.CompareTo(child.Fitness) > 0)
                     continue;
-                if (child.Fitness.CompareTo(bestParent.Fitness) > 0)
-                    yield return child;
                 bestParent = child;
+                if (bestParent.Fitness.CompareTo(child.Fitness) < 0)
+                    yield return child;
             }
         }
     }

@@ -205,7 +205,7 @@ namespace PrimeTesting.knights
                     where 0 < p.X && p.X < width - 1 && 0 < p.Y && p.Y < height - 1
                     select p)).ToArray();
 
-            int FitnessFun(Position[] genes, int size) => Fitness(genes, width, height);
+            int FitnessFun(Position[] genes) => Fitness(genes, width, height);
             void DisplayFun(Chromosome<Position, int> candidate) => Display(candidate, watch, width, height);
             Position[] MutateFun(Position[] genes) => Mutate(genes, width, height, allPositions, nonEdgePositions);
             Position RandomPositionFun() => nonEdgePositions[Random.Next(nonEdgePositions.Count())];
