@@ -20,11 +20,11 @@ namespace PrimeTesting.sudoku
 
         public delegate void DisplayFun(Chromosome<TGene, TFitness> child);
 
-        public delegate TGene[] MutateFun(TGene[] genes);
+        public delegate TGene[] MutateGeneFun(TGene[] genes);
 
-        public delegate Chromosome<TGene, TFitness> MutateDelegate(Chromosome<TGene, TFitness> parent);
+        public delegate Chromosome<TGene, TFitness> MutateChromosomeFun(Chromosome<TGene, TFitness> parent);
 
-        public delegate Chromosome<TGene, TFitness> GenerateParentDelegate();
+        public delegate Chromosome<TGene, TFitness> GenerateParentFun();
 
         public delegate TGene[] CreateFun();
 
@@ -43,15 +43,16 @@ namespace PrimeTesting.sudoku
             return genes.ToArray();
         }
 
-        public Chromosome<TGene, TFitness> GenerateParent(int length, TGene[] geneSet, FitnessFun fitnessFun)
+        public Chromosome<TGene, TFitness> GenerateParent(int length, TGene[] geneSet, FitnessFun fitnessFun,
+            CreateFun createFun = null)
         {
-            var genes = RandomSample(geneSet, length);
+            var genes = createFun != null ? createFun() : RandomSample(geneSet, length);
             var fitness = fitnessFun(genes);
             var chromosome = new Chromosome<TGene, TFitness>(genes, fitness);
             return chromosome;
         }
 
-        public TGene[] RandomChildren(TGene[] parentGenes, TGene[] geneSet)
+        public TGene[] MutateGene(TGene[] parentGenes, TGene[] geneSet)
         {
             var childGenes = new TGene[parentGenes.Length];
             Array.Copy(parentGenes, childGenes, parentGenes.Length);
@@ -64,27 +65,22 @@ namespace PrimeTesting.sudoku
         }
 
         public Chromosome<TGene, TFitness> Mutate(Chromosome<TGene, TFitness> parent, FitnessFun fitnessFun,
-            TGene[] geneSet, MutateFun mutateFun)
+            TGene[] geneSet, MutateGeneFun mutateGeneFun)
         {
-            var genese = (mutateFun != null) ? mutateFun(parent.Genes) : RandomChildren(parent.Genes, geneSet);
+            var genese = (mutateGeneFun != null) ? mutateGeneFun(parent.Genes) : MutateGene(parent.Genes, geneSet);
             var fitness = fitnessFun(genese);
             return new Chromosome<TGene, TFitness>(genese, fitness);
         }
 
         internal Chromosome<TGene, TFitness> BestFitness(FitnessFun fitnessFun, int length, TFitness optimalFitness,
-            TGene[] geneSet, DisplayFun displayFun, MutateFun mutateFun = null, CreateFun createFun = null,
+            TGene[] geneSet, DisplayFun displayFun, MutateGeneFun mutateGeneFun = null, CreateFun createFun = null,
             int maxAge = 0)
         {
             Chromosome<TGene, TFitness> FnMutate(Chromosome<TGene, TFitness> parent) =>
-                Mutate(parent, fitnessFun, geneSet, mutateFun);
+                Mutate(parent, fitnessFun, geneSet, mutateGeneFun);
 
-            Chromosome<TGene, TFitness> FnGenerateParent()
-            {
-                var genes = createFun != null ? createFun() : RandomSample(geneSet, length);
-                var fitness = fitnessFun(genes);
-                var chromosome = new Chromosome<TGene, TFitness>(genes, fitness);
-                return chromosome;
-            }
+            Chromosome<TGene, TFitness> FnGenerateParent() =>
+                GenerateParent(length, geneSet, fitnessFun, createFun);
 
             foreach (var improvement in GetImprovement(FnMutate, FnGenerateParent, maxAge))
             {
@@ -96,17 +92,17 @@ namespace PrimeTesting.sudoku
             throw new UnauthorizedAccessException();
         }
 
-        public IEnumerable<Chromosome<TGene, TFitness>> GetImprovement(MutateDelegate mutateFun,
-            GenerateParentDelegate generateParent, int maxAge = 0)
+        public IEnumerable<Chromosome<TGene, TFitness>> GetImprovement(MutateChromosomeFun mutateChromosomeFun,
+            GenerateParentFun generateParentFun, int maxAge = 0)
         {
-            var bestParent = generateParent();
+            var bestParent = generateParentFun();
             var parent = bestParent;
             yield return bestParent;
 
             var historicalFitnesses = new List<TFitness> {bestParent.Fitness};
             while (true)
             {
-                var child = mutateFun(parent);
+                var child = mutateChromosomeFun(parent);
                 if (parent.Fitness.CompareTo(child.Fitness) > 0)
                 {
                     if (maxAge <= 0)
