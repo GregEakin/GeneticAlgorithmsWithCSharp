@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace PrimeTesting.yield
+namespace PrimeTesting.primes.yield
 {
     public class LazyList<T> : IMyList<T>
     {

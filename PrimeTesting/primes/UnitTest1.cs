@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace PrimeTesting
+namespace PrimeTesting.primes
 {
     [TestClass]
     public class UnitTest1

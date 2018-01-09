@@ -1,7 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 
-namespace PrimeTesting.lazy
+namespace PrimeTesting.primes.lazy
 {
     [TestClass]
     public class PrimeTests

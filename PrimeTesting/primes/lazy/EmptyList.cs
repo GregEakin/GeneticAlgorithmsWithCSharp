@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace PrimeTesting.lazy
+namespace PrimeTesting.primes.lazy
 {
     public class EmptyList<T> : IMyList<T>
     {

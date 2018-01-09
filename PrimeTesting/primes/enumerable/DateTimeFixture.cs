@@ -1,7 +1,7 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace PrimeTesting.enumerable
+namespace PrimeTesting.primes.enumerable
 {
     public interface ISystemService
     {

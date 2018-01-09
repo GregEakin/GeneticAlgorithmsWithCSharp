@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace PrimeTesting.enumerable
+namespace PrimeTesting.primes.enumerable
 {
     [TestClass]
     public class PrimeFactorTests

@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace PrimeTesting.enumerable
+namespace PrimeTesting.primes.enumerable
 {
     // https://handcraftsman.wordpress.com/2010/09/02/ienumerable-of-prime-numbers-in-csharp/
     [TestClass]
