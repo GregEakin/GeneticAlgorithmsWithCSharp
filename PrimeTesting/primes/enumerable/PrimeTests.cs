@@ -127,7 +127,6 @@ namespace PrimeTesting.enumerable
             CollectionAssert.AreEqual(Primes, Primes6().Take(Primes.Length).ToList());
         }
 
-
         public static IEnumerable<int> Primes7()
         {
             return PotentialPrimes7().Where(x =>
@@ -157,7 +156,6 @@ namespace PrimeTesting.enumerable
         {
             CollectionAssert.AreEqual(Primes, Primes7().Take(Primes.Length).ToList());
         }
-
 
         public static IEnumerable<int> Primes8()
         {

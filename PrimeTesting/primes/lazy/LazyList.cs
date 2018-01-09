@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace PrimeTesting.yield
+namespace PrimeTesting.lazy
 {
     public class LazyList<T> : IMyList<T>
     {

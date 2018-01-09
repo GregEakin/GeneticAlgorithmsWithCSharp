@@ -13,7 +13,9 @@ namespace PrimeTesting.sudoku
 
         public static int Fitness(int[] genes, Rule[] validationRules)
         {
-            return 0;
+//            firstFailingRule = next(rule for rule in validationRules 
+//              if genes[rule.Index] == genes[rule.OtherIndex])
+                    return 100;
         }
 
         public static void Display(Chromosome<int, int> candidate, Stopwatch watch)
@@ -27,7 +29,7 @@ namespace PrimeTesting.sudoku
                     Console.WriteLine(" ----- + ----- + -----");
             }
 
-            Console.WriteLine(" - = -   - = -   - = - {0}\t{1} ms", candidate.Fitness, watch.ElapsedMilliseconds);
+            Console.WriteLine(" - = -   - = -   - = - \t{0}\t{1} ms", candidate.Fitness, watch.ElapsedMilliseconds);
             Console.WriteLine();
         }
 
@@ -90,11 +92,13 @@ namespace PrimeTesting.sudoku
             var geneSet = Enumerable.Range(1, 9).ToArray();
             var genes = RandomSample(geneSet, 81);
             var validationRules = BuildValidationRules();
+            var fitness = Fitness(genes, validationRules);
 
-            Display(new Chromosome<int, int>(genes, 0), watch);
+            Display(new Chromosome<int, int>(genes, fitness), watch);
             var child = Mutate(genes, validationRules);
 
-            Display(new Chromosome<int, int>(child, 0), watch);
+            var fitness2 = Fitness(child, validationRules);
+            Display(new Chromosome<int, int>(child, fitness2), watch);
             CollectionAssert.AreNotEqual(genes, child);
         }
 

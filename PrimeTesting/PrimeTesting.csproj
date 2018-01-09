@@ -52,9 +52,9 @@
     <Compile Include="cards\Chromosome.cs" />
     <Compile Include="cards\Fitness.cs" />
     <Compile Include="cards\Genetic.cs" />
-    <Compile Include="enumerable\DateTimeFixture.cs" />
-    <Compile Include="enumerable\PrimeFactorTests.cs" />
-    <Compile Include="enumerable\PrimeTests.cs" />
+    <Compile Include="primes\enumerable\DateTimeFixture.cs" />
+    <Compile Include="primes\enumerable\PrimeFactorTests.cs" />
+    <Compile Include="primes\enumerable\PrimeTests.cs" />
     <Compile Include="knapsack\Chromosome.cs" />
     <Compile Include="knapsack\Fitness.cs" />
     <Compile Include="knapsack\Genetic.cs" />
@@ -69,11 +69,11 @@
     <Compile Include="knights\Genetic.cs" />
     <Compile Include="knights\KnightTests.cs" />
     <Compile Include="knights\Position.cs" />
-    <Compile Include="lazy\EmptyList.cs" />
-    <Compile Include="lazy\LazyList.cs" />
-    <Compile Include="lazy\MyLinkedList.cs" />
-    <Compile Include="lazy\MyList.cs" />
-    <Compile Include="lazy\PrimeTests.cs" />
+    <Compile Include="primes\lazy\EmptyList.cs" />
+    <Compile Include="primes\lazy\LazyList.cs" />
+    <Compile Include="primes\lazy\MyLinkedList.cs" />
+    <Compile Include="primes\lazy\MyList.cs" />
+    <Compile Include="primes\lazy\PrimeTests.cs" />
     <Compile Include="linearEquation\Chromosome.cs" />
     <Compile Include="linearEquation\Fitness.cs" />
     <Compile Include="linearEquation\Fraction.cs" />
@@ -105,11 +105,11 @@
     <Compile Include="sudoku\Chromosome.cs" />
     <Compile Include="sudoku\Genetic.cs" />
     <Compile Include="sudoku\SudokuTests.cs" />
-    <Compile Include="UnitTest1.cs" />
+    <Compile Include="primes\UnitTest1.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="yield\EmptyList.cs" />
-    <Compile Include="yield\LazyList.cs" />
-    <Compile Include="yield\MyList.cs" />
+    <Compile Include="primes\yield\EmptyList.cs" />
+    <Compile Include="primes\yield\LazyList.cs" />
+    <Compile Include="primes\yield\MyList.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="mapColors\adjacent_states.csv">
@@ -119,7 +119,15 @@
     <None Include="packages.config" />
     <None Include="Readme.md" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="approximatingPi\" />
+    <Folder Include="equationGeneration\" />
+    <Folder Include="lawnmowerProblem\" />
+    <Folder Include="logicCircuits\" />
+    <Folder Include="regularExpressions\" />
+    <Folder Include="ticTacToe\" />
+    <Folder Include="travelingSalesmanProblem\" />
+  </ItemGroup>
   <Import Project="$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets" Condition="Exists('$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets')" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
