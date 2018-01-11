@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace GeneticAlgorithms.cards
+namespace GeneticAlgorithms.Cards
 {
     [TestClass]
     public class CardTests

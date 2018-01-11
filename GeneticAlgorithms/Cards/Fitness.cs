@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace GeneticAlgorithms.cards
+namespace GeneticAlgorithms.Cards
 {
     public class Fitness : IComparable
     {

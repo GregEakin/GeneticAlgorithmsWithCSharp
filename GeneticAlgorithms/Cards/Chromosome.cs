@@ -1,4 +1,4 @@
-﻿namespace GeneticAlgorithms.cards
+﻿namespace GeneticAlgorithms.Cards
 {
     public class Chromosome<TGene, TFitness>
     {
