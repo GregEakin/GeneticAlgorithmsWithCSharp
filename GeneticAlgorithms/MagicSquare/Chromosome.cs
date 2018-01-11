@@ -1,4 +1,4 @@
-﻿namespace GeneticAlgorithms.magicSquare
+﻿namespace GeneticAlgorithms.MagicSquare
 {
     public class Chromosome<TGene, TFitness>
     {

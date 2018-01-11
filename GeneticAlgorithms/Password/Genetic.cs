@@ -2,7 +2,7 @@
 using System.Diagnostics;
 using System.Linq;
 
-namespace GeneticAlgorithms.password
+namespace GeneticAlgorithms.Password
 {
     public static class Genetic
     {

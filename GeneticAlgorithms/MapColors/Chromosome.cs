@@ -1,4 +1,4 @@
-﻿namespace GeneticAlgorithms.mapColors
+﻿namespace GeneticAlgorithms.MapColors
 {
     public class Chromosome<TGene, TFitness>
     {

@@ -1,4 +1,4 @@
-﻿namespace GeneticAlgorithms.sudoku
+﻿namespace GeneticAlgorithms.Sudoku
 {
     public class Chromosome<TGene, TFitness>
     {

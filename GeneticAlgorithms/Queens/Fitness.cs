@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace GeneticAlgorithms.queens
+namespace GeneticAlgorithms.Queens
 {
     public class Fitness : IComparable
     {

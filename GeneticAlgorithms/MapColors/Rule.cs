@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace GeneticAlgorithms.mapColors
+namespace GeneticAlgorithms.MapColors
 {
     public class Rule : IComparable
     {

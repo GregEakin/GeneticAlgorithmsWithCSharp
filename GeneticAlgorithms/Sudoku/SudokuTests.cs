@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace GeneticAlgorithms.sudoku
+namespace GeneticAlgorithms.Sudoku
 {
     [TestClass]
     public class SudokuTests

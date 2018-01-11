@@ -2,7 +2,7 @@
 using System;
 using System.Diagnostics;
 
-namespace GeneticAlgorithms.password
+namespace GeneticAlgorithms.Password
 {
     [TestClass]
     public class PasswordGeneratorTests

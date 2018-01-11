@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace GeneticAlgorithms.mapColors
+namespace GeneticAlgorithms.MapColors
 {
     public class State : IComparable
     {

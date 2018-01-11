@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Text;
 
-namespace GeneticAlgorithms.knights
+namespace GeneticAlgorithms.Knights
 {
     public class Board
     {

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace GeneticAlgorithms.travelingSalesmanProblem
+namespace GeneticAlgorithms.TravelingSalesmanProblem
 {
     public class Genetic<TGene, TFitness>
         where TGene : IComparable

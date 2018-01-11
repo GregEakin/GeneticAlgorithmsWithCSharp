@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Text;
 
-namespace GeneticAlgorithms.queens
+namespace GeneticAlgorithms.Queens
 {
     public class Board
     {

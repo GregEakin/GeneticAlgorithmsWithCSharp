@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace GeneticAlgorithms.mapColors
+namespace GeneticAlgorithms.MapColors
 {
     [TestClass]
     public class Prototype

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace GeneticAlgorithms.magicSquare
+namespace GeneticAlgorithms.MagicSquare
 {
     public class Fitness : IComparable
     {

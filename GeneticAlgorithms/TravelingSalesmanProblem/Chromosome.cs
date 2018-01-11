@@ -1,4 +1,4 @@
-﻿namespace GeneticAlgorithms.travelingSalesmanProblem
+﻿namespace GeneticAlgorithms.TravelingSalesmanProblem
 {
     public class Chromosome<TGene, TFitness>
     {

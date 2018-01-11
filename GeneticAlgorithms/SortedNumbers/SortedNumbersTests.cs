@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace GeneticAlgorithms.sortedNumbers
+namespace GeneticAlgorithms.SortedNumbers
 {
     [TestClass]
     public class SortedNumbersTests

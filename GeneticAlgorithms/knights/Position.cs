@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace GeneticAlgorithms.knights
+namespace GeneticAlgorithms.Knights
 {
     public class Position : IComparable
     {

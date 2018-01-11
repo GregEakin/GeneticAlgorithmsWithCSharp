@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 
-namespace GeneticAlgorithms.magicSquare
+namespace GeneticAlgorithms.MagicSquare
 {
     [TestClass]
     public class MagicSquareTests

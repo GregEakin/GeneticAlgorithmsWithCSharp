@@ -1,4 +1,4 @@
-﻿namespace GeneticAlgorithms.sortedNumbers
+﻿namespace GeneticAlgorithms.SortedNumbers
 {
     public class Chromosome<TGene, TFitness>
     {

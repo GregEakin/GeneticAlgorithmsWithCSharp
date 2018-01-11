@@ -1,4 +1,4 @@
-﻿namespace GeneticAlgorithms.queens
+﻿namespace GeneticAlgorithms.Queens
 {
     public class Chromosome<TGene, TFitness>
     {

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace GeneticAlgorithms.linearEquation
+namespace GeneticAlgorithms.LinearEquation
 {
     public class Fitness : IComparable
     {

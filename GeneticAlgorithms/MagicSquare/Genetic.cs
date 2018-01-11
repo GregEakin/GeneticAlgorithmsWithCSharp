@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace GeneticAlgorithms.magicSquare
+namespace GeneticAlgorithms.MagicSquare
 {
     public class Genetic<TGene, TFitness>
         where TGene : IComparable

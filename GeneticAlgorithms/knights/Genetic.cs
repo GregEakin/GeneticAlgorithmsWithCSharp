@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace GeneticAlgorithms.knights
+namespace GeneticAlgorithms.Knights
 {
     public class Genetic<TGene, TFitness>
         where TGene : IComparable

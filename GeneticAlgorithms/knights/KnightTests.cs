@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace GeneticAlgorithms.knights
+namespace GeneticAlgorithms.Knights
 {
     [TestClass]
     public class KnightTests

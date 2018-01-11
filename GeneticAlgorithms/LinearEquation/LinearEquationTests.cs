@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 
-namespace GeneticAlgorithms.linearEquation
+namespace GeneticAlgorithms.LinearEquation
 {
     [TestClass]
     public class LinearEquationTests

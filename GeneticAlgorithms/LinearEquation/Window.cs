@@ -1,4 +1,4 @@
-﻿namespace GeneticAlgorithms.linearEquation
+﻿namespace GeneticAlgorithms.LinearEquation
 {
     public class Window
     {

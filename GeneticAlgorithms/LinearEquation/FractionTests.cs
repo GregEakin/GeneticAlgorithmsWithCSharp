@@ -1,6 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace GeneticAlgorithms.linearEquation
+namespace GeneticAlgorithms.LinearEquation
 {
     [TestClass]
     public class FractionTests

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace GeneticAlgorithms.sudoku
+namespace GeneticAlgorithms.Sudoku
 {
     public class Genetic<TGene, TFitness>
         where TGene : IComparable
