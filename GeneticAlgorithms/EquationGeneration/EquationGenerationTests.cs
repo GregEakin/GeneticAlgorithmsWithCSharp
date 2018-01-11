@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace GeneticAlgorithms.equationGeneration
+namespace GeneticAlgorithms.EquationGeneration
 {
     [TestClass]
     public class EquationGenerationTests

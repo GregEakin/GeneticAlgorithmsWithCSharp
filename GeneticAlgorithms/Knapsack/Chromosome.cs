@@ -1,4 +1,4 @@
-﻿namespace GeneticAlgorithms.knapsack
+﻿namespace GeneticAlgorithms.Knapsack
 {
     public class Chromosome<TGene, TFitness>
     {

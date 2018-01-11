@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace GeneticAlgorithms.knapsack
+namespace GeneticAlgorithms.Knapsack
 {
     public class ItemQuantity : IComparable
     {

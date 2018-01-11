@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-namespace GeneticAlgorithms.knapsack
+namespace GeneticAlgorithms.Knapsack
 {
     public class KnapsackProblemData
     {

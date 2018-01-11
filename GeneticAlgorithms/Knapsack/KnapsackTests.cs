@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace GeneticAlgorithms.knapsack
+namespace GeneticAlgorithms.Knapsack
 {
     [TestClass]
     public class KnapsackTests

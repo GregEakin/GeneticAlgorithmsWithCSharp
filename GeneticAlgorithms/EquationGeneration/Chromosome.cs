@@ -1,4 +1,4 @@
-﻿namespace GeneticAlgorithms.equationGeneration
+﻿namespace GeneticAlgorithms.EquationGeneration
 {
     public class Chromosome<TGene, TFitness>
     {

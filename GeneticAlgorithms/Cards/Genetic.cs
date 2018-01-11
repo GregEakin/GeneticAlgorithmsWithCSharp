@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace GeneticAlgorithms.cards
+namespace GeneticAlgorithms.Cards
 {
     public class Genetic<TGene, TFitness>
         where TGene : IComparable

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace GeneticAlgorithms.equationGeneration
+namespace GeneticAlgorithms.EquationGeneration
 {
     public partial class Genetic<TGene, TFitness>
         where TGene : IComparable
