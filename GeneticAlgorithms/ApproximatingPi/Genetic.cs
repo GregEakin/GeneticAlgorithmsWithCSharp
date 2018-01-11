@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 
-namespace GeneticAlgorithms.approximatingPi
+namespace GeneticAlgorithms.ApproximatingPi
 {
     public partial class Genetic<TGene, TFitness>
         where TGene : IComparable

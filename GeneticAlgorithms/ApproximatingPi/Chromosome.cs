@@ -1,4 +1,4 @@
-﻿namespace GeneticAlgorithms.approximatingPi
+﻿namespace GeneticAlgorithms.ApproximatingPi
 {
     public class Chromosome<TGene, TFitness>
     {

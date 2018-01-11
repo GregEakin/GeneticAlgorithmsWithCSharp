@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace GeneticAlgorithms.approximatingPi
+namespace GeneticAlgorithms.ApproximatingPi
 {
     public partial class Genetic<TGene, TFitness>
         where TGene : IComparable
