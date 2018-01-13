@@ -211,7 +211,6 @@ namespace GeneticAlgorithms.Knights
             Position RandomPositionFun() => nonEdgePositions[Random.Next(nonEdgePositions.Length)];
             Position[] CreateFun() => Create(RandomPositionFun, expectedKnights);
 
-
             var optimalFitness = width * height;
             watch.Start();
             var best = generic.BestFitness(FitnessFun, 0, optimalFitness, null, DisplayFun, MutateFun, CreateFun);

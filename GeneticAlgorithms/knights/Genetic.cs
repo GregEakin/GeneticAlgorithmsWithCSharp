@@ -7,14 +7,6 @@ namespace GeneticAlgorithms.Knights
     public class Genetic<TGene, TFitness>
         where TFitness : IComparable
     {
-        public class ReverseComparer<T> : IComparer<T>
-        {
-            public int Compare(T x, T y)
-            {
-                return Comparer<T>.Default.Compare(y, x);
-            }
-        }
-
         public delegate TFitness FitnessFun(TGene[] gene);
 
         public delegate void DisplayFun(Chromosome<TGene, TFitness> child);
@@ -66,7 +58,7 @@ namespace GeneticAlgorithms.Knights
         public Chromosome<TGene, TFitness> Mutate(Chromosome<TGene, TFitness> parent, FitnessFun fitnessFun,
             TGene[] geneSet, MutateGeneFun mutateGeneFun)
         {
-            var genese = (mutateGeneFun != null) ? mutateGeneFun(parent.Genes) : MutateGene(parent.Genes, geneSet);
+            var genese = mutateGeneFun != null ? mutateGeneFun(parent.Genes) : MutateGene(parent.Genes, geneSet);
             var fitness = fitnessFun(genese);
             return new Chromosome<TGene, TFitness>(genese, fitness);
         }
