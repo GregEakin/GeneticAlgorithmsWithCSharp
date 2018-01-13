@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 
-namespace GeneticAlgorithms.ApproximatingPi
+namespace GeneticAlgorithms.LawnmowerProblem
 {
     public partial class Genetic<TGene, TFitness>
         where TFitness : IComparable
@@ -27,8 +27,6 @@ namespace GeneticAlgorithms.ApproximatingPi
         public delegate Chromosome<TGene, TFitness> GenerateParentFun();
 
         public delegate TGene[] CreateFun();
-
-        public delegate TGene[] CrossoverFun(TGene[] genes1, TGene[] genes2);
 
         private readonly Random _random = new Random();
 
@@ -70,10 +68,12 @@ namespace GeneticAlgorithms.ApproximatingPi
         public Chromosome<TGene, TFitness> Mutate(Chromosome<TGene, TFitness> parent, FitnessFun fitnessFun,
             TGene[] geneSet, MutateGeneFun mutateGeneFun)
         {
-            var genes = (mutateGeneFun != null) ? mutateGeneFun(parent.Genes) : MutateGene(parent.Genes, geneSet);
+            var genes = mutateGeneFun != null ? mutateGeneFun(parent.Genes) : MutateGene(parent.Genes, geneSet);
             var fitness = fitnessFun(genes);
             return new Chromosome<TGene, TFitness>(genes, fitness, Chromosome<TGene, TFitness>.Strategies.Mutate);
         }
+
+        public delegate TGene[] CrossoverFun(TGene[] genes1, TGene[] genes2);
 
         public Chromosome<TGene, TFitness> Crossover(TGene[] parentGenes, int index,
             Chromosome<TGene, TFitness>[] parents,

@@ -208,7 +208,7 @@ namespace GeneticAlgorithms.Knights
             int FitnessFun(Position[] genes) => Fitness(genes, width, height);
             void DisplayFun(Chromosome<Position, int> candidate) => Display(candidate, watch, width, height);
             Position[] MutateFun(Position[] genes) => Mutate(genes, width, height, allPositions, nonEdgePositions);
-            Position RandomPositionFun() => nonEdgePositions[Random.Next(nonEdgePositions.Count())];
+            Position RandomPositionFun() => nonEdgePositions[Random.Next(nonEdgePositions.Length)];
             Position[] CreateFun() => Create(RandomPositionFun, expectedKnights);
 
 

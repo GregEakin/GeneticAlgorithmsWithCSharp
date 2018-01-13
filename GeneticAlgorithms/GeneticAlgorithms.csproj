@@ -60,6 +60,13 @@
     <Compile Include="EquationGeneration\EquationGenerationTests.cs" />
     <Compile Include="EquationGeneration\Genetic.cs" />
     <Compile Include="EquationGeneration\SearchTimeoutException.cs" />
+    <Compile Include="LawnmowerProblem\Chromosome.cs" />
+    <Compile Include="LawnmowerProblem\Fitness.cs" />
+    <Compile Include="LawnmowerProblem\Genetic.cs" />
+    <Compile Include="LawnmowerProblem\Lawnmower.cs" />
+    <Compile Include="LawnmowerProblem\LawnmowerTests.cs" />
+    <Compile Include="LawnmowerProblem\Mow.cs" />
+    <Compile Include="LawnmowerProblem\SearchTimeoutException.cs" />
     <Compile Include="Primes\enumerable\DateTimeFixture.cs" />
     <Compile Include="Primes\enumerable\PrimeFactorTests.cs" />
     <Compile Include="Primes\enumerable\PrimeTests.cs" />
@@ -131,7 +138,6 @@
     <None Include="Readme.md" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="LawnmowerProblem\" />
     <Folder Include="LogicCircuits\" />
     <Folder Include="RegularExpressions\" />
     <Folder Include="TicTacToe\" />

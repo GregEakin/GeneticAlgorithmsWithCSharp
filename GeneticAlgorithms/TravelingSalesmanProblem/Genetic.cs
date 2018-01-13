@@ -5,7 +5,6 @@ using System.Linq;
 namespace GeneticAlgorithms.TravelingSalesmanProblem
 {
     public class Genetic<TGene, TFitness>
-        where TGene : IComparable
         where TFitness : IComparable
     {
         public class ReverseComparer<T> : IComparer<T>
@@ -63,7 +62,7 @@ namespace GeneticAlgorithms.TravelingSalesmanProblem
             var randomSample = RandomSample(geneSet, 2);
             var newGene = randomSample[0];
             var alternate = randomSample[1];
-            childGenes[index] = newGene.CompareTo(childGenes[index]) == 0 ? alternate : newGene;
+            childGenes[index] = newGene.Equals(childGenes[index]) ? alternate : newGene;
             return childGenes;
         }
 

@@ -3,7 +3,6 @@
 namespace GeneticAlgorithms.ApproximatingPi
 {
     public partial class Genetic<TGene, TFitness>
-        where TGene : IComparable
         where TFitness : IComparable
     {
         public class SearchTimeoutException : Exception

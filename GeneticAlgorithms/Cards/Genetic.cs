@@ -5,7 +5,6 @@ using System.Linq;
 namespace GeneticAlgorithms.Cards
 {
     public class Genetic<TGene, TFitness>
-        where TGene : IComparable
         where TFitness : IComparable
     {
         public delegate TFitness FitnessFun(TGene[] gene, int size);
@@ -45,7 +44,7 @@ namespace GeneticAlgorithms.Cards
             var randomSample = RandomSample(geneSet, 2);
             var newGene = randomSample[0];
             var alternate = randomSample[1];
-            childGenes[index] = newGene.CompareTo(childGenes[index]) == 0 ? alternate : newGene;
+            childGenes[index] = newGene.Equals(childGenes[index]) ? alternate : newGene;
             var fitness = fitnessFun(childGenes, childGenes.Length);
             return new Chromosome<TGene, TFitness>(childGenes, fitness);
         }
