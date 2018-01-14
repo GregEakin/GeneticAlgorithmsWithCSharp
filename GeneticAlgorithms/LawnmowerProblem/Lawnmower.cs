@@ -188,8 +188,6 @@ namespace GeneticAlgorithms.LawnmowerProblem
 
                 Console.WriteLine();
             }
-
-            Console.WriteLine();
         }
 
         public abstract Tuple<Location, bool> FixLocation(Location location);

@@ -53,7 +53,7 @@ namespace GeneticAlgorithms.LawnmowerProblem
 
         public override string ToString()
         {
-            return $"jump({Forward},{Right}";
+            return $"jump({Forward},{Right})";
         }
     }
 
@@ -85,9 +85,9 @@ namespace GeneticAlgorithms.LawnmowerProblem
         public override string ToString()
         {
             var x = Ops.Length > 0
-                ? string.Join<INode>(" ", Ops)
+                ? $"{{{string.Join<INode>(", ", Ops)}}}"
                 : OpCount.ToString();
-            return $"repeat({x} , {Times}";
+            return $"repeat({x}, {Times})";
         }
     }
 
@@ -116,7 +116,7 @@ namespace GeneticAlgorithms.LawnmowerProblem
 
         public override string ToString()
         {
-            return $"Func{string.Join<INode>(" ", Ops)}: {Id}";
+            return $"Func {{{string.Join<INode>(", ", Ops)}}}: {Id}";
         }
     }
 
@@ -132,7 +132,7 @@ namespace GeneticAlgorithms.LawnmowerProblem
         }
 
         public Call(int? funcId)
-            : this(funcId, new INode[0])
+            : this(funcId, null)
         {
         }
 
@@ -145,7 +145,7 @@ namespace GeneticAlgorithms.LawnmowerProblem
 
         public override string ToString()
         {
-            return $"Call-{FuncId?.ToString() ?? "Func"}";
+            return $"call-{FuncId?.ToString() ?? "Func"}";
         }
     }
 
@@ -166,8 +166,7 @@ namespace GeneticAlgorithms.LawnmowerProblem
                     case Repeat repeat:
                         var start1 = index + 1;
                         var end1 = Math.Min(index + repeat.OpCount + 1, temp.Count);
-                        var x = temp.Skip(start1).Take(end1 - start1).ToArray();
-                        temp[index] = new Repeat(repeat.OpCount, repeat.Times, x);
+                        repeat.Ops = temp.Skip(start1).Take(end1 - start1).ToArray();
                         temp.RemoveRange(start1, end1 - start1);
                         continue;
 
@@ -206,9 +205,9 @@ namespace GeneticAlgorithms.LawnmowerProblem
                         continue;
                     if (funcId >= funcs.Count || funcs[(int) funcId].Ops.Length == 0)
                     {
-                        var x = new List<INode>(func.Ops);
-                        x.RemoveAt(index);
-                        func.Ops = x.ToArray();
+                        var funcOps = new List<INode>(func.Ops);
+                        funcOps.RemoveAt(index);
+                        func.Ops = funcOps.ToArray();
                     }
                 }
 
@@ -236,13 +235,14 @@ namespace GeneticAlgorithms.LawnmowerProblem
 
         public void Print()
         {
-            if (Funcs == null) return;
-            foreach (var func in Funcs)
-            {
-                if (func.Id != null && func.Ops.Length == 0)
-                    continue;
-                Console.WriteLine(func);
-            }
+            if (Funcs != null)
+                foreach (var func in Funcs)
+                {
+                    if (func.Id != null && func.Ops.Length == 0)
+                        continue;
+                    Console.WriteLine(func);
+                }
+            Console.WriteLine(string.Join<INode>(", ", Main));
         }
     }
 }

@@ -28,6 +28,8 @@ namespace GeneticAlgorithms.LawnmowerProblem
             var tuple = fnEvaluate(candidate.Genes);
             tuple.Item1.Display(tuple.Item2);
             Console.WriteLine("{0}\t{1} ms", candidate.Fitness, watch.ElapsedMilliseconds);
+            tuple.Item3.Print();
+            Console.WriteLine();
         }
 
         public static INode[] Mutate(INode[] input, Func<INode>[] geneSet, int minGenes, int maxGenes,
