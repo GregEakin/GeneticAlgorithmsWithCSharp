@@ -44,7 +44,7 @@ namespace GeneticAlgorithms.LawnmowerProblem
                 var adding = genes.Count == 0 || genes.Count <= maxGenes && Random.Next(0, 6) == 0;
                 if (adding)
                 {
-                    genes.Add(geneSet[Random.Next(geneSet.Length)].Invoke());
+                    genes.Add(geneSet[Random.Next(geneSet.Length)]());
                     continue;
                 }
 
@@ -56,7 +56,7 @@ namespace GeneticAlgorithms.LawnmowerProblem
                 }
 
                 var index = Random.Next(genes.Count);
-                genes[index] = geneSet[Random.Next(geneSet.Length)].Invoke();
+                genes[index] = geneSet[Random.Next(geneSet.Length)]();
             }
 
             return genes.ToArray();
@@ -67,7 +67,7 @@ namespace GeneticAlgorithms.LawnmowerProblem
             var numGenes = Random.Next(minGenes, maxGenes + 1);
             var genes = new INode[numGenes];
             for (var i = 0; i < numGenes; i++)
-                genes[i] = geneSet[Random.Next(geneSet.Length)].Invoke();
+                genes[i] = geneSet[Random.Next(geneSet.Length)]();
             return genes;
         }
 
