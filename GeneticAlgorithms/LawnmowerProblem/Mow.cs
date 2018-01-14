@@ -123,7 +123,7 @@ namespace GeneticAlgorithms.LawnmowerProblem
     public class Call : INode
     {
         public int? FuncId { get; }
-        public INode[] Funcs { get; }
+        public INode[] Funcs { get; set; }
 
         public Call(int? funcId, INode[] funcs)
         {
@@ -172,13 +172,13 @@ namespace GeneticAlgorithms.LawnmowerProblem
                         continue;
 
                     case Call call:
-                        temp[index] = new Call(call.FuncId, funcs.ToArray());
+                        call.Funcs = funcs.Cast<INode>().ToArray();
                         break;
 
                     case Func func:
                         if (funcs.Count > 0 && !func.ExpectCall)
                         {
-                            temp[index] = new Call(null, funcs.ToArray());
+                            temp[index] = new Call(null, funcs.Cast<INode>().ToArray());
                             continue;
                         }
 
