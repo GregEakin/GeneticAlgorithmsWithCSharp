@@ -188,7 +188,7 @@ namespace GeneticAlgorithms.LawnmowerProblem
                         if (func.ExpectCall)
                             func2.Id = funcs.Count;
                         func2.Ops = temp.Skip(start2).Take(end2 - start2)
-                            .Where(type => !(type is Repeat) || ((Repeat) type).Ops.Length > 0).ToArray();
+                            .Where(t => !(t is Repeat) || ((Repeat) t).Ops.Length > 0).ToArray();
                         funcs.Add(func2);
                         temp.RemoveRange(index, end2 - index);
                         break;

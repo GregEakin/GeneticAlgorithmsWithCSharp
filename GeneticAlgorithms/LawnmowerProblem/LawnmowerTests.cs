@@ -227,7 +227,8 @@ namespace GeneticAlgorithms.LawnmowerProblem
             var height = 8;
             var geneSet = new Func<INode>[]
             {
-                () => new Mow(), () => new Turn(),
+                () => new Mow(),
+                () => new Turn(),
                 () => new Jump(Random.Next(0, Math.Min(width, height) + 1),
                     Random.Next(0, Math.Min(width, height) + 1)),
                 () => new Func()
@@ -252,7 +253,8 @@ namespace GeneticAlgorithms.LawnmowerProblem
             var height = 8;
             var geneSet = new Func<INode>[]
             {
-                () => new Mow(), () => new Turn(),
+                () => new Mow(),
+                () => new Turn(),
                 () => new Jump(Random.Next(0, Math.Min(width, height) + 1),
                     Random.Next(0, Math.Min(width, height) + 1)),
                 () => new Func(true),
