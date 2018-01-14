@@ -30,25 +30,25 @@ namespace GeneticAlgorithms.LawnmowerProblem
             Console.WriteLine("{0}\t{1} ms", candidate.Fitness, watch.ElapsedMilliseconds);
         }
 
-        public static INode[] Mutate(INode[] input, INode[] geneSet, int minGenes, int maxGenes,
+        public static INode[] Mutate(INode[] input, Func<INode>[] geneSet, int minGenes, int maxGenes,
             FnFitnessDelegate fnFitness, int maxRounds)
         {
             var initialFitness = fnFitness(input);
             var genes = new List<INode>(input);
-            var count = Random.Next(1, maxRounds);
+            var count = Random.Next(1, maxRounds + 1);
             while (count-- > 0)
             {
                 var fitness = fnFitness(genes.ToArray());
                 if (fitness.CompareTo(initialFitness) > 0)
                     return genes.ToArray();
-                var adding = genes.Count == 0 || genes.Count <= maxGenes && Random.Next(0, 5) == 0;
+                var adding = genes.Count == 0 || genes.Count <= maxGenes && Random.Next(0, 6) == 0;
                 if (adding)
                 {
-                    genes.Add(geneSet[Random.Next(geneSet.Length)]);
+                    genes.Add(geneSet[Random.Next(geneSet.Length)].Invoke());
                     continue;
                 }
 
-                var removing = genes.Count > 0 && Random.Next(0, 50) == 0;
+                var removing = genes.Count > 0 && Random.Next(0, 51) == 0;
                 if (removing)
                 {
                     genes.RemoveAt(Random.Next(genes.Count));
@@ -56,18 +56,18 @@ namespace GeneticAlgorithms.LawnmowerProblem
                 }
 
                 var index = Random.Next(genes.Count);
-                genes[index] = geneSet[Random.Next(geneSet.Length)];
+                genes[index] = geneSet[Random.Next(geneSet.Length)].Invoke();
             }
 
             return genes.ToArray();
         }
 
-        public static INode[] Create(INode[] geneSet, int minGenes, int maxGenes)
+        public static INode[] Create(Func<INode>[] geneSet, int minGenes, int maxGenes)
         {
             var numGenes = Random.Next(minGenes, maxGenes + 1);
             var genes = new INode[numGenes];
             for (var i = 0; i < numGenes; i++)
-                genes[i] = geneSet[Random.Next(geneSet.Length)];
+                genes[i] = geneSet[Random.Next(geneSet.Length)].Invoke();
             return genes;
         }
 
@@ -91,7 +91,7 @@ namespace GeneticAlgorithms.LawnmowerProblem
         public void MutateTest()
         {
             var parent = new INode[] {new Mow(), new Mow(), new Mow(), new Mow(),};
-            var geneSet = new INode[] {new Turn(),};
+            var geneSet = new Func<INode>[] {() => new Turn()};
 
             Tuple<Field, Mower, Program> FnEvaluate(INode[] instructions)
             {
@@ -115,7 +115,7 @@ namespace GeneticAlgorithms.LawnmowerProblem
         [TestMethod]
         public void CreateTest()
         {
-            var geneSet = new INode[] {new Mow(), new Turn()};
+            var geneSet = new Func<INode>[] {() => new Mow(), () => new Turn()};
             var child = Create(geneSet, 2, 5);
             Assert.IsTrue(child.Length >= 2);
             Assert.IsTrue(child.Length <= 5);
@@ -136,7 +136,7 @@ namespace GeneticAlgorithms.LawnmowerProblem
         {
             var width = 8;
             var height = 8;
-            var geneSet = new INode[] {new Mow(), new Turn(),};
+            var geneSet = new Func<INode>[] {() => new Mow(), () => new Turn(),};
             var minGenes = width * height;
             var maxGenes = 3 * minGenes / 2;
             var maxMutationRounds = 3;
@@ -154,10 +154,11 @@ namespace GeneticAlgorithms.LawnmowerProblem
         {
             var width = 8;
             var height = 8;
-            var geneSet = new INode[]
+            var geneSet = new Func<INode>[]
             {
-                new Mow(), new Turn(),
-                new Jump(Random.Next(0, Math.Min(width, height)), Random.Next(0, Math.Min(width, height)))
+                () => new Mow(),
+                () => new Turn(),
+                () => new Jump(Random.Next(0, Math.Min(width, height) + 1), Random.Next(0, Math.Min(width, height) + 1))
             };
             var minGenes = width * height;
             var maxGenes = 3 * minGenes / 2;
@@ -176,10 +177,11 @@ namespace GeneticAlgorithms.LawnmowerProblem
         {
             var width = 8;
             var height = 8;
-            var geneSet = new INode[]
+            var geneSet = new Func<INode>[]
             {
-                new Mow(), new Turn(),
-                new Jump(Random.Next(0, Math.Min(width, height)), Random.Next(0, Math.Min(width, height)))
+                () => new Mow(),
+                () => new Turn(),
+                () => new Jump(Random.Next(0, Math.Min(width, height) + 1), Random.Next(0, Math.Min(width, height) + 1))
             };
             var minGenes = width * height;
             var maxGenes = 3 * minGenes / 2;
@@ -198,10 +200,12 @@ namespace GeneticAlgorithms.LawnmowerProblem
         {
             var width = 8;
             var height = 8;
-            var geneSet = new INode[]
+            var geneSet = new Func<INode>[]
             {
-                new Mow(), new Turn(),
-                new Repeat(Random.Next(0, Math.Min(width, height) + 1), Random.Next(0, Math.Min(width, height) + 1))
+                () => new Mow(),
+                () => new Turn(),
+                () => new Repeat(Random.Next(0, Math.Min(width, height) + 1),
+                    Random.Next(0, Math.Min(width, height) + 1))
             };
             var minGenes = 3;
             var maxGenes = 20;
@@ -221,11 +225,12 @@ namespace GeneticAlgorithms.LawnmowerProblem
         {
             var width = 8;
             var height = 8;
-            var geneSet = new INode[]
+            var geneSet = new Func<INode>[]
             {
-                new Mow(), new Turn(),
-                new Jump(Random.Next(0, Math.Min(width, height)), Random.Next(0, Math.Min(width, height))),
-                new Func()
+                () => new Mow(), () => new Turn(),
+                () => new Jump(Random.Next(0, Math.Min(width, height) + 1),
+                    Random.Next(0, Math.Min(width, height) + 1)),
+                () => new Func()
             };
             var minGenes = 3;
             var maxGenes = 20;
@@ -245,12 +250,13 @@ namespace GeneticAlgorithms.LawnmowerProblem
         {
             var width = 8;
             var height = 8;
-            var geneSet = new INode[]
+            var geneSet = new Func<INode>[]
             {
-                new Mow(), new Turn(),
-                new Jump(Random.Next(0, Math.Min(width, height)), Random.Next(0, Math.Min(width, height))),
-                new Func(true),
-                new Call(Random.Next(0, 6)),
+                () => new Mow(), () => new Turn(),
+                () => new Jump(Random.Next(0, Math.Min(width, height) + 1),
+                    Random.Next(0, Math.Min(width, height) + 1)),
+                () => new Func(true),
+                () => new Call(Random.Next(0, 6)),
             };
             var minGenes = 3;
             var maxGenes = 20;
@@ -265,7 +271,7 @@ namespace GeneticAlgorithms.LawnmowerProblem
                 FnCreateField, expectedNumberOfSteps);
         }
 
-        private void RunWith(INode[] geneSet, int width, int height, int minGenes, int maxGenes,
+        private void RunWith(Func<INode>[] geneSet, int width, int height, int minGenes, int maxGenes,
             int expectedNumberOfInstructions, int maxMutationRounds, CreateFieldFun fnCreateField,
             int expectedNumberOfSteps)
         {

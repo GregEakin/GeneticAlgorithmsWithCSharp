@@ -26,7 +26,7 @@ namespace GeneticAlgorithms.LawnmowerProblem
                         return TotalMowed.CompareTo(that.TotalMowed);
                     if (StepCount != that.StepCount)
                         return -1 * StepCount.CompareTo(that.StepCount);
-                    return -1 * TotalInstructions.CompareTo(that.StepCount);
+                    return -1 * TotalInstructions.CompareTo(that.TotalInstructions);
                 default:
                     throw new ArgumentException("Object is not a Fitness");
             }
