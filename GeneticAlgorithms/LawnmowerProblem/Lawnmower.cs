@@ -6,10 +6,10 @@ namespace GeneticAlgorithms.LawnmowerProblem
 {
     public static class FieldContents
     {
-        public static char Grass = '#';
-        public static char Mowed = '.';
-        public static char Mower = 'M';
-        public static char None = ' ';
+        public static string Grass = " #";
+        public static string Mowed = " .";
+        public static string Mower = "M";
+        public static string None = "  ";
     }
 
     public class Direction
@@ -36,9 +36,9 @@ namespace GeneticAlgorithms.LawnmowerProblem
     public class Directions
     {
         public static Direction North = new Direction(0, 0, -1, '^');
-        public static Direction South = new Direction(1, 1, 0, 'v');
-        public static Direction East = new Direction(2, 0, 1, '<');
-        public static Direction West = new Direction(3, -1, 0, '>');
+        public static Direction East = new Direction(1, 1, 0, '>');
+        public static Direction South = new Direction(2, 0, 1, 'v');
+        public static Direction West = new Direction(3, -1, 0, '<');
 
         public static Direction[] Dirs =
         {
@@ -47,14 +47,14 @@ namespace GeneticAlgorithms.LawnmowerProblem
 
         public static Direction GetDirectionAfterTurnLeft90Degrees(Direction direction)
         {
-            var newIndex = direction.Index > 0 ? direction.Index - 1 : Directions.Dirs.Length - 1;
+            var newIndex = direction.Index > 0 ? direction.Index - 1 : Dirs.Length - 1;
             var newDirection = Dirs.Single(d => d.Index == newIndex);
             return newDirection;
         }
 
         public static Direction GetDirectionAfterTurnRight90Degrees(Direction direction)
         {
-            var newIndex = direction.Index < Directions.Dirs.Length ? direction.Index + 1 : 0;
+            var newIndex = direction.Index < Dirs.Length - 1 ? direction.Index + 1 : 0;
             var newDirection = Dirs.Single(d => d.Index == newIndex);
             return newDirection;
         }
@@ -75,49 +75,95 @@ namespace GeneticAlgorithms.LawnmowerProblem
         {
             return new Location(X + xOffset, Y + yOffset);
         }
+
+        public override bool Equals(object obj)
+        {
+            switch (obj)
+            {
+                case null:
+                    return false;
+                case Location that:
+                    return X == that.X && Y == that.Y;
+                default:
+                    return false;
+            }
+        }
+
+        public override int GetHashCode()
+        {
+            return X * 1000 + Y;
+        }
     }
 
     public class Mower
     {
-        public Location Location { get; }
-        public Direction Direction { get; }
-        public int StepCount { get; }
+        public Location Location { get; private set; }
+        public Direction Direction { get; private set; }
+        public int StepCount { get; private set; }
 
-        public Mower(Location location, Direction direction, int stepCount)
+        public Mower(Location location, Direction direction)
         {
             Location = location;
             Direction = direction;
-            StepCount = stepCount;
         }
 
-        public Mower TurnLeft()
+        public void TurnLeft()
         {
-            return new Mower(Location, Directions.GetDirectionAfterTurnLeft90Degrees(Direction), StepCount + 1);
+            Direction = Directions.GetDirectionAfterTurnLeft90Degrees(Direction);
+            StepCount++;
         }
 
-        public Mower Mow(Field field)
+        public void Mow(Field field)
         {
-            return null;
+            var newLocation = Direction.MoveFrom(Location);
+            var tuple = field.FixLocation(newLocation);
+            if (!tuple.Item2) return;
+            Location = tuple.Item1;
+            StepCount++;
+            field[Location] = StepCount.ToString().PadLeft(2);
+        }
+
+        public void Jump(Field field, int forward, int right)
+        {
+            var newLocation = Direction.MoveFrom(Location, forward);
+            var rightDirection = Directions.GetDirectionAfterTurnRight90Degrees(Direction);
+            newLocation = rightDirection.MoveFrom(newLocation, right);
+            var tuple = field.FixLocation(newLocation);
+            var valid = tuple.Item2;
+            if (!valid) return;
+            Location = tuple.Item1;
+            StepCount += 1;
+            field[Location] = StepCount.ToString().PadLeft(2);
         }
     }
 
-    public class Field
+    public abstract class Field
     {
-        private readonly char[,] _field;
+        private readonly string[,] _field;
 
         public int Width => _field.GetLength(0);
 
         public int Height => _field.GetLength(1);
 
-        public Field(int width, int height)
+        protected Field(int width, int height, string initialContent)
         {
-            _field = new char[width, height];
+            _field = new string[width, height];
+
+            for (var x = 0; x < width; x++)
+            for (var y = 0; y < height; y++)
+                _field[x, y] = initialContent;
         }
 
-        public char this[int x, int y]
+        public string this[int x, int y]
         {
             get => _field[x, y];
             set => _field[x, y] = value;
+        }
+
+        public string this[Location location]
+        {
+            get => _field[location.X, location.Y];
+            set => _field[location.X, location.Y] = value;
         }
 
         public int CountMowed()
@@ -130,43 +176,56 @@ namespace GeneticAlgorithms.LawnmowerProblem
             return sum;
         }
 
-        public void Dispaly(Mower mower)
+        public void Display(Mower mower)
         {
+            for (var y = 0; y < Height; y++)
             {
-                for (var y = 0; y < Height; y++)
-                {
-                    for (var x = 0; x < Width; x++)
-                        if (y != mower.Location.Y)
-                        {
-                            Console.Write(" {0} ", _field[x, y]);
-                        }
-                        else
-                        {
-                            {
-                                if (x != mower.Location.X)
-                                    Console.Write(" {0} ", _field[x, y]);
-                                else
-                                    Console.Write("{0}{1} ", FieldContents.Mower, mower.Direction.Symbol);
-                            }
-                        }
+                for (var x = 0; x < Width; x++)
+                    if (x == mower.Location.X && y == mower.Location.Y)
+                        Console.Write("{0}{1} ", FieldContents.Mower, mower.Direction.Symbol);
+                    else
+                        Console.Write("{0} ", _field[x, y]);
 
-                    Console.WriteLine();
-                }
+                Console.WriteLine();
             }
+
+            Console.WriteLine();
         }
+
+        public abstract Tuple<Location, bool> FixLocation(Location location);
     }
 
     public class ValidatingField : Field
     {
-        public ValidatingField(int width, int height) : base(width, height)
+        public ValidatingField(int width, int height, string initialContent) : base(width, height, initialContent)
         {
+        }
+
+        public override Tuple<Location, bool> FixLocation(Location location)
+        {
+            return 0 <= location.X && location.X < Width && 0 <= location.Y && location.Y < Height
+                ? new Tuple<Location, bool>(location, true)
+                : new Tuple<Location, bool>(null, false);
         }
     }
 
     public class ToroidField : Field
     {
-        public ToroidField(int width, int height) : base(width, height)
+        public ToroidField(int width, int height, string initialContent) : base(width, height, initialContent)
         {
+        }
+
+        public override Tuple<Location, bool> FixLocation(Location location)
+        {
+            var x = Mod(location.X, Width);
+            var y = Mod(location.Y, Height);
+            var newLocation = new Location(x, y);
+            return new Tuple<Location, bool>(newLocation, true);
+        }
+
+        public static int Mod(int x, int m)
+        {
+            return (x % m + m) % m;
         }
     }
 }

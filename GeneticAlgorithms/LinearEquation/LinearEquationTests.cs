@@ -21,7 +21,7 @@ namespace GeneticAlgorithms.LinearEquation
                     (current, equation) => current + Fraction.Abs(equation(genes)));
                 return new Fitness(fitness);
             }
-            catch (ArgumentException e)
+            catch (ArgumentException)
             {
                 // divide by zero?
                 return new Fitness(new Fraction(int.MaxValue));

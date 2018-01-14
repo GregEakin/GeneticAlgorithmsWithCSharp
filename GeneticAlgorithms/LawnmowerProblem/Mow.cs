@@ -61,7 +61,7 @@ namespace GeneticAlgorithms.LawnmowerProblem
     {
         public int OpCount { get; }
         public int Times { get; }
-        public INode[] Ops { get; }
+        public INode[] Ops { get; set; }
 
         public Repeat(int opCount, int times, INode[] ops)
         {
@@ -70,13 +70,16 @@ namespace GeneticAlgorithms.LawnmowerProblem
             Ops = ops;
         }
 
+        public Repeat(int opCount, int times)
+            : this(opCount, times, new INode[0])
+        {
+        }
+
         public void Execute(Mower mower, Field field)
         {
             for (var i = 0; i < Times; i++)
                 foreach (var op in Ops)
-                {
                     op.Execute(mower, field);
-                }
         }
 
         public override string ToString()
@@ -90,14 +93,19 @@ namespace GeneticAlgorithms.LawnmowerProblem
 
     public class Func : INode
     {
-        public INode[] Ops { get; }
+        public INode[] Ops { get; set; }
         public bool ExpectCall { get; }
-        public int? Id { get; } = null;
+        public int? Id { get; set; } = null;
 
-        public Func(INode[] ops, bool expectCall = false)
+        public Func(INode[] ops, bool expectCall)
         {
             Ops = ops;
             ExpectCall = expectCall;
+        }
+
+        public Func(bool expectCall = false)
+            : this(new INode[0], expectCall)
+        {
         }
 
         public void Execute(Mower mower, Field field)
@@ -121,6 +129,11 @@ namespace GeneticAlgorithms.LawnmowerProblem
         {
             FuncId = funcId;
             Funcs = funcs;
+        }
+
+        public Call(int? funcId)
+            : this(funcId, new INode[0])
+        {
         }
 
         public void Execute(Mower mower, Field field)
@@ -155,7 +168,7 @@ namespace GeneticAlgorithms.LawnmowerProblem
                         var end1 = Math.Min(index + repeat.OpCount + 1, temp.Count);
                         var x = temp.Skip(start1).Take(end1 - start1).ToArray();
                         temp[index] = new Repeat(repeat.OpCount, repeat.Times, x);
-                        temp.RemoveRange(start1, end1-start1);
+                        temp.RemoveRange(start1, end1 - start1);
                         continue;
 
                     case Call call:
@@ -169,36 +182,44 @@ namespace GeneticAlgorithms.LawnmowerProblem
                             continue;
                         }
 
-//                        var start2 = index + 1;
-//                        var end2 = Math.Min(index + func.OpCount + 1, temp.Count);
-//                        var ops = 
-//                        var func2 = new Func();
-//                        funcs.Add(func2);
+                        var start2 = index + 1;
+                        var end2 = temp.Count;
+                        var func2 = new Func();
+                        if (func.ExpectCall)
+                            func2.Id = funcs.Count;
+                        func2.Ops = temp.Skip(start2).Take(end2 - start2)
+                            .Where(type => !(type is Repeat) || ((Repeat) type).Ops.Length > 0).ToArray();
+                        funcs.Add(func2);
+                        temp.RemoveRange(index, end2 - index);
                         break;
                 }
             }
 
             foreach (var func in funcs)
             {
-                for (var index = func.Ops.Length; index >= 0; index--)
+                for (var index = func.Ops.Length - 1; index >= 0; index--)
                 {
                     if (!(func.Ops[index] is Call call))
                         continue;
                     var funcId = call.FuncId;
                     if (funcId == null)
                         continue;
-//                    if (funcId >= funcs.Count || funcs[(int)funcId].Ops.Length == 0)
-//                        func.Ops[index];
+                    if (funcId >= funcs.Count || funcs[(int) funcId].Ops.Length == 0)
+                    {
+                        var x = new List<INode>(func.Ops);
+                        x.RemoveAt(index);
+                        func.Ops = x.ToArray();
+                    }
                 }
 
-                for (var index = func.Ops.Length; index >= 0; index--)
+                for (var index = func.Ops.Length - 1; index >= 0; index--)
                 {
                     if (!(func.Ops[index] is Call call))
                         continue;
                     var funcId = call.FuncId;
                     if (funcId == null)
                         continue;
-                    if (funcId >= funcs.Count || funcs[(int)funcId].Ops.Length == 0)
+                    if (funcId >= funcs.Count || funcs[(int) funcId].Ops.Length == 0)
                         temp.RemoveAt(index);
                 }
             }

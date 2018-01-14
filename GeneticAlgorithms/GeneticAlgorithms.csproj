@@ -61,6 +61,7 @@
     <Compile Include="EquationGeneration\Genetic.cs" />
     <Compile Include="EquationGeneration\SearchTimeoutException.cs" />
     <Compile Include="LawnmowerProblem\Chromosome.cs" />
+    <Compile Include="LawnmowerProblem\DirectionTests.cs" />
     <Compile Include="LawnmowerProblem\Fitness.cs" />
     <Compile Include="LawnmowerProblem\Genetic.cs" />
     <Compile Include="LawnmowerProblem\Lawnmower.cs" />
