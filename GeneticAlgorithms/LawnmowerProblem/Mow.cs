@@ -85,7 +85,7 @@ namespace GeneticAlgorithms.LawnmowerProblem
         public override string ToString()
         {
             var x = Ops.Length > 0
-                ? string.Join(" ", Ops.ToString())
+                ? string.Join<INode>(" ", Ops)
                 : OpCount.ToString();
             return $"repeat({x} , {Times}";
         }

@@ -33,14 +33,15 @@ namespace GeneticAlgorithms.LawnmowerProblem
         public static INode[] Mutate(INode[] input, Func<INode>[] geneSet, int minGenes, int maxGenes,
             FnFitnessDelegate fnFitness, int maxRounds)
         {
-            var initialFitness = fnFitness(input);
             var genes = new List<INode>(input);
             var count = Random.Next(1, maxRounds + 1);
+            var initialFitness = fnFitness(input);
             while (count-- > 0)
             {
                 var fitness = fnFitness(genes.ToArray());
                 if (fitness.CompareTo(initialFitness) > 0)
                     return genes.ToArray();
+
                 var adding = genes.Count == 0 || genes.Count <= maxGenes && Random.Next(0, 6) == 0;
                 if (adding)
                 {
@@ -48,7 +49,7 @@ namespace GeneticAlgorithms.LawnmowerProblem
                     continue;
                 }
 
-                var removing = genes.Count > 0 && Random.Next(0, 51) == 0;
+                var removing = genes.Count > minGenes && Random.Next(0, 51) == 0;
                 if (removing)
                 {
                     genes.RemoveAt(Random.Next(genes.Count));
