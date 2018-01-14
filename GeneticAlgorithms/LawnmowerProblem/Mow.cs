@@ -48,7 +48,7 @@ namespace GeneticAlgorithms.LawnmowerProblem
 
         public void Execute(Mower mower, Field field)
         {
-            mower.TurnLeft();
+            mower.Jump(field, Forward, Right);
         }
 
         public override string ToString()
@@ -95,7 +95,7 @@ namespace GeneticAlgorithms.LawnmowerProblem
     {
         public INode[] Ops { get; set; }
         public bool ExpectCall { get; }
-        public int? Id { get; set; } = null;
+        public int? Id { get; set; }
 
         public Func(INode[] ops, bool expectCall)
         {

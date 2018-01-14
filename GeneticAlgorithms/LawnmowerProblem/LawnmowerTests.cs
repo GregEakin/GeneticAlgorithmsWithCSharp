@@ -158,7 +158,7 @@ namespace GeneticAlgorithms.LawnmowerProblem
             {
                 () => new Mow(),
                 () => new Turn(),
-                () => new Jump(Random.Next(0, Math.Min(width, height) + 1), Random.Next(0, Math.Min(width, height) + 1))
+                () => new Jump(Random.Next(0, Math.Min(width, height)), Random.Next(0, Math.Min(width, height)))
             };
             var minGenes = width * height;
             var maxGenes = 3 * minGenes / 2;
@@ -181,7 +181,7 @@ namespace GeneticAlgorithms.LawnmowerProblem
             {
                 () => new Mow(),
                 () => new Turn(),
-                () => new Jump(Random.Next(0, Math.Min(width, height) + 1), Random.Next(0, Math.Min(width, height) + 1))
+                () => new Jump(Random.Next(0, Math.Min(width, height)), Random.Next(0, Math.Min(width, height)))
             };
             var minGenes = width * height;
             var maxGenes = 3 * minGenes / 2;
@@ -204,8 +204,7 @@ namespace GeneticAlgorithms.LawnmowerProblem
             {
                 () => new Mow(),
                 () => new Turn(),
-                () => new Repeat(Random.Next(0, Math.Min(width, height) + 1),
-                    Random.Next(0, Math.Min(width, height) + 1))
+                () => new Repeat(Random.Next(0, Math.Min(width, height)), Random.Next(0, Math.Min(width, height)))
             };
             var minGenes = 3;
             var maxGenes = 20;
@@ -229,8 +228,7 @@ namespace GeneticAlgorithms.LawnmowerProblem
             {
                 () => new Mow(),
                 () => new Turn(),
-                () => new Jump(Random.Next(0, Math.Min(width, height) + 1),
-                    Random.Next(0, Math.Min(width, height) + 1)),
+                () => new Jump(Random.Next(0, Math.Min(width, height)), Random.Next(0, Math.Min(width, height))),
                 () => new Func()
             };
             var minGenes = 3;
@@ -255,8 +253,7 @@ namespace GeneticAlgorithms.LawnmowerProblem
             {
                 () => new Mow(),
                 () => new Turn(),
-                () => new Jump(Random.Next(0, Math.Min(width, height) + 1),
-                    Random.Next(0, Math.Min(width, height) + 1)),
+                () => new Jump(Random.Next(0, Math.Min(width, height)), Random.Next(0, Math.Min(width, height))),
                 () => new Func(true),
                 () => new Call(Random.Next(0, 6)),
             };

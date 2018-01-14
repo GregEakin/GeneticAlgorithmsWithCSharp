@@ -158,7 +158,7 @@ namespace GeneticAlgorithms.LawnmowerProblem
             }
 
             for (var i = 1; i < 5; i++)
-                Assert.AreEqual(i.ToString().PadLeft(2), field[i+1, 1]);
+                Assert.AreEqual(i.ToString().PadLeft(2), field[i + 1, 1]);
         }
 
         [TestMethod]
@@ -173,6 +173,21 @@ namespace GeneticAlgorithms.LawnmowerProblem
             mower.Jump(field, 2, 1);
             field.Display(mower);
             Assert.AreEqual(" 1", field[1, 1]);
+            Assert.AreEqual(new Location(1, 1), mower.Location);
+        }
+
+        [TestMethod]
+        public void JumpFailedTest()
+        {
+            var location = new Location(3, 2);
+            var dir = Directions.East;
+            var mower = new Mower(location, dir);
+            var field = new ValidatingField(4, 4, FieldContents.Grass);
+            field.Display(mower);
+
+            mower.Jump(field, 2, 1);
+            field.Display(mower);
+            Assert.AreEqual(new Location(3, 2), mower.Location);
         }
     }
 
