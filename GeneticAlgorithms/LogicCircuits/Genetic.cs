@@ -231,10 +231,26 @@ namespace GeneticAlgorithms.LogicCircuits
             }
         }
 
-        public Chromosome<TGene, TFitness> HillClimbing(int optimizationFunction, int is_improvement, int is_optimal,
-            int get_next_feature_value, int display, int initialFeatureValue)
+        public Chromosome<TGene, TFitness> HillClimbing(Func<int, Chromosome<TGene, TFitness>> optimizationFunction,
+            Func<Chromosome<TGene, TFitness>, Chromosome<TGene, TFitness>, bool> isImprovement,
+            Func<Chromosome<TGene, TFitness>, bool> isOptimal,
+            Func<Chromosome<TGene, TFitness>, int> getNextFeatureValue,
+            Action<Chromosome<TGene, TFitness>, int> display,
+            int initialFeatureValue)
         {
-            throw new NotImplementedException();
+            var best = optimizationFunction(initialFeatureValue);
+            while (!isOptimal(best))
+            {
+                var featureValue = getNextFeatureValue(best);
+                var child = optimizationFunction(featureValue);
+                if (!isImprovement(best, child))
+                    continue;
+
+                best = child;
+                display(best, featureValue);
+            }
+
+            return best;
         }
     }
 }

@@ -12,22 +12,48 @@ namespace GeneticAlgorithms.LogicCircuits
 
         public delegate int FnCreateGene();
 
-        public delegate int FnFitnessDelegate(string[] genes);
+        public delegate int FnFitnessDelegate(Node[] genes);
 
-        public static int Fitness(Node[] genes, Tuple<bool[], bool>[] rules, ICircuit[] inputs)
+        public static int Fitness(Node[] genes, Tuple<bool[], bool>[] rules, Dictionary<char, bool?> inputs)
         {
             var circuit = NodesToCircuit(genes).Item1;
-            var sourceLabels = "ABCD".ToCharArray();
+            var sourceLabels = "ABCD";
             var rulesPassed = 0;
             foreach (var rule in rules)
             {
-                // inputs.Clear();
-                // inputs.update(zip(sourceLabels, rule.Item1))
+                inputs.Clear();
+                for (var i = 0; i < rule.Item1.Length; i++)
+                    inputs.Add(sourceLabels[i], rule.Item1[i]);
                 if (circuit.Output == rule.Item2)
                     rulesPassed++;
             }
 
             return rulesPassed;
+        }
+
+        [TestMethod]
+        public void FitnessTest()
+        {
+            var inputs = new Dictionary<char, bool?>();
+
+            var nodes = new[]
+            {
+                new Node((a, b) => new Source('A', inputs)),
+                new Node((a, b) => new Source('B', inputs)),
+                new Node((a, b) => new Or(a, b), 0, 1)
+            };
+
+            var rules = new[]
+            {
+                new Tuple<bool[], bool>(new[] {false, false}, false),
+                new Tuple<bool[], bool>(new[] {false, true}, true),
+                new Tuple<bool[], bool>(new[] {true, false}, true),
+                new Tuple<bool[], bool>(new[] {true, true}, true)
+            };
+
+            var fitness = Fitness(nodes, rules, inputs);
+            Assert.AreEqual(4, fitness);
+            Assert.AreEqual(2, inputs.Count);
         }
 
         public static void Display(Chromosome<Node, int> candidate, Stopwatch watch)
@@ -59,15 +85,22 @@ namespace GeneticAlgorithms.LogicCircuits
             return new Node(gateType.Item1, indexA, indexB);
         }
 
-        public static string[] Mutate(string[] childGenes, FnCreateGene fnCreateGene, FnFitnessDelegate fnFitness,
+        public static void Mutate(Node[] childGenes, FnCreateGene fnCreateGene, FnFitnessDelegate fnFitness,
             int sourceCount)
         {
-            throw new NotImplementedException();
-        }
-
-        public static string[] Crossover(string[] mother, string[] father)
-        {
-            throw new NotImplementedException();
+            var count = Random.Next(1, 6);
+            var initialFitness = fnFitness(childGenes);
+            while (count-- > 0)
+            {
+                //var indexesUsed = NodesToCircuit(childGenes).Item2
+                // [i for i in nodes_to_circuit(childGenes)[1] if i >= sourceCount];
+                //if (indexUsed.Length == 0)
+                //    return;
+                //var index = indexesUsed[Random.Next(indexesUsed.Lehgth)];
+                //childGenes[index] = fnCreateGene(index);
+                //if (fnFitness(childGenes).CompareTo(initialFitness) > 0)
+                //    return;
+            }
         }
 
         [TestMethod]
@@ -140,6 +173,22 @@ namespace GeneticAlgorithms.LogicCircuits
 
         [TestMethod]
         public void GenerateAxBxCTest()
+        {
+        }
+
+        public void Get2BitAdderRulesForBit()
+        {
+        }
+
+        public void Test2BitAdder1SBit()
+        {
+        }
+
+        public void Test2BitAdder2SBit()
+        {
+        }
+
+        public void Test2BitAdder4SBit()
         {
         }
 
