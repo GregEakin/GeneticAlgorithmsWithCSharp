@@ -71,6 +71,7 @@
     <Compile Include="LogicCircuits\Chromosome.cs" />
     <Compile Include="LogicCircuits\Circuits.cs" />
     <Compile Include="LogicCircuits\CircuitTests.cs" />
+    <Compile Include="LogicCircuits\CircuitTests2.cs" />
     <Compile Include="LogicCircuits\Genetic.cs" />
     <Compile Include="LogicCircuits\SearchTimeoutException.cs" />
     <Compile Include="Primes\enumerable\DateTimeFixture.cs" />
