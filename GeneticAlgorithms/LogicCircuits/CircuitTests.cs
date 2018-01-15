@@ -70,30 +70,17 @@ namespace GeneticAlgorithms.LogicCircuits
             throw new NotImplementedException();
         }
 
-        public void SetupClass()
-        {
-            var inputs = new HashSet<string>();
-            var gates = new ICircuit[0];
-            // [[circuits.And, circuits.And], [lambda i1, i2: circuits.Not(i1), circuits.Not]]
-            // { {new And(), new And() }, {(i1, i2)=> new Not(i1), new Not()} }
-            var sources = new bool?[0];
-            // [ [lambda i1, i2: circuits.Source('A', cls.inputs), circuits.Source],
-            //   [lambda i1, i2: circuits.Source('B', cls.inputs), circuits.Source] ]
-            // { {(i1, i2) => circuits.Souce('A', inputs), circuits.Source },
-            //   {(i1, i2) => circuits.Souce('B', inputs), circuits.Source } }
-        }
-
         [TestMethod]
         public void CreateGeneTest()
         {
             var sourceContainer = new Dictionary<char, bool?> {{'A', false}, {'B', true}};
 
-            var source = new[]
+            var sources = new[]
             {
                 new Tuple<Node.CrateGeneDelegate, ICircuit>((a, b) => new Source('A', sourceContainer),
-                    new Source('A', sourceContainer)),
+                    new Source('A', null)),
                 new Tuple<Node.CrateGeneDelegate, ICircuit>((a, b) => new Source('B', sourceContainer),
-                    new Source('B', sourceContainer))
+                    new Source('B', null))
             };
 
             var gates = new[]
@@ -104,11 +91,31 @@ namespace GeneticAlgorithms.LogicCircuits
 
             var nodes = new Node[6];
             for (var i = 0; i < nodes.Length; i++)
-                nodes[i] = CreateGene(i, gates, source);
+                nodes[i] = CreateGene(i, gates, sources);
 
             var tuple = NodesToCircuit(nodes);
             var circuit = tuple.Item1;
             Console.Write("{0} = {1}", circuit, circuit.Output);
+        }
+
+        private Dictionary<char, bool?> _inputs;
+        private List<Tuple<Node.CrateGeneDelegate, ICircuit>> _gates;
+        private List<Tuple<Node.CrateGeneDelegate, ICircuit>> _sources;
+
+        [TestInitialize]
+        public void SetupClass()
+        {
+            _inputs = new Dictionary<char, bool?>();
+            _gates = new List<Tuple<Node.CrateGeneDelegate, ICircuit>>
+            {
+                new Tuple<Node.CrateGeneDelegate, ICircuit>((i1, i2) => new And(i1, i2), new And(null, null)),
+                new Tuple<Node.CrateGeneDelegate, ICircuit>((i1, i2) => new Not(i1), new Not(null))
+            };
+            _sources = new List<Tuple<Node.CrateGeneDelegate, ICircuit>>
+            {
+                new Tuple<Node.CrateGeneDelegate, ICircuit>((a, b) => new Source('A', _inputs), new Source('A', null)),
+                new Tuple<Node.CrateGeneDelegate, ICircuit>((a, b) => new Source('B', _inputs), new Source('B', null))
+            };
         }
 
         [TestMethod]
@@ -138,6 +145,25 @@ namespace GeneticAlgorithms.LogicCircuits
 
         public void FindCircuit(Tuple<bool[], bool>[] rules, int optimalLength)
         {
+            var genetic = new Genetic<Node, int>();
+            var watch = new Stopwatch();
+            watch.Start();
+
+            // fnDisplay
+            // fnGetFitness
+            // fnCreateGene
+            // fnMutate
+            var maxLength = 50;
+            // fnCreate
+            // fnOptimizationFunction
+            // fnIsImprovement
+            // fnIsOptimal
+            // fnGetNextFeatureValue
+
+            // var best = genetic.HillClimbing(fnOptimizationFunction, fnIsImprovement, fnIsOptimal, fnGetNextFeatureValue, fnDisplay, maxLength);
+            // Assert.AreEqual(rules.Length, best.Fitness);
+            // var circuit = NodesToCircuit(best.Genes).Item2;
+            // Assert.IsFalse(circuit.Length > expectedLength);
         }
 
         public static Tuple<ICircuit, int> NodesToCircuit(Node[] genes)
