@@ -18,7 +18,7 @@ namespace GeneticAlgorithms.LogicCircuits
 
         public delegate TFitness FitnessFun(TGene[] gene);
 
-        public delegate void DisplayFun(Chromosome<TGene, TFitness> child);
+        public delegate void DisplayFun(Chromosome<TGene, TFitness> child, int? length = null);
 
         public delegate TGene[] MutateGeneFun(TGene[] genes);
 
@@ -235,7 +235,7 @@ namespace GeneticAlgorithms.LogicCircuits
             Func<Chromosome<TGene, TFitness>, Chromosome<TGene, TFitness>, bool> isImprovement,
             Func<Chromosome<TGene, TFitness>, bool> isOptimal,
             Func<Chromosome<TGene, TFitness>, int> getNextFeatureValue,
-            Action<Chromosome<TGene, TFitness>, int> display,
+            Action<Chromosome<TGene, TFitness>, int?> display,
             int initialFeatureValue)
         {
             var best = optimizationFunction(initialFeatureValue);

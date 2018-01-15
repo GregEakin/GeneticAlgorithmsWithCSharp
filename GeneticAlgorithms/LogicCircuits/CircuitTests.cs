@@ -86,21 +86,26 @@ namespace GeneticAlgorithms.LogicCircuits
             return new Node(gateType.Item1, indexA, indexB);
         }
 
-        public static void Mutate(Node[] childGenes, FnCreateGene fnCreateGene, FnFitnessDelegate fnFitness,
+        public static Node[] Mutate(Node[] input, FnCreateGene fnCreateGene, FnFitnessDelegate fnFitness,
             int sourceCount)
         {
+            var childGenes = new Node[input.Length];
+            Array.Copy(input, childGenes, input.Length);
+
             var count = Random.Next(1, 6);
             var initialFitness = fnFitness(childGenes);
             while (count-- > 0)
             {
                 var indexesUsed = NodesToCircuit(childGenes).Item2.Skip(sourceCount).ToArray();
                 if (indexesUsed.Length == 0)
-                    return;
+                    return childGenes;
                 var index = indexesUsed[Random.Next(indexesUsed.Length)];
                 childGenes[index] = fnCreateGene(index);
                 if (fnFitness(childGenes).CompareTo(initialFitness) > 0)
-                    return;
+                    return childGenes;
             }
+
+            return childGenes;
         }
 
         [TestMethod]
@@ -168,50 +173,140 @@ namespace GeneticAlgorithms.LogicCircuits
         [TestMethod]
         public void GenerateXorTest()
         {
+            var rules = new[]
+            {
+                new Tuple<bool[], bool>(new[] {false, false}, false),
+                new Tuple<bool[], bool>(new[] {false, true}, true),
+                new Tuple<bool[], bool>(new[] {true, false}, true),
+                new Tuple<bool[], bool>(new[] {true, true}, false)
+            };
+
+            FindCircuit(rules, 9);
         }
 
         [TestMethod]
         public void GenerateAxBxCTest()
         {
+            var rules = new[]
+            {
+                new Tuple<bool[], bool>(new[] {false, false, false}, false),
+                new Tuple<bool[], bool>(new[] {false, false, true}, true),
+                new Tuple<bool[], bool>(new[] {false, true, false}, true),
+                new Tuple<bool[], bool>(new[] {false, true, true}, false),
+                new Tuple<bool[], bool>(new[] {true, false, false}, true),
+                new Tuple<bool[], bool>(new[] {true, false, true}, false),
+                new Tuple<bool[], bool>(new[] {true, true, false}, false),
+                new Tuple<bool[], bool>(new[] {true, true, true}, true)
+            };
+
+            _sources.Add(new Tuple<Node.CrateGeneDelegate, ICircuit>((a, b) => new Source('C', _inputs),
+                new Source('C', null)));
+            _gates.Add(new Tuple<Node.CrateGeneDelegate, ICircuit>((i1, i2) => new Or(i1, i2), new Or(null, null)));
+
+            FindCircuit(rules, 12);
         }
 
-        public void Get2BitAdderRulesForBit()
+        public Tuple<bool[], bool>[] Get2BitAdderRulesForBit(int bit)
         {
+            var rules = new[]
+            {
+                new Tuple<int[], int[]>(new[] {0, 0, 0, 0}, new[] {0, 0, 0}),  // 0 + 0 = 0
+                new Tuple<int[], int[]>(new[] {0, 0, 0, 1}, new[] {0, 0, 1}),  // 0 + 1 = 1
+                new Tuple<int[], int[]>(new[] {0, 0, 1, 0}, new[] {0, 1, 0}),  // 0 + 2 = 2
+                new Tuple<int[], int[]>(new[] {0, 0, 1, 1}, new[] {0, 1, 1}),  // 0 + 3 = 3
+                new Tuple<int[], int[]>(new[] {0, 1, 0, 0}, new[] {0, 0, 1}),  // 1 + 0 = 1
+                new Tuple<int[], int[]>(new[] {0, 1, 0, 1}, new[] {0, 1, 0}),  // 1 + 1 = 2
+                new Tuple<int[], int[]>(new[] {0, 1, 1, 0}, new[] {0, 1, 1}),  // 1 + 2 = 3
+                new Tuple<int[], int[]>(new[] {0, 1, 1, 1}, new[] {1, 0, 0}),  // 1 + 3 = 4
+                new Tuple<int[], int[]>(new[] {1, 0, 0, 0}, new[] {0, 1, 0}),  // 2 + 0 = 2
+                new Tuple<int[], int[]>(new[] {1, 0, 0, 1}, new[] {0, 1, 1}),  // 2 + 1 = 3
+                new Tuple<int[], int[]>(new[] {1, 0, 1, 0}, new[] {1, 0, 0}),  // 2 + 2 = 4
+                new Tuple<int[], int[]>(new[] {1, 0, 1, 1}, new[] {1, 0, 1}),  // 2 + 3 = 5
+                new Tuple<int[], int[]>(new[] {1, 1, 0, 0}, new[] {0, 1, 1}),  // 3 + 0 = 3
+                new Tuple<int[], int[]>(new[] {1, 1, 0, 1}, new[] {1, 0, 0}),  // 3 + 1 = 4
+                new Tuple<int[], int[]>(new[] {1, 1, 1, 0}, new[] {1, 0, 1}),  // 3 + 2 = 5
+                new Tuple<int[], int[]>(new[] {1, 1, 1, 1}, new[] {1, 1, 0}),  // 3 + 3 = 6
+            };
+
+            var bitNRules = rules.Select(rule =>
+                new Tuple<bool[], bool>(rule.Item1.Select(b => b != 0).ToArray(), rule.Item2[2 - bit] != 0));
+            _gates.Add(new Tuple<Node.CrateGeneDelegate, ICircuit>((i1, i2) => new Or(i1, i2), new Or(null, null)));
+            _gates.Add(new Tuple<Node.CrateGeneDelegate, ICircuit>((i1, i2) => new Xor(i1, i2), new Xor(null, null)));
+            _sources.Add(new Tuple<Node.CrateGeneDelegate, ICircuit>((a, b) => new Source('C', _inputs),
+                new Source('C', null)));
+            _sources.Add(new Tuple<Node.CrateGeneDelegate, ICircuit>((a, b) => new Source('D', _inputs),
+                new Source('D', null)));
+            return bitNRules.ToArray();
         }
 
+        [TestMethod]
         public void Test2BitAdder1SBit()
         {
+            var rules = Get2BitAdderRulesForBit(0);
+            FindCircuit(rules, 3);
         }
 
+        [TestMethod]
         public void Test2BitAdder2SBit()
         {
+            var rules = Get2BitAdderRulesForBit(1);
+            FindCircuit(rules, 7);
         }
 
+        [TestMethod]
         public void Test2BitAdder4SBit()
         {
+            var rules = Get2BitAdderRulesForBit(2);
+            FindCircuit(rules, 9);
         }
 
-        public void FindCircuit(Tuple<bool[], bool>[] rules, int optimalLength)
+        public void FindCircuit(Tuple<bool[], bool>[] rules, int expectedLength)
         {
             var genetic = new Genetic<Node, int>();
             var watch = new Stopwatch();
-            watch.Start();
 
-            // fnDisplay
-            // fnGetFitness
-            // fnCreateGene
-            // fnMutate
+            void FnDisplay(Chromosome<Node, int> candidate, int? length = null)
+            {
+                if (length != null)
+                    Console.WriteLine("-- distinct nodes in circuit: {0}", NodesToCircuit(candidate.Genes).Item2.Count);
+                else
+                    Display(candidate, watch);
+            }
+
+            int FnGetFitness(Node[] genes) => Fitness(genes, rules, _inputs);
+
+            Node FnCreateGene(int index) => CreateGene(index, _gates.ToArray(), _sources.ToArray());
+
+            Node[] FnMutate(Node[] genes) => Mutate(genes, FnCreateGene, FnGetFitness, _sources.Count);
+
             var maxLength = 50;
-            // fnCreate
-            // fnOptimizationFunction
-            // fnIsImprovement
-            // fnIsOptimal
-            // fnGetNextFeatureValue
 
-            // var best = genetic.HillClimbing(fnOptimizationFunction, fnIsImprovement, fnIsOptimal, fnGetNextFeatureValue, fnDisplay, maxLength);
-            // Assert.AreEqual(rules.Length, best.Fitness);
-            // var circuit = NodesToCircuit(best.Genes).Item2;
-            // Assert.IsFalse(circuit.Length > expectedLength);
+            Node[] FnCreate() => Enumerable.Range(0, maxLength).Select(FnCreateGene).ToArray();
+
+            Chromosome<Node, int> FnOptimizationFunction(int variableLength)
+            {
+                maxLength = variableLength;
+                return genetic.BestFitness(FnGetFitness, 0, rules.Length, null, FnDisplay, FnMutate, FnCreate, 0, 3,
+                    null, 30);
+            }
+
+            bool FnIsImprovement(Chromosome<Node, int> currentBest, Chromosome<Node, int> child) =>
+                child.Fitness == rules.Length &&
+                NodesToCircuit(child.Genes).Item2.Count < NodesToCircuit(currentBest.Genes).Item2.Count;
+
+            bool FnIsOptimal(Chromosome<Node, int> child) =>
+                child.Fitness == rules.Length &&
+                NodesToCircuit(child.Genes).Item2.Count <= expectedLength;
+
+            int FnGetNextFeatureValue(Chromosome<Node, int> currentBest) =>
+                NodesToCircuit(currentBest.Genes).Item2.Count;
+
+            watch.Start();
+            var best = genetic.HillClimbing(FnOptimizationFunction, FnIsImprovement, FnIsOptimal, FnGetNextFeatureValue,
+                FnDisplay, maxLength);
+            Assert.AreEqual(rules.Length, best.Fitness);
+            var circuit = NodesToCircuit(best.Genes).Item2;
+            Assert.IsFalse(circuit.Count > expectedLength);
         }
 
         public static Tuple<ICircuit, ISet<int>> NodesToCircuit(Node[] genes)
