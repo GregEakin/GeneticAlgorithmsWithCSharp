@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 
 namespace GeneticAlgorithms.LogicCircuits
 {
@@ -10,7 +11,7 @@ namespace GeneticAlgorithms.LogicCircuits
     {
         private static readonly Random Random = new Random();
 
-        public delegate int FnCreateGene();
+        public delegate Node FnCreateGene(int index);
 
         public delegate int FnFitnessDelegate(Node[] genes);
 
@@ -92,14 +93,13 @@ namespace GeneticAlgorithms.LogicCircuits
             var initialFitness = fnFitness(childGenes);
             while (count-- > 0)
             {
-                //var indexesUsed = NodesToCircuit(childGenes).Item2
-                // [i for i in nodes_to_circuit(childGenes)[1] if i >= sourceCount];
-                //if (indexUsed.Length == 0)
-                //    return;
-                //var index = indexesUsed[Random.Next(indexesUsed.Lehgth)];
-                //childGenes[index] = fnCreateGene(index);
-                //if (fnFitness(childGenes).CompareTo(initialFitness) > 0)
-                //    return;
+                var indexesUsed = NodesToCircuit(childGenes).Item2.Skip(sourceCount).ToArray();
+                if (indexesUsed.Length == 0)
+                    return;
+                var index = indexesUsed[Random.Next(indexesUsed.Length)];
+                childGenes[index] = fnCreateGene(index);
+                if (fnFitness(childGenes).CompareTo(initialFitness) > 0)
+                    return;
             }
         }
 
@@ -126,8 +126,7 @@ namespace GeneticAlgorithms.LogicCircuits
             for (var i = 0; i < nodes.Length; i++)
                 nodes[i] = CreateGene(i, gates, sources);
 
-            var tuple = NodesToCircuit(nodes);
-            var circuit = tuple.Item1;
+            var circuit = NodesToCircuit(nodes).Item1;
             Console.Write("{0} = {1}", circuit, circuit.Output);
         }
 
@@ -215,10 +214,10 @@ namespace GeneticAlgorithms.LogicCircuits
             // Assert.IsFalse(circuit.Length > expectedLength);
         }
 
-        public static Tuple<ICircuit, int> NodesToCircuit(Node[] genes)
+        public static Tuple<ICircuit, ISet<int>> NodesToCircuit(Node[] genes)
         {
             var circuit = new List<ICircuit>();
-            var usedIndexes = new List<int>();
+            var usedIndexes = new List<ISet<int>>();
             for (var i = 0; i < genes.Length; i++)
             {
                 var node = genes[i];
@@ -228,19 +227,19 @@ namespace GeneticAlgorithms.LogicCircuits
                 if (node.IndexA != null && i > node.IndexA)
                 {
                     inputA = circuit[(int) node.IndexA];
-                    used.Add(usedIndexes[(int) node.IndexA]);
+                    used.UnionWith(usedIndexes[(int) node.IndexA]);
                     if (node.IndexB != null && i > node.IndexB)
                     {
                         inputB = circuit[(int) node.IndexB];
-                        used.Add(usedIndexes[(int) node.IndexB]);
+                        used.UnionWith(usedIndexes[(int) node.IndexB]);
                     }
                 }
 
                 circuit.Add(node.CreateGate(inputA, inputB));
-                usedIndexes.AddRange(used);
+                usedIndexes.Add(used);
             }
 
-            return new Tuple<ICircuit, int>(circuit[circuit.Count - 1], usedIndexes[usedIndexes.Count - 1]);
+            return new Tuple<ICircuit, ISet<int>>(circuit[circuit.Count - 1], usedIndexes[usedIndexes.Count - 1]);
         }
     }
 
