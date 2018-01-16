@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace GeneticAlgorithms.MapColors
 {
-    public class State : IComparable
+    public class State : IComparable, IComparable<State>
     {
         public string Name { get; }
         public int Index { get; }
@@ -24,15 +24,22 @@ namespace GeneticAlgorithms.MapColors
                 case null:
                     return 1;
                 case State that:
-                    return string.Compare(Name, that.Name, StringComparison.Ordinal);
+                    return CompareTo(that);
                 default:
                     throw new ArgumentException("Object is not a State");
             }
         }
 
-        //public override int GetHashCode() => Name.GetHashCode();
+        public int CompareTo(State that)
+        {
+            if (ReferenceEquals(this, that)) return 0;
+            if (that is null) return 1;
+            return string.Compare(Name, that.Name, StringComparison.Ordinal);
+        }
 
-        //public override bool Equals(object obj) => obj is State item && Name.Equals(item.Name);
+        public override int GetHashCode() => Name.GetHashCode() * 10 + Index;
+
+        public override bool Equals(object obj) => obj is State that && CompareTo(that) == 0;
 
         public override string ToString() => Name;
     }

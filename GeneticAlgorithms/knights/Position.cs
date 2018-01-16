@@ -2,7 +2,7 @@
 
 namespace GeneticAlgorithms.Knights
 {
-    public class Position : IComparable
+    public class Position : IComparable, IComparable<Position>
     {
         public int X { get; }
         public int Y { get; }
@@ -25,7 +25,7 @@ namespace GeneticAlgorithms.Knights
                 case null:
                     return false;
                 case Position that:
-                    return X == that.X && Y == that.Y;
+                    return CompareTo(that) == 0;
                 default:
                     return false;
             }
@@ -43,12 +43,19 @@ namespace GeneticAlgorithms.Knights
                 case null:
                     return 1;
                 case Position that:
-                    return X != that.X
-                        ? X.CompareTo(that.X)
-                        : Y.CompareTo(that.Y);
+                    return CompareTo(that);
                 default:
                     throw new ArgumentException("Object is not a Fitness");
             }
+        }
+
+        public int CompareTo(Position that)
+        {
+            if (ReferenceEquals(this, that)) return 0;
+            if (that is null) return 1;
+            var xComparison = X.CompareTo(that.X);
+            if (xComparison != 0) return xComparison;
+            return Y.CompareTo(that.Y);
         }
     }
 }

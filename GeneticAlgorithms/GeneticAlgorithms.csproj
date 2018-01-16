@@ -66,6 +66,7 @@
     <Compile Include="LawnmowerProblem\Genetic.cs" />
     <Compile Include="LawnmowerProblem\Lawnmower.cs" />
     <Compile Include="LawnmowerProblem\LawnmowerTests.cs" />
+    <Compile Include="LawnmowerProblem\Location.cs" />
     <Compile Include="LawnmowerProblem\Mow.cs" />
     <Compile Include="LawnmowerProblem\SearchTimeoutException.cs" />
     <Compile Include="LogicCircuits\Chromosome.cs" />
@@ -122,6 +123,8 @@
     <Compile Include="Queens\Fitness.cs" />
     <Compile Include="Queens\Genetic.cs" />
     <Compile Include="Queens\QueenTests.cs" />
+    <Compile Include="RegularExpressions\Fitness.cs" />
+    <Compile Include="RegularExpressions\RegexTests.cs" />
     <Compile Include="SortedNumbers\Chromosome.cs" />
     <Compile Include="SortedNumbers\Genetic.cs" />
     <Compile Include="SortedNumbers\SortedNumbersTests.cs" />
@@ -146,7 +149,6 @@
     <None Include="Readme.md" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="RegularExpressions\" />
     <Folder Include="TicTacToe\" />
   </ItemGroup>
   <Import Project="$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets" Condition="Exists('$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets')" />

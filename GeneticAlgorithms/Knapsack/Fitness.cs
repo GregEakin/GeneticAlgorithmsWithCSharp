@@ -2,7 +2,7 @@
 
 namespace GeneticAlgorithms.Knapsack
 {
-    public class Fitness : IComparable
+    public class Fitness : IComparable, IComparable<Fitness>
     {
         public double TotalWeight { get; }
 
@@ -24,10 +24,17 @@ namespace GeneticAlgorithms.Knapsack
                 case null:
                     return 1;
                 case Fitness that:
-                    return TotalValue.CompareTo(that.TotalValue);
+                    return CompareTo(that);
                 default:
                     throw new ArgumentException("Object is not a Fitness");
             }
+        }
+
+        public int CompareTo(Fitness that)
+        {
+            if (ReferenceEquals(this, that)) return 0;
+            if (that is null) return 1;
+            return TotalValue.CompareTo(that.TotalValue);
         }
 
         public override string ToString()

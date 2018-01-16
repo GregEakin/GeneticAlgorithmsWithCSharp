@@ -3,7 +3,7 @@
 namespace GeneticAlgorithms.LogicCircuits
 {
     public partial class Genetic<TGene, TFitness>
-        where TFitness : IComparable
+        where TFitness : IComparable<TFitness>
     {
         public class SearchTimeoutException : Exception
         {

@@ -5,7 +5,7 @@ using System.Linq;
 namespace GeneticAlgorithms.Knights
 {
     public class Genetic<TGene, TFitness>
-        where TFitness : IComparable
+        where TFitness : IComparable<TFitness>
     {
         public delegate TFitness FitnessFun(TGene[] gene);
 

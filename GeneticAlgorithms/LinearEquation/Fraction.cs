@@ -2,7 +2,7 @@
 
 namespace GeneticAlgorithms.LinearEquation
 {
-    public class Fraction : IComparable
+    public class Fraction : IComparable, IComparable<Fraction>
     {
         public int Numerator { get; }
 
@@ -82,7 +82,7 @@ namespace GeneticAlgorithms.LinearEquation
                 case null:
                     return false;
                 case Fraction that:
-                    return Numerator == that.Numerator && Denominator == that.Denominator;
+                    return CompareTo(that) == 0;
                 default:
                     return false;
             }
@@ -248,10 +248,19 @@ namespace GeneticAlgorithms.LinearEquation
                 case null:
                     return 1;
                 case Fraction that:
-                    return ((double) this).CompareTo((double) that);
+                    return CompareTo(that);
                 default:
                     throw new ArgumentException("Object is not a Fraction");
             }
+        }
+
+        public int CompareTo(Fraction that)
+        {
+            if (ReferenceEquals(this, that)) return 0;
+            if (that is null) return 1;
+            var denominatorComparison = Denominator.CompareTo(that.Denominator);
+            if (denominatorComparison != 0) return denominatorComparison;
+            return Numerator.CompareTo(that.Numerator);
         }
     }
 }

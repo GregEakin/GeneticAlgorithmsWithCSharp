@@ -2,7 +2,7 @@
 
 namespace GeneticAlgorithms.Knapsack
 {
-    public class Resource : IComparable
+    public class Resource : IComparable, IComparable<Resource>
     {
         public string Name { get; }
         public int Value { get; }
@@ -24,10 +24,17 @@ namespace GeneticAlgorithms.Knapsack
                 case null:
                     return 1;
                 case Resource that:
-                    return string.Compare(Name, that.Name, StringComparison.Ordinal);
+                    return CompareTo(that);
                 default:
                     throw new ArgumentException("Object is not a Fitness");
             }
+        }
+
+        public int CompareTo(Resource that)
+        {
+            if (ReferenceEquals(this, that)) return 0;
+            if (that is null) return 1;
+            return string.Compare(Name, that.Name, StringComparison.Ordinal);
         }
     }
 }

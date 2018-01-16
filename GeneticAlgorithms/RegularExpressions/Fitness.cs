@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace GeneticAlgorithms.LawnmowerProblem
+namespace GeneticAlgorithms.RegularExpressions
 {
     public class Fitness : IComparable, IComparable<Fitness>
     {

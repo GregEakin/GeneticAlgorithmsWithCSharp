@@ -5,13 +5,14 @@ using System.Linq;
 namespace GeneticAlgorithms.Cards
 {
     public class Genetic<TGene, TFitness>
-        where TFitness : IComparable
+        where TFitness : IComparable<TFitness>
     {
         public delegate TFitness FitnessFun(TGene[] gene, int size);
 
         public delegate void DisplayFun(Chromosome<TGene, TFitness> child);
 
         public delegate TGene[] MutateFun(TGene[] genes);
+
         public delegate TGene[] MutateGeneFun(TGene[] genes);
 
         public delegate Chromosome<TGene, TFitness> MutateDelegate(Chromosome<TGene, TFitness> parent);

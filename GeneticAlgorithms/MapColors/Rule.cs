@@ -1,8 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace GeneticAlgorithms.MapColors
 {
-    public class Rule : IComparable
+    public class Rule : IComparable, IComparable<Rule>
     {
         public State From { get; }
         public State To { get; }
@@ -25,12 +26,19 @@ namespace GeneticAlgorithms.MapColors
                 case null:
                     return 1;
                 case Rule that:
-                    var thisRule = From.Name + To.Name;
-                    var thatRule = that.From.Name + that.To.Name;
-                    return string.Compare(thisRule, thatRule, StringComparison.Ordinal);
+                    return CompareTo(that);
                 default:
                     throw new ArgumentException("Object is not a Rule");
             }
+        }
+
+        public int CompareTo(Rule that)
+        {
+            if (ReferenceEquals(this, that)) return 0;
+            if (that is null) return 1;
+            var fromComparison = Comparer<State>.Default.Compare(From, that.From);
+            if (fromComparison != 0) return fromComparison;
+            return Comparer<State>.Default.Compare(To, that.To);
         }
     }
 }

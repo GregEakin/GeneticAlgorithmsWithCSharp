@@ -6,7 +6,7 @@ using System.Linq;
 namespace GeneticAlgorithms.LawnmowerProblem
 {
     public partial class Genetic<TGene, TFitness>
-        where TFitness : IComparable
+        where TFitness : IComparable<TFitness>
     {
         public class ReverseComparer<T> : IComparer<T>
         {

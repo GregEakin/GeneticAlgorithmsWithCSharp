@@ -2,7 +2,7 @@
 
 namespace GeneticAlgorithms.Queens
 {
-    public class Fitness : IComparable
+    public class Fitness : IComparable, IComparable<Fitness>
     {
         public int Total { get; }
 
@@ -18,10 +18,17 @@ namespace GeneticAlgorithms.Queens
                 case null:
                     return 1;
                 case Fitness that:
-                    return -1 * Total.CompareTo(that.Total);
+                    return CompareTo(that);
                 default:
                     throw new ArgumentException("Object is not a Fitness");
             }
+        }
+
+        public int CompareTo(Fitness that)
+        {
+            if (ReferenceEquals(this, that)) return 0;
+            if (that is null) return 1;
+            return -Total.CompareTo(that.Total);
         }
 
         public override string ToString()
