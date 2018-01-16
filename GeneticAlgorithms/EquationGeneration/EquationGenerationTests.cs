@@ -183,8 +183,7 @@ namespace GeneticAlgorithms.EquationGeneration
             var expectedTotal = Evaluate(optimalLengthSolution, prioritizedOperations);
             var minNumbers = (1 + optimalLengthSolution.Length) / 2;
             var maxNumbers = 6 * minNumbers;
-            var watch = new Stopwatch();
-            watch.Start();
+            var watch = Stopwatch.StartNew();
 
             void FnDisplay(Chromosome<string, int> candidate) => Display(candidate, watch);
             int FnEvaluate(string[] genes) => Evaluate(genes, prioritizedOperations);

@@ -29,13 +29,11 @@ namespace GeneticAlgorithms.SortedNumbers
 
             var genetic = new Genetic<int, int>();
             var geneSet = new[] {0, 1};
-            var watch = new Stopwatch();
+            var watch = Stopwatch.StartNew();
             void DisplayFun(Chromosome<int, int> candidate) => Display(candidate, watch, length);
 
             var optimalFitness = length;
-            watch.Start();
             var best = genetic.BestFitness(Fitness, length, optimalFitness, geneSet, DisplayFun);
-            watch.Stop();
             Assert.IsTrue(best.Fitness >= length);
         }
     }

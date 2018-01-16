@@ -11,21 +11,13 @@ namespace GeneticAlgorithms.Knights
     {
         private static readonly Random Random = new Random();
 
-        public static Position[] Attacks(Position location, int width, int height)
-        {
-            var indexes = new[] {-2, -1, 1, 2};
-            var attacks = from x in indexes
-                where 0 <= x + location.X && x + location.X < width
-                from y in indexes
-                where 0 <= y + location.Y && y + location.Y < height
-                where Math.Abs(x) != Math.Abs(y)
-                select new Position(x + location.X, y + location.Y);
-            return attacks.ToArray();
-        }
+        public delegate Position RandomPosition();
 
         public static int Fitness(Position[] genes, int width, int height)
         {
-            var attacks = from kn in genes from pos in Attacks(kn, width, height) select pos;
+            var attacks = from kn in genes
+                from pos in Attacks(kn, width, height)
+                select pos;
             return attacks.Distinct().Count();
         }
 
@@ -70,11 +62,12 @@ namespace GeneticAlgorithms.Knights
                         knightIndexes.Remove(p);
                 }
 
-                var knightPositions = unattacked.SelectMany(u => Attacks(u, width, height))
+                var knightPositions = unattacked.SelectMany(x => Attacks(x, width, height))
                     .Where(nonEdgePositions.Contains).Distinct();
                 var potentialKnightPositions = unattacked.Count > 0
                     ? knightPositions.ToArray()
                     : nonEdgePositions;
+
                 var geneIndex = knightIndexes.Count == 0
                     ? Random.Next(genes.Length)
                     : knightIndexes.ElementAt(Random.Next(knightIndexes.Count));
@@ -86,12 +79,79 @@ namespace GeneticAlgorithms.Knights
             return genes;
         }
 
-        public delegate Position RandomPosition();
-
         public Position[] Create(RandomPosition randomPositionFun, int expectedKnights)
         {
             var genes = Enumerable.Range(0, expectedKnights).Select(k => randomPositionFun());
             return genes.ToArray();
+        }
+
+        public static Position[] Attacks(Position location, int width, int height)
+        {
+            var indexes = new[] {-2, -1, 1, 2};
+            var attacks = from x in indexes
+                where 0 <= x + location.X && x + location.X < width
+                from y in indexes
+                where 0 <= y + location.Y && y + location.Y < height
+                where Math.Abs(x) != Math.Abs(y)
+                select new Position(x + location.X, y + location.Y);
+            return attacks.ToArray();
+        }
+
+        [TestMethod]
+        public void Knight_3x4Test()
+        {
+            FindKnightPositions(4, 3, 6);
+        }
+
+        [TestMethod]
+        public void Knight_8x8Test()
+        {
+            FindKnightPositions(8, 8, 14);
+        }
+
+        [TestMethod]
+        public void Knight_10x10Test()
+        {
+            FindKnightPositions(10, 10, 22);
+        }
+
+        [TestMethod]
+        public void Knight_12x12Test()
+        {
+            FindKnightPositions(12, 12, 28);
+        }
+
+        [TestMethod]
+        public void Knight_13x13Test()
+        {
+            FindKnightPositions(13, 13, 32);
+        }
+
+        public void FindKnightPositions(int width, int height, int expectedKnights)
+        {
+            var generic = new Genetic<Position, int>();
+            var watch = Stopwatch.StartNew();
+
+            int FitnessFun(Position[] genes) => Fitness(genes, width, height);
+            void DisplayFun(Chromosome<Position, int> candidate) => Display(candidate, watch, width, height);
+
+            var allPositions = (from x in Enumerable.Range(0, width)
+                from y in Enumerable.Range(0, height)
+                select new Position(x, y)).ToArray();
+
+            var nonEdgePositions = (width < 6 || height < 6
+                ? allPositions
+                : (from p in allPositions
+                    where 0 < p.X && p.X < width - 1 && 0 < p.Y && p.Y < height - 1
+                    select p)).ToArray();
+
+            Position RandomPositionFun() => nonEdgePositions[Random.Next(nonEdgePositions.Length)];
+            Position[] MutateFun(Position[] genes) => Mutate(genes, width, height, allPositions, nonEdgePositions);
+            Position[] CreateFun() => Create(RandomPositionFun, expectedKnights);
+
+            var optimalFitness = width * height;
+            var best = generic.BestFitness(FitnessFun, 0, optimalFitness, null, DisplayFun, MutateFun, CreateFun);
+            Assert.IsFalse(optimalFitness > best.Fitness);
         }
 
         [TestMethod]
@@ -154,7 +214,7 @@ namespace GeneticAlgorithms.Knights
             };
 
             var candidate = new Chromosome<Position, int>(genes, 86);
-            var watch = new Stopwatch();
+            var watch = Stopwatch.StartNew();
             Display(candidate, watch, 4, 3);
         }
 
@@ -177,74 +237,13 @@ namespace GeneticAlgorithms.Knights
                 select new Position(x, y);
 
             var allPositionsArray = allPositions.ToArray();
-            var nonEdgePositions = width < 6 || height < 6
-                ? allPositionsArray
-                : (from p in allPositionsArray
-                    where 0 < p.X && p.X < width - 1 && 0 < p.Y && p.Y < height - 1
-                    select p);
 
-            var v1 = new Board(genes, width, height);
-            Console.WriteLine(v1);
+            var b1 = new Board(genes, width, height);
+            Console.WriteLine(b1);
 
-            Mutate(genes, width, height, allPositionsArray, nonEdgePositions.ToArray());
-            var v2 = new Board(genes, width, height);
-            Console.WriteLine(v2);
-        }
-
-        public void FindKnightPositions(int width, int height, int expectedKnights)
-        {
-            var generic = new Genetic<Position, int>();
-            var watch = new Stopwatch();
-
-            var allPositions = (from x in Enumerable.Range(0, width)
-                from y in Enumerable.Range(0, height)
-                select new Position(x, y)).ToArray();
-            var nonEdgePositions = (width < 6 || height < 6
-                ? allPositions
-                : (from p in allPositions
-                    where 0 < p.X && p.X < width - 1 && 0 < p.Y && p.Y < height - 1
-                    select p)).ToArray();
-
-            int FitnessFun(Position[] genes) => Fitness(genes, width, height);
-            void DisplayFun(Chromosome<Position, int> candidate) => Display(candidate, watch, width, height);
-            Position[] MutateFun(Position[] genes) => Mutate(genes, width, height, allPositions, nonEdgePositions);
-            Position RandomPositionFun() => nonEdgePositions[Random.Next(nonEdgePositions.Length)];
-            Position[] CreateFun() => Create(RandomPositionFun, expectedKnights);
-
-            var optimalFitness = width * height;
-            watch.Start();
-            var best = generic.BestFitness(FitnessFun, 0, optimalFitness, null, DisplayFun, MutateFun, CreateFun);
-            Assert.IsFalse(optimalFitness > best.Fitness);
-        }
-
-        [TestMethod]
-        public void Knight_3x4Test()
-        {
-            FindKnightPositions(4, 3, 6);
-        }
-
-        [TestMethod]
-        public void Knight_8x8Test()
-        {
-            FindKnightPositions(8, 8, 14);
-        }
-
-        [TestMethod]
-        public void Knight_10x10Test()
-        {
-            FindKnightPositions(10, 10, 22);
-        }
-
-        [TestMethod]
-        public void Knight_12x12Test()
-        {
-            FindKnightPositions(12, 12, 28);
-        }
-
-        [TestMethod]
-        public void Knight_13x13Test()
-        {
-            FindKnightPositions(13, 13, 32);
+            genes = Mutate(genes, width, height, allPositionsArray, allPositionsArray);
+            var b2 = new Board(genes, width, height);
+            Console.WriteLine(b2);
         }
     }
 }

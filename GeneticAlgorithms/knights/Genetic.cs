@@ -47,7 +47,7 @@ namespace GeneticAlgorithms.Knights
         {
             var childGenes = new TGene[parentGenes.Length];
             Array.Copy(parentGenes, childGenes, parentGenes.Length);
-            var index = _random.Next(parentGenes.Length);
+            var index = _random.Next(childGenes.Length);
             var randomSample = RandomSample(geneSet, 2);
             var newGene = randomSample[0];
             var alternate = randomSample[1];
@@ -95,7 +95,7 @@ namespace GeneticAlgorithms.Knights
                     continue;
 
                 bestParent = child;
-                if (bestParent.Fitness.CompareTo(child.Fitness) < 0)
+                if (bestParent.Fitness.CompareTo(child.Fitness) <= 0)
                     yield return child;
             }
         }

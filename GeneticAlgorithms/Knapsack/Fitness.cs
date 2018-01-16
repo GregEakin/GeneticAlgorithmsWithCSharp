@@ -24,7 +24,7 @@ namespace GeneticAlgorithms.Knapsack
                 case null:
                     return 1;
                 case Fitness that:
-                    return -1 * TotalValue.CompareTo(that.TotalValue);
+                    return TotalValue.CompareTo(that.TotalValue);
                 default:
                     throw new ArgumentException("Object is not a Fitness");
             }

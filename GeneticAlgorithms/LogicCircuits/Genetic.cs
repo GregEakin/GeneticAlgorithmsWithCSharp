@@ -153,8 +153,7 @@ namespace GeneticAlgorithms.LogicCircuits
             Func<Chromosome<TGene, TFitness>, int, Chromosome<TGene, TFitness>[], Chromosome<TGene, TFitness>>
                 newChildFun, GenerateParentFun generateParentFun, int maxAge, int poolSize, int maxSeconds)
         {
-            var watch = new Stopwatch();
-            watch.Start();
+            var watch = Stopwatch.StartNew();
             var bestParent = generateParentFun();
             if (maxSeconds > 0 && maxSeconds < watch.Elapsed.Seconds)
                 throw new SearchTimeoutException(bestParent);

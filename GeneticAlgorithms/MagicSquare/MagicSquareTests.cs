@@ -85,7 +85,7 @@ namespace GeneticAlgorithms.MagicSquare
 
         public static void Generate(int diagonalSize, int maxAge)
         {
-            var watch = new Stopwatch();
+            var watch = Stopwatch.StartNew();
             var genetic = new Genetic<int, Fitness>();
 
             var nSquared = diagonalSize * diagonalSize;
@@ -99,7 +99,6 @@ namespace GeneticAlgorithms.MagicSquare
             int[] CreateFun() => geneSet.OrderBy(i => Random.Next(geneSet.Length)).ToArray();
 
             var optimalValue = new Fitness(0);
-            watch.Start();
             var best = genetic.BestFitness(FitnessFun, nSquared, optimalValue, geneSet, DisplayFun, MutateFun,
                 CreateFun, maxAge);
             Assert.IsTrue(optimalValue.CompareTo(best.Fitness) <= 0);

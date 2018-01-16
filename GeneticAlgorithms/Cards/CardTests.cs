@@ -71,7 +71,7 @@ namespace GeneticAlgorithms.Cards
             var genes = new[] {1, 1, 1, 1, 1, 2, 2, 2, 2, 2};
             var fitness = Fitness(genes, genes.Length);
             var chromosome = new Chromosome<int, Fitness>(genes, fitness);
-            var watch = new Stopwatch();
+            var watch = Stopwatch.StartNew();
 
             Display(chromosome, watch);
         }
@@ -81,15 +81,13 @@ namespace GeneticAlgorithms.Cards
         {
             var genetic = new Genetic<int, Fitness>();
             var geneSet = Enumerable.Range(1, 10).ToArray();
-            var watch = new Stopwatch();
+            var watch = Stopwatch.StartNew();
 
             void DisplayFun(Chromosome<int, Fitness> candidate) => Display(candidate, watch);
             int[] MutateFun(int[] genes) => Mutate(genes, geneSet, genetic);
 
             var optimalFitness = new Fitness(36, 360, 0);
-            watch.Start();
             var best = genetic.BestFitness(Fitness, 10, optimalFitness, geneSet, DisplayFun, MutateFun);
-            watch.Stop();
             Assert.IsTrue(optimalFitness.CompareTo(best.Fitness) <= 0);
         }
     }

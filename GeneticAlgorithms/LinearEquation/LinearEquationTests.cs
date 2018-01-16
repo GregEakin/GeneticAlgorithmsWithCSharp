@@ -59,7 +59,7 @@ namespace GeneticAlgorithms.LinearEquation
             var genes = geneSet.OrderBy(g => Random.Next()).Take(4).ToArray();
             var fitness = new Fitness(new Fraction(42));
             var chromosome = new Chromosome<Fraction, Fitness>(genes, fitness);
-            var watch = new Stopwatch();
+            var watch = Stopwatch.StartNew();
             Display(chromosome, watch);
         }
 
@@ -97,7 +97,7 @@ namespace GeneticAlgorithms.LinearEquation
         [TestMethod]
         public void MutateTest()
         {
-            var watch = new Stopwatch();
+            var watch = Stopwatch.StartNew();
             var fitness = new Fitness(new Fraction(0));
 
             var range = Enumerable.Range(-5, 11).ToArray();
@@ -186,7 +186,7 @@ namespace GeneticAlgorithms.LinearEquation
         public Chromosome<Fraction, Fitness> SolveUnknown(int numUnknowns, Fraction[] geneSet, Equation[] equations)
         {
             var genetic = new Genetic<Fraction, Fitness>();
-            var watch = new Stopwatch();
+            var watch = Stopwatch.StartNew();
             var maxAge = 50;
             var window = new Window(Math.Max(1, geneSet.Length / (2 * maxAge)),
                 Math.Max(1, geneSet.Length / 3),
@@ -199,7 +199,6 @@ namespace GeneticAlgorithms.LinearEquation
             Fraction[] FnMutate(Fraction[] genes) => Mutate(genes, sortedGeneSet, window, geneIndexes);
 
             var optimalFitness = new Fitness(new Fraction(0));
-            watch.Start();
             var best = genetic.BestFitness(FnFitness, numUnknowns, optimalFitness, geneSet, FnDispaly, FnMutate,
                 null, maxAge);
             Assert.IsTrue(optimalFitness.CompareTo(best.Fitness) <= 0);

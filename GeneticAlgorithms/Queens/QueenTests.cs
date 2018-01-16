@@ -141,12 +141,10 @@ namespace GeneticAlgorithms.Queens
         {
             var genetic = new Genetic<int, Fitness>();
             var geneSet = new[] {0, 1, 2, 3};
-            var watch = new Stopwatch();
+            var watch = Stopwatch.StartNew();
             void DisplayFun(Chromosome<int, Fitness> candidate) => Display(candidate, watch, geneSet.Length);
 
-            watch.Start();
             var best = genetic.BestFitness(Fitness, geneSet.Length, new Fitness(0), geneSet, DisplayFun);
-            watch.Stop();
             Assert.IsTrue(best.Fitness.Total <= 0);
         }
 
@@ -155,12 +153,10 @@ namespace GeneticAlgorithms.Queens
         {
             var genetic = new Genetic<int, Fitness>();
             var geneSet = new[] {0, 1, 2, 3, 4, 5, 6, 7};
-            var watch = new Stopwatch();
+            var watch = Stopwatch.StartNew();
             void DisplayFun(Chromosome<int, Fitness> candidate) => Display(candidate, watch, geneSet.Length);
 
-            watch.Start();
             var best = genetic.BestFitness(Fitness, geneSet.Length, new Fitness(0), geneSet, DisplayFun);
-            watch.Stop();
             Assert.IsTrue(best.Fitness.Total <= 0);
         }
     }

@@ -81,14 +81,14 @@ namespace GeneticAlgorithms.Sudoku
                 genes.Add(j);
 
             var candidate = new Chromosome<int, int>(genes.ToArray(), 0);
-            var watch = new Stopwatch();
+            var watch = Stopwatch.StartNew();
             Display(candidate, watch);
         }
 
         [TestMethod]
         public void MutateTest()
         {
-            var watch = new Stopwatch();
+            var watch = Stopwatch.StartNew();
             var geneSet = Enumerable.Range(1, 9).ToArray();
             var genes = RandomSample(geneSet, 81);
             var validationRules = BuildValidationRules();
@@ -107,7 +107,7 @@ namespace GeneticAlgorithms.Sudoku
         {
             var generic = new Genetic<int, int>();
             var geneSet = Enumerable.Range(1, 9).ToArray();
-            var watch = new Stopwatch();
+            var watch = Stopwatch.StartNew();
             var optimalValue = 100;
             var validationRules = BuildValidationRules();
 

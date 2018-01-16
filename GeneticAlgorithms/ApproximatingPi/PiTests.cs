@@ -66,7 +66,7 @@ namespace GeneticAlgorithms.ApproximatingPi
         {
             var genetic = new Genetic<bool, double>();
             var geneSet = new[] {false, true};
-            var watch = new Stopwatch();
+            var watch = Stopwatch.StartNew();
             var optimalFitness = 3.14159; // Math.PI;
 
             void FnDispaly(Chromosome<bool, double> candidate) => Display(candidate, watch, bitValues, display);
@@ -74,7 +74,6 @@ namespace GeneticAlgorithms.ApproximatingPi
             bool[] FnMutate(bool[] genes) => Mutate(genes, bitValues.Length);
 
             var length = 2 * bitValues.Length;
-            watch.Start();
             var best = genetic.BestFitness(FnFitness, length, optimalFitness, geneSet, FnDispaly, FnMutate, null, 250,
                 1, null, maxSeconds);
 
@@ -99,14 +98,13 @@ namespace GeneticAlgorithms.ApproximatingPi
         public void OptimizePi()
         {
             var genetic = new Genetic<int, double>();
-            var geneSet = Enumerable.Range(1, 512).ToArray();
+            var geneSet = Enumerable.Range(1, 514).ToArray();
             var length = 10;
             var maxSeconds = 2;
 
             double FnGetFitness(int[] genes)
             {
-                var watch = new Stopwatch();
-                watch.Start();
+                var watch = Stopwatch.StartNew();
                 var count = 0.0;
                 while (watch.Elapsed.Seconds < maxSeconds)
                 {
@@ -134,8 +132,7 @@ namespace GeneticAlgorithms.ApproximatingPi
         public void TestFindTop10Approximations()
         {
             // 355 / 113	3.1415923868256
-            var watch = new Stopwatch();
-            watch.Start();
+            var watch = Stopwatch.StartNew();
 
             var best = new Dictionary<double, Tuple<int, int>>();
             for (var numerator = 1; numerator < (1 << 10) + 1; numerator++)

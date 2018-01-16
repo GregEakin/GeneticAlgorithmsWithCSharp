@@ -29,14 +29,12 @@ namespace GeneticAlgorithms.Password
 
         private static Stopwatch GuessPassword(string target)
         {
-            var watch = new Stopwatch();
+            var watch = Stopwatch.StartNew();
             int FitnessFun(string guess) => Fitness(target, guess);
             void DisplayFun(Chromosome candidate) => Display(candidate, watch);
             // void DisplayFun(Chromosome candidate) { }
             
-            watch.Start();
             var answer = Genetic.BestFitness(FitnessFun, target.Length, target.Length, GeneSet, DisplayFun);
-            watch.Stop();
             Assert.AreEqual(target.Length, answer.Fitness);
             Assert.AreEqual(target, answer.Genes);
 

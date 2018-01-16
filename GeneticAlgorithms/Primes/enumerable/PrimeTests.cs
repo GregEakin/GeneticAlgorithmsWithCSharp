@@ -225,10 +225,8 @@ namespace GeneticAlgorithms.primes.enumerable
         public void TimingTest()
         {
             const int limit = 100000;
-            var watch = new Stopwatch();
-            watch.Start();
+            var watch = Stopwatch.StartNew();
             var list = Primes9().Take(limit).ToList();
-            watch.Stop();
             Assert.AreEqual(limit, list.Count);
             Console.WriteLine("Time took {0} ms", watch.ElapsedMilliseconds);
         }

@@ -295,7 +295,7 @@ namespace GeneticAlgorithms.LawnmowerProblem
 
             Fitness FnFitness(INode[] genes) => Fitness(genes, FnEvaluate);
 
-            var watch = new Stopwatch();
+            var watch = Stopwatch.StartNew();
 
             void FnDisplay(Chromosome<INode, Fitness> candidate) => Display(candidate, watch, FnEvaluate);
 
@@ -303,7 +303,6 @@ namespace GeneticAlgorithms.LawnmowerProblem
 
             var optimalFitness = new Fitness(width * height, expectedNumberOfInstructions, expectedNumberOfSteps);
 
-            watch.Start();
             var best = genetic.BestFitness(FnFitness, 0, optimalFitness, null, FnDisplay, FnMutate, FnCreate, 0, 10,
                 Crossover, 30);
 

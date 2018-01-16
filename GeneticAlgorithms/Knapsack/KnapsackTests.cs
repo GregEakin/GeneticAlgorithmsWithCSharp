@@ -132,24 +132,6 @@ namespace GeneticAlgorithms.Knapsack
             return Math.Min(weight, volume);
         }
 
-        public static void FillKnapsack(Resource[] items, double maxWeight, double maxVolume, Fitness optimalFitness)
-        {
-            var genetic = new Genetic<ItemQuantity, Fitness>();
-            var watch = new Stopwatch();
-            var window = new Window(1, Math.Max(1, items.Length / 3), items.Length / 2);
-            var sortedItems = items.OrderBy(i => i.Value).ToArray();
-
-            Fitness FitnessFun(ItemQuantity[] genes) => Fitness(genes);
-            void DisplayFun(Chromosome<ItemQuantity, Fitness> candidate) => Display(candidate, watch);
-            ItemQuantity[] MutateFun(ItemQuantity[] genes) => Mutate(genes, sortedItems, maxWeight, maxVolume, window);
-            ItemQuantity[] CreateFun() => Create(items, maxWeight, maxVolume);
-
-            watch.Start();
-            var best = genetic.BestFitness(FitnessFun, 0, optimalFitness, null, DisplayFun, MutateFun, CreateFun, 50);
-            watch.Stop();
-            Assert.IsTrue(optimalFitness.CompareTo(best.Fitness) <= 0);
-        }
-
         [TestMethod]
         public void CookieTest()
         {
@@ -182,6 +164,22 @@ namespace GeneticAlgorithms.Knapsack
             var maxVolume = 0.0;
             var optimal = Fitness(problemInfo.Solution);
             FillKnapsack(items, maxWeight, maxVolume, optimal);
+        }
+
+        public static void FillKnapsack(Resource[] items, double maxWeight, double maxVolume, Fitness optimalFitness)
+        {
+            var genetic = new Genetic<ItemQuantity, Fitness>();
+            var watch = Stopwatch.StartNew();
+            var window = new Window(1, Math.Max(1, items.Length / 3), items.Length / 2);
+            var sortedItems = items.OrderBy(i => i.Value).ToArray();
+
+            Fitness FitnessFun(ItemQuantity[] genes) => Fitness(genes);
+            void DisplayFun(Chromosome<ItemQuantity, Fitness> candidate) => Display(candidate, watch);
+            ItemQuantity[] MutateFun(ItemQuantity[] genes) => Mutate(genes, sortedItems, maxWeight, maxVolume, window);
+            ItemQuantity[] CreateFun() => Create(items, maxWeight, maxVolume);
+
+            var best = genetic.BestFitness(FitnessFun, 0, optimalFitness, null, DisplayFun, MutateFun, CreateFun, 50);
+            Assert.IsTrue(optimalFitness.CompareTo(best.Fitness) <= 0);
         }
     }
 }
