@@ -212,7 +212,7 @@ namespace GeneticAlgorithms.LogicCircuits
                     continue;
                 }
 
-                if (parent.Fitness.CompareTo(child.Fitness) >= 0)
+                if (child.Fitness.CompareTo(parent.Fitness) <= 0)
                 {
                     child.Age = parent.Age + 1;
                     parents[pIndex] = child;

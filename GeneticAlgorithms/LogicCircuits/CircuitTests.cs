@@ -273,6 +273,9 @@ namespace GeneticAlgorithms.LogicCircuits
                     Display(candidate, watch);
             }
 
+            void FnBlankDisplay(Chromosome<Node, int> candidate, int? length = null)
+            {}
+
             int FnGetFitness(Node[] genes) => Fitness(genes, rules, _inputs);
 
             Node FnCreateGene(int index) => CreateGene(index, _gates.ToArray(), _sources.ToArray());
@@ -286,7 +289,7 @@ namespace GeneticAlgorithms.LogicCircuits
             Chromosome<Node, int> FnOptimizationFunction(int variableLength)
             {
                 maxLength = variableLength;
-                return genetic.BestFitness(FnGetFitness, 0, rules.Length, null, FnDisplay, FnMutate, FnCreate, 0, 3,
+                return genetic.BestFitness(FnGetFitness, 0, rules.Length, null, FnBlankDisplay, FnMutate, FnCreate, 0, 3,
                     null, 30);
             }
 
@@ -334,22 +337,6 @@ namespace GeneticAlgorithms.LogicCircuits
             }
 
             return new Tuple<ICircuit, ISet<int>>(circuit[circuit.Count - 1], usedIndexes[usedIndexes.Count - 1]);
-        }
-    }
-
-    public class Node
-    {
-        public delegate ICircuit CrateGeneDelegate(ICircuit inputA, ICircuit inputB);
-
-        public CrateGeneDelegate CreateGate { get; }
-        public int? IndexA { get; }
-        public int? IndexB { get; }
-
-        public Node(CrateGeneDelegate createGate, int? indexA = null, int? indexB = null)
-        {
-            CreateGate = createGate;
-            IndexA = indexA;
-            IndexB = indexB;
         }
     }
 }
