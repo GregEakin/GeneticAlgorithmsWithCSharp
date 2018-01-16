@@ -155,17 +155,18 @@ namespace GeneticAlgorithms.LogicCircuits
         {
             var watch = Stopwatch.StartNew();
             var bestParent = generateParentFun();
-            if (maxSeconds > 0 && maxSeconds < watch.Elapsed.Seconds)
+            if (maxSeconds > 0 && watch.Elapsed.Seconds > maxSeconds)
                 throw new SearchTimeoutException(bestParent);
-
             yield return bestParent;
+
             var parents = new List<Chromosome<TGene, TFitness>> {bestParent};
             var historicalFitnesses = new List<TFitness> {bestParent.Fitness};
             for (var i = 0; i < poolSize - 1; i++)
             {
                 var parent = generateParentFun();
-                if (maxSeconds > 0 && maxSeconds < watch.Elapsed.Seconds)
+                if (maxSeconds > 0 && watch.Elapsed.Seconds > maxSeconds)
                     throw new SearchTimeoutException(parent);
+                yield return parent;
 
                 if (parent.Fitness.CompareTo(bestParent.Fitness) > 0)
                 {
@@ -181,8 +182,9 @@ namespace GeneticAlgorithms.LogicCircuits
             var pIndex = 1;
             while (true)
             {
-                if (maxSeconds > 0 && maxSeconds < watch.Elapsed.Seconds)
+                if (maxSeconds > 0 && watch.Elapsed.Seconds > maxSeconds)
                     throw new SearchTimeoutException(bestParent);
+                yield return bestParent;
 
                 pIndex = pIndex > 0 ? pIndex - 1 : lastParentIndex;
                 var parent = parents[pIndex];
@@ -200,8 +202,7 @@ namespace GeneticAlgorithms.LogicCircuits
                     if (index < 0) index = ~index;
                     var difference = historicalFitnesses.Count - index;
                     var proportionSimilar = (double) difference / historicalFitnesses.Count;
-                    var exp = Math.Exp(-proportionSimilar);
-                    if (_random.NextDouble() < exp)
+                    if (_random.NextDouble() < Math.Exp(-proportionSimilar))
                     {
                         parents[pIndex] = child;
                         continue;

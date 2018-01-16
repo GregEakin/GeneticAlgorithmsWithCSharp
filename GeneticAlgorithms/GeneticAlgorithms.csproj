@@ -130,6 +130,7 @@
     <Compile Include="SortedNumbers\SortedNumbersTests.cs" />
     <Compile Include="Sudoku\Chromosome.cs" />
     <Compile Include="Sudoku\Genetic.cs" />
+    <Compile Include="Sudoku\Rule.cs" />
     <Compile Include="Sudoku\SudokuTests.cs" />
     <Compile Include="Primes\UnitTest1.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
