@@ -124,7 +124,9 @@
     <Compile Include="Queens\Genetic.cs" />
     <Compile Include="Queens\QueenTests.cs" />
     <Compile Include="RegularExpressions\Fitness.cs" />
+    <Compile Include="RegularExpressions\FitnessTests.cs" />
     <Compile Include="RegularExpressions\RegexTests.cs" />
+    <Compile Include="RegularExpressions\SimpleTests.cs" />
     <Compile Include="SortedNumbers\Chromosome.cs" />
     <Compile Include="SortedNumbers\Genetic.cs" />
     <Compile Include="SortedNumbers\SortedNumbersTests.cs" />

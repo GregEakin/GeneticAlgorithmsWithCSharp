@@ -89,9 +89,7 @@ namespace GeneticAlgorithms.LogicCircuits
         public static Node[] Mutate(Node[] input, FnCreateGene fnCreateGene, FnFitnessDelegate fnFitness,
             int sourceCount)
         {
-            var childGenes = new Node[input.Length];
-            Array.Copy(input, childGenes, input.Length);
-
+            var childGenes = input.ToArray();
             var count = Random.Next(1, 6);
             var initialFitness = fnFitness(childGenes);
             while (count-- > 0)

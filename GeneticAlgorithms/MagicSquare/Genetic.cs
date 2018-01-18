@@ -53,8 +53,7 @@ namespace GeneticAlgorithms.MagicSquare
 
         public TGene[] MutateGene(TGene[] parentGenes, TGene[] geneSet)
         {
-            var childGenes = new TGene[parentGenes.Length];
-            Array.Copy(parentGenes, childGenes, parentGenes.Length);
+            var childGenes = parentGenes.ToArray();
             var index = _random.Next(parentGenes.Length);
             var randomSample = RandomSample(geneSet, 2);
             var newGene = randomSample[0];

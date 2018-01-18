@@ -4,15 +4,19 @@ namespace GeneticAlgorithms.RegularExpressions
 {
     public class Fitness : IComparable, IComparable<Fitness>
     {
-        public int TotalMowed { get; }
-        public int TotalInstructions { get; }
-        public int StepCount { get; }
+        public static bool UseRegexLength { get; set; }
 
-        public Fitness(int totalMowed, int totalInstructions, int stepCount)
+        public int NumWantedMatched { get; }
+        private readonly int _totalWanted;
+        public int NumUnwantedMatched { get; }
+        public int Length { get; }
+
+        public Fitness(int numWantedMatched, int totalWanted, int numUnwantedMatched, int length)
         {
-            TotalMowed = totalMowed;
-            TotalInstructions = totalInstructions;
-            StepCount = stepCount;
+            NumWantedMatched = numWantedMatched;
+            _totalWanted = totalWanted;
+            NumUnwantedMatched = numUnwantedMatched;
+            Length = length;
         }
 
         public int CompareTo(object obj)
@@ -32,16 +36,29 @@ namespace GeneticAlgorithms.RegularExpressions
         {
             if (ReferenceEquals(this, that)) return 0;
             if (that is null) return 1;
-            var totalMowedComparison = TotalMowed.CompareTo(that.TotalMowed);
-            if (totalMowedComparison != 0) return totalMowedComparison;
-            var stepCountComparison = -StepCount.CompareTo(that.StepCount);
-            if (stepCountComparison != 0) return stepCountComparison;
-            return -TotalInstructions.CompareTo(that.TotalInstructions);
+
+            var combined = _totalWanted - NumWantedMatched + NumUnwantedMatched;
+            var thatCombined = that._totalWanted - that.NumWantedMatched + that.NumUnwantedMatched;
+            if (combined != thatCombined)
+                return -combined.CompareTo(thatCombined);
+
+            var success = combined == 0;
+            var otherSuccess = thatCombined == 0;
+            if (success != otherSuccess)
+                return success ? 1 : 0;
+
+            if (!success)
+                return UseRegexLength
+                    ? -Length.CompareTo(that.Length)
+                    : 0;
+
+            return -Length.CompareTo(that.Length);
         }
 
         public override string ToString()
         {
-            return $"{TotalMowed} mowed with {TotalInstructions} instructions and {StepCount} steps";
+            var wanted = _totalWanted == NumWantedMatched ? "all" : NumWantedMatched.ToString();
+            return $"matches: {wanted} wanted, {NumUnwantedMatched} unwanted, len {Length}";
         }
     }
 }

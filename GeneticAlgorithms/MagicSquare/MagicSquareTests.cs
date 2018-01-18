@@ -59,8 +59,7 @@ namespace GeneticAlgorithms.MagicSquare
 
         public static int[] Mutate(int[] input, int[] allPositions)
         {
-            var genes = new int[input.Length];
-            Array.Copy(input, genes, input.Length);
+            var genes = input.ToArray();
             var randomSample = RandomSample(allPositions, 2);
             var indexA = randomSample[0];
             var indexB = randomSample[1];

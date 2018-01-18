@@ -29,8 +29,7 @@ namespace GeneticAlgorithms.Cards
 
         public static int[] Mutate(int[] input, int[] geneSet, Genetic<int, Fitness> genetic)
         {
-            var genes = new int[input.Length];
-            Array.Copy(input, genes, input.Length);
+            var genes = input.ToArray();
             var duplicates = genes.Length - new HashSet<int>(genes).Count;
             if (duplicates == 0)
             {

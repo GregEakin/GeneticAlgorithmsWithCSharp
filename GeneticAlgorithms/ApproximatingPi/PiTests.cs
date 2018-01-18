@@ -53,8 +53,7 @@ namespace GeneticAlgorithms.ApproximatingPi
 
         public static bool[] Mutate(bool[] input, int numBits)
         {
-            var genes = new bool[input.Length];
-            Array.Copy(input, genes, input.Length);
+            var genes = input.ToArray();
             var numeratorIndex = Random.Next(0, numBits);
             var denominatorIndex = Random.Next(numBits, genes.Length);
             genes[numeratorIndex] = !genes[numeratorIndex];

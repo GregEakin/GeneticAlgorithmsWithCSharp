@@ -35,9 +35,7 @@ namespace GeneticAlgorithms.Sudoku
 
         public static int[] Mutate(int[] parent, Rule[] validationRules)
         {
-            var genes = new int[parent.Length];
-            Array.Copy(parent, genes, parent.Length);
-
+            var genes = parent.ToArray();
             foreach (var selectedRule in validationRules)
             {
                 if (selectedRule.Index == selectedRule.OtherIndex)

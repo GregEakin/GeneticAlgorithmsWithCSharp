@@ -76,8 +76,7 @@ namespace GeneticAlgorithms.LinearEquation
 
         public static Fraction[] Mutate(Fraction[] input, Fraction[] sortedGeneSet, Window window, int[] geneIndexes)
         {
-            var genes = new Fraction[input.Length];
-            Array.Copy(input, genes, input.Length);
+            var genes = input.ToArray();
             window.Slide();
             var indexes = Random.Next(10) == 0
                 ? geneIndexes.OrderBy(g => Random.Next()).Take(1 + Random.Next(geneIndexes.Length - 1)).ToArray()

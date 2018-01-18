@@ -45,8 +45,7 @@ namespace GeneticAlgorithms.Knights
 
         public TGene[] MutateGene(TGene[] parentGenes, TGene[] geneSet)
         {
-            var childGenes = new TGene[parentGenes.Length];
-            Array.Copy(parentGenes, childGenes, parentGenes.Length);
+            var childGenes = parentGenes.ToArray();
             var index = _random.Next(childGenes.Length);
             var randomSample = RandomSample(geneSet, 2);
             var newGene = randomSample[0];

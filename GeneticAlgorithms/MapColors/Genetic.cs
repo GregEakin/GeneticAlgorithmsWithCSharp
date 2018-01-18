@@ -37,8 +37,7 @@ namespace GeneticAlgorithms.MapColors
         public Chromosome<TGene, TFitness> Mutate(TGene[] geneSet, Chromosome<TGene, TFitness> parent,
             FitnessFun fitnessFun)
         {
-            var childGenes = new TGene[parent.Genes.Length];
-            Array.Copy(parent.Genes, childGenes, parent.Genes.Length);
+            var childGenes = parent.Genes.ToArray();
             var index = _random.Next(parent.Genes.Length);
             var randomSample = RandomSample(geneSet, 2);
             var newGene = randomSample[0];

@@ -53,7 +53,7 @@ namespace GeneticAlgorithms.Sudoku
 
         public TGene[] MutateGene(TGene[] parentGenes, TGene[] geneSet)
         {
-            var childGenes = new TGene[parentGenes.Length];
+            var childGenes = parentGenes.ToArray();
             Array.Copy(parentGenes, childGenes, parentGenes.Length);
             var index = _random.Next(parentGenes.Length);
             var randomSample = RandomSample(geneSet, 2);

@@ -35,8 +35,7 @@ namespace GeneticAlgorithms.Knights
         public static Position[] Mutate(Position[] input, int width, int height, Position[] allPositions,
             Position[] nonEdgePositions)
         {
-            var genes = new Position[input.Length];
-            Array.Copy(input, genes, input.Length);
+            var genes = input.ToArray();
             var loops = Random.Next(10) == 0 ? 2 : 1;
             for (var count = 0; count < loops; count++)
             {
