@@ -181,54 +181,118 @@ namespace GeneticAlgorithms.RegularExpressions
                 watch.ElapsedMilliseconds);
         }
 
-        public bool MutateAdd(string[] genes, string[] geneSet)
+        public bool MutateAdd(List<string> genes, string[] geneSet)
         {
-            throw new NotImplementedException();
+            var index = genes.Count > 0 ? Random.Next(genes.Count) : 0;
+            genes.Insert(index, geneSet[Random.Next(geneSet.Length)]);
+            return true;
         }
 
-        public bool MutateRemove(string[] genes)
+        public bool MutateRemove(List<string> genes)
         {
-            throw new NotImplementedException();
+            if (genes.Count < 1)
+                return false;
+            genes.RemoveAt(Random.Next(genes.Count));
+            if (genes.Count > 1 && Random.Next(2) == 1)
+                genes.RemoveAt(Random.Next(genes.Count));
+            return true;
         }
 
-        public bool MutateReplace(string[] genes, string[] geneSet)
+        public bool MutateReplace(List<string> genes, string[] geneSet)
         {
-            throw new NotImplementedException();
+            if (genes.Count < 1)
+                return false;
+            var index = Random.Next(genes.Count);
+            genes[index] = geneSet[Random.Next(geneSet.Length)];
+            return true;
         }
 
-        public bool MutateSwap(string[] genes)
+        public bool MutateSwap(List<string> genes)
         {
-            throw new NotImplementedException();
+            if (genes.Count < 2)
+                return false;
+            var indexA = Random.Next(genes.Count);
+            int indexB;
+            do indexB = Random.Next(genes.Count); while (indexA != indexB);
+            var temp = genes[indexA];
+            genes[indexA] = genes[indexB];
+            genes[indexB] = temp;
+            return true;
         }
 
-        public bool MutateMove(string[] genes)
+        public bool MutateMove(List<string> genes)
         {
-            throw new NotImplementedException();
+            if (genes.Count < 3)
+                return false;
+            var start = Random.Next(genes.Count);
+            var length = Random.Next(1, 3);
+            var toMove = genes.Skip(start).Take(length).ToList();
+            genes.RemoveRange(start, length);
+            var index = Random.Next(genes.Count);
+            genes.InsertRange(index, toMove);
+            return true;
         }
 
-        public bool MutateToCharacterSet(string[] genes)
+        public bool MutateToCharacterSet(List<string> genes)
         {
-            throw new NotImplementedException();
+            if (genes.Count < 3)
+                return false;
+            var ors = new List<int>();
+            if (ors.Count <= 0)
+                return false;
+            var index = ors[Random.Next(ors.Count)];
+            var distinct = new HashSet<int> {1};
+            var sequence = new List<string> {"a"};
+            genes.RemoveRange(index - 1, 2);
+            genes.InsertRange(index, sequence);
+            return true;
         }
 
-        public bool MutateToCharacterSetLeft(string[] genes, string[] wanted)
+        public bool MutateToCharacterSetLeft(List<string> genes, string[] wanted)
         {
-            throw new NotImplementedException();
+            if (genes.Count < 4)
+                return false;
+            var ors = new List<int>();
+            if (ors.Count <= 0)
+                return false;
+            var lookup = new Dictionary<string, string>();
+            foreach (var i in ors)
+            {
+            }
+
+            var min2 = lookup.Values.Where(v => v.Length > 1).ToList();
+            if (min2.Count <= 0)
+                return false;
+            var choice = min2[Random.Next(min2.Count)];
+            var characterSet = new List<string> {"|", $"{genes[choice[0] + 1][0]}", "["};
+            foreach (var i in choice)
+                characterSet.Add(genes[i + 1]);
+            characterSet.Add("]");
+            genes.AddRange(characterSet);
+            foreach (var i in choice.Reverse())
+                if (i >= 0)
+                    genes.RemoveRange(i, 2);
+            genes.AddRange(characterSet);
+            return true;
         }
 
-        public bool MutateAddWanted(string[] genes, string[] wanted)
+        public bool MutateAddWanted(List<string> genes, string[] wanted)
         {
-            throw new NotImplementedException();
+            var index = genes.Count > 0 ? Random.Next(genes.Count) : 0;
+            genes.Insert(index, "|");
+            genes.Insert(index + 1, wanted[Random.Next(wanted.Length)]);
+            return true;
         }
 
-        public delegate int FnFitnessDelegate(string[] genes);
+        public delegate Fitness FnFitnessDelegate(string[] genes);
 
-        public delegate bool FnMutateDelegate(string[] genes);
+        public delegate bool FnMutateDelegate(List<string> genes);
 
-        public void Mutate(string[] genes, FnFitnessDelegate fnGetFitness, List<FnMutateDelegate> mutationOperators,
+        public string[] Mutate(string[] input, FnFitnessDelegate fnGetFitness, List<FnMutateDelegate> mutationOperators,
             List<int> mutationRoundCounts)
         {
-            var initialFitness = fnGetFitness(genes);
+            var genes = input.ToList();
+            var initialFitness = fnGetFitness(genes.ToArray());
             var count = mutationRoundCounts[Random.Next(mutationRoundCounts.Count)];
             for (var i = 1; i < count + 3; i++)
             {
@@ -240,12 +304,14 @@ namespace GeneticAlgorithms.RegularExpressions
                     func = copy[Random.Next(copy.Count)];
                 }
 
-                if (fnGetFitness(genes).CompareTo(initialFitness) <= 0)
+                if (fnGetFitness(genes.ToArray()).CompareTo(initialFitness) <= 0)
                     continue;
 
                 mutationRoundCounts.Add(i);
-                return;
+                break;
             }
+
+            return genes.ToArray();
         }
 
         [TestMethod]
@@ -271,10 +337,11 @@ namespace GeneticAlgorithms.RegularExpressions
             var wanted = new[] {"NE", "NV", "NH", "NJ", "NM", "NY", "NC", "ND"};
             var unwanted = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".Select(v => $"N{v}").Where(st => !wanted.Contains(st))
                 .ToArray();
-//            var customOperators = [
-//            partial(mutate_to_character_set_left, wanted = wanted),
-//                ];
-//            FindRegex(wanted, unwanted, 11, customOperators)
+            var customOperators = new FnMutateDelegate[]
+            {
+                (genes) => MutateToCharacterSetLeft(genes, wanted)
+            };
+            FindRegex(wanted, unwanted, 120, customOperators);
         }
 
         [TestMethod]
@@ -291,10 +358,11 @@ namespace GeneticAlgorithms.RegularExpressions
                 "0", "1", "000", "001", "010", "011", "100", "101",
                 "110", "111", ""
             };
-//            var customOperators = [
-//            mutate_to_character_set,
-//                ];
-//            FindRegex(wanted, unwanted, 10, customOperators);
+            var customOperators = new FnMutateDelegate[]
+            {
+                MutateToCharacterSet
+            };
+            FindRegex(wanted, unwanted, 120, customOperators);
         }
 
         [TestMethod]
@@ -319,21 +387,53 @@ namespace GeneticAlgorithms.RegularExpressions
                 where !wanted.Contains($"{a}{b}")
                 select $"{a}{b}").Concat(
                 from i in "ABCDEFGHIJKLMNOPQRSTUVWXYZ" select $"{i}").ToArray();
-//            var customOperators = [
-//            partial(mutate_to_character_set_left, wanted = wanted),
-//            mutate_to_character_set,
-//            partial(mutate_add_wanted, wanted =[i for i in wanted]),
-//                ];
-//            FindRegex(wanted, unwanted, 120, customOperators);
+            var customOperators = new FnMutateDelegate[]
+            {
+                (genes) => MutateToCharacterSetLeft(genes, wanted),
+                MutateToCharacterSet,
+                (genes) => MutateAddWanted(genes, wanted)
+            };
+            FindRegex(wanted, unwanted, 120, customOperators);
         }
 
-        public void FindRegex(string[] wanted, string[] unwanted, int expetedLength, string[] customOperators = null)
+        public void FindRegex(string[] wanted, string[] unwanted, int expectedLength,
+            FnMutateDelegate[] customOperators = null)
         {
             var genetic = new Genetic<string, Fitness>();
+            var watch = Stopwatch.StartNew();
 
-            var mutationOperators = new List<FnMutateDelegate>();
+            var textGenes = new string[] {""};
+            var fullGeneSet = new string[] {""};
 
-            throw new NotImplementedException();
+            void FnDisplay(Chromosome<string, Fitness> candidate, int? length) => Display(candidate, watch);
+
+            Fitness FnFitness(string[] genes) => GetFitness(genes, wanted.ToList(), unwanted.ToList());
+
+            var mutationRoundCounts = new List<int> {1};
+
+            var mutationOperators = new List<FnMutateDelegate>
+            {
+                (genes) => MutateAdd(genes, fullGeneSet.ToArray()),
+                (genes) => MutateReplace(genes, fullGeneSet.ToArray()),
+                MutateRemove,
+                MutateSwap,
+                MutateMove,
+            };
+
+            if (customOperators != null)
+                mutationOperators.AddRange(customOperators);
+
+            string[] FnMutate(string[] genes) => Mutate(genes, FnFitness, mutationOperators, mutationRoundCounts);
+
+            var optimalFitness = new Fitness(wanted.Length, wanted.Length, 0, expectedLength);
+
+            var best = genetic.BestFitness(FnFitness, Math.Max(1, 2), optimalFitness, fullGeneSet, FnDisplay, FnMutate,
+                null, 0, 10);
+
+            Assert.IsTrue(optimalFitness.CompareTo(best.Fitness) <= 0);
+
+            foreach (var error in _regexErrorsSeen)
+                Console.WriteLine("Error: {0}", error.Message);
         }
     }
 }
