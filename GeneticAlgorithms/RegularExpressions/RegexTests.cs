@@ -129,7 +129,7 @@ namespace GeneticAlgorithms.RegularExpressions
                     if (result[result.Count - 1] == "[")
                         result.RemoveAt(result.Count - 1);
                     result.Add(token);
-                    var match = string.Join("", finals).LastIndexOf(")", StringComparison.Ordinal);
+                    var match = string.Join("", finals).LastIndexOf("]", StringComparison.Ordinal);
                     if (match >= 0)
                         finals.RemoveAt(match);
                     return RepairIgnoreRepeatMetasFollowingRepeatOrStartMetas;
@@ -256,18 +256,6 @@ namespace GeneticAlgorithms.RegularExpressions
         }
 
         [TestMethod]
-        public void SaveTest1()
-        {
-            for (var i = 0; i < 10; i++)
-            {
-                var genes = "1*0?10*".ToCharArray().Select(c => c.ToString()).ToList();
-                Assert.IsTrue(MutateSwap(genes));
-                Assert.AreEqual(7, genes.Count);
-                Console.WriteLine("{0}, {1}", string.Join(string.Empty, genes.Select(p => p)), genes.Count);
-            }
-        }
-
-        [TestMethod]
         public void MutateSwapTest()
         {
             var genes = "1*0?10*".ToCharArray().Select(c => c.ToString()).ToList();
@@ -302,7 +290,7 @@ namespace GeneticAlgorithms.RegularExpressions
         {
             if (genes.Count < 3)
                 return false;
-            var ors = Enumerable.Range(1, genes.Count - 1).Where(i =>
+            var ors = Enumerable.Range(1, genes.Count - 2).Where(i =>
                 genes[i] == "|" && !AllMetas.Contains(genes[i - 1]) && !AllMetas.Contains(genes[i + 1])).ToList();
             if (ors.Count <= 0)
                 return false;
@@ -319,11 +307,14 @@ namespace GeneticAlgorithms.RegularExpressions
             if (shorter.Count == 0)
                 return false;
             var index = ors[Random.Next(ors.Count)];
-            var distinct = new HashSet<char> {'x'};
+            var distinct = genes.Skip(index - 1).Take(3).Where((x, j) => j % 2 == 0).SelectMany(s => s.ToCharArray()).Select(c => c.ToString()).Distinct();
+
+            //var distinct = new HashSet<char>(genes.SelectMany(mo => mo.Substring(index-1, index+2).ToCharArray()));
+
             var sequence = new List<string> {"["};
-            sequence.AddRange(distinct.Select(c => $"{c}").ToList());
+            sequence.AddRange(distinct);
             sequence.Add("]");
-            genes.RemoveRange(index - 1, 2);
+            genes.RemoveRange(index - 1, 3);
             genes.InsertRange(index - 1, sequence);
             return true;
         }
@@ -331,51 +322,56 @@ namespace GeneticAlgorithms.RegularExpressions
         [TestMethod]
         public void MutateToCharacterSetTest()
         {
-            var rgx1 = new Regex("cat|bat|car|bar");
-            Assert.AreEqual(4, rgx1.Matches("cat bar car bar").Count);
-            Assert.AreEqual(0, rgx1.Matches("rat tar far fat").Count);
-
-            var rgx2 = new Regex("[cb]a[tr]");
-            Assert.AreEqual(4, rgx2.Matches("cat bar car bar").Count);
-            Assert.AreEqual(0, rgx2.Matches("rat tar far fat").Count);
-
-            //for (var i = 0; i < 10; i++)
-            {
-                var genes = new List<string> {"cat", "|", "bat"};
-                MutateToCharacterSet(genes);
-                //Assert.IsTrue(MutateToCharacterSet(genes));
-                //Assert.AreEqual(7, genes.Count);
-                Console.WriteLine("{0}, {1}", string.Join(string.Empty, genes.Select(p => p)), genes.Count);
-                //Assert.AreNotEqual("1*0?10*", string.Join(string.Empty, genes.Select(p => p)));
-            }
+            var genes = new List<string> {"00", "|", "01"};
+            Assert.IsTrue(MutateToCharacterSet(genes));
+            CollectionAssert.AreEqual(new[] {"[", "0", "1", "]"}, genes);
         }
 
         public bool MutateToCharacterSetLeft(List<string> genes, string[] wanted)
         {
             if (genes.Count < 4)
                 return false;
-            var ors = new List<int>();
-            if (ors.Count <= 0)
+            var ors = Enumerable.Range(-1, genes.Count - 2).Where(i =>
+                (i == -1 || StartMetas.Contains(genes[genes.Count - 1])) && genes[i + 1].Length == 2 &&
+                wanted.Contains(genes[i + 1]) &&
+                (genes.Count == i + 1 || genes[i + 2] == "|" || EndMetas.Contains(genes[i + 2]))).ToArray();
+
+            if (ors.Length <= 0)
                 return false;
-            var lookup = new Dictionary<string, string>();
+            var lookup = new Dictionary<string, List<int>>();
             foreach (var i in ors)
             {
+                var key = genes[i + 1][0].ToString();
+                if (lookup.TryGetValue(key, out var value))
+                    value.Add(i);
+                else
+                    lookup.Add(key, new List<int> {i});
             }
 
-            var min2 = lookup.Values.Where(v => v.Length > 1).ToList();
+            var min2 = lookup.Values.Where(i => i.Count > 1).ToList();
             if (min2.Count <= 0)
                 return false;
             var choice = min2[Random.Next(min2.Count)];
-            var characterSet = new List<string> {"|", $"{genes[choice[0] + 1][0]}", "["};
+            var characterSet = new List<string> {"|", genes[choice[0] + 1][0].ToString(), "["};
             foreach (var i in choice)
-                characterSet.Add(genes[i + 1]);
+                characterSet.Add(genes[i + 1][1].ToString());
             characterSet.Add("]");
-            genes.AddRange(characterSet);
-            foreach (var i in choice.Reverse())
-                if (i >= 0)
-                    genes.RemoveRange(i, 2);
+            choice.Reverse();
+            foreach (var i in choice)
+                if (i + 1 >= 0)
+                    genes.RemoveAt(i+1);
             genes.AddRange(characterSet);
             return true;
+        }
+
+        [TestMethod]
+        public void MutateToCharacterSetLeftTest()
+        {
+            var genes = new List<string>{"MA", ")", "ME", "|", "]", "?", "MS", "|" };
+            var wanted = new[] {"MA", "ME"};
+            var mutated = MutateToCharacterSetLeft(genes, wanted);
+            Assert.IsTrue(mutated);
+            CollectionAssert.AreEqual(new List<string>{")", "|", "]", "?", "MS", "|", "|", "M", "[", "A", "E", "]" }, genes);
         }
 
         public bool MutateAddWanted(List<string> genes, string[] wanted)
@@ -517,8 +513,8 @@ namespace GeneticAlgorithms.RegularExpressions
 
             var mutationOperators = new List<FnMutateDelegate>
             {
-                (genes) => MutateAdd(genes, fullGeneSet),
-                (genes) => MutateReplace(genes, fullGeneSet),
+                genes => MutateAdd(genes, fullGeneSet),
+                genes => MutateReplace(genes, fullGeneSet),
                 MutateRemove,
                 MutateSwap,
                 MutateMove,
