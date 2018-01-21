@@ -56,19 +56,13 @@
     <Compile Include="Cards\Chromosome.cs" />
     <Compile Include="Cards\Fitness.cs" />
     <Compile Include="Cards\Genetic.cs" />
-    <Compile Include="EquationGeneration\Chromosome.cs" />
     <Compile Include="EquationGeneration\EquationGenerationTests.cs" />
-    <Compile Include="EquationGeneration\Genetic.cs" />
-    <Compile Include="EquationGeneration\SearchTimeoutException.cs" />
-    <Compile Include="LawnmowerProblem\Chromosome.cs" />
     <Compile Include="LawnmowerProblem\DirectionTests.cs" />
     <Compile Include="LawnmowerProblem\Fitness.cs" />
-    <Compile Include="LawnmowerProblem\Genetic.cs" />
     <Compile Include="LawnmowerProblem\Lawnmower.cs" />
     <Compile Include="LawnmowerProblem\LawnmowerTests.cs" />
     <Compile Include="LawnmowerProblem\Location.cs" />
     <Compile Include="LawnmowerProblem\Mow.cs" />
-    <Compile Include="LawnmowerProblem\SearchTimeoutException.cs" />
     <Compile Include="LogicCircuits\Chromosome.cs" />
     <Compile Include="LogicCircuits\Circuits.cs" />
     <Compile Include="LogicCircuits\CircuitTests.cs" />
@@ -79,9 +73,7 @@
     <Compile Include="Primes\enumerable\DateTimeFixture.cs" />
     <Compile Include="Primes\enumerable\PrimeFactorTests.cs" />
     <Compile Include="Primes\enumerable\PrimeTests.cs" />
-    <Compile Include="Knapsack\Chromosome.cs" />
     <Compile Include="Knapsack\Fitness.cs" />
-    <Compile Include="Knapsack\Genetic.cs" />
     <Compile Include="Knapsack\ItemQuantity.cs" />
     <Compile Include="Knapsack\KnapsackProblemData.cs" />
     <Compile Include="Knapsack\KnapsackProblemDataParser.cs" />
@@ -98,19 +90,15 @@
     <Compile Include="Primes\lazy\MyLinkedList.cs" />
     <Compile Include="Primes\lazy\MyList.cs" />
     <Compile Include="Primes\lazy\PrimeTests.cs" />
-    <Compile Include="LinearEquation\Chromosome.cs" />
     <Compile Include="LinearEquation\Fitness.cs" />
     <Compile Include="LinearEquation\Fraction.cs" />
     <Compile Include="LinearEquation\FractionTests.cs" />
-    <Compile Include="LinearEquation\Genetic.cs" />
     <Compile Include="LinearEquation\LinearEquationTests.cs" />
     <Compile Include="LinearEquation\Window.cs" />
     <Compile Include="MagicSquare\Chromosome.cs" />
     <Compile Include="MagicSquare\Fitness.cs" />
     <Compile Include="MagicSquare\Genetic.cs" />
     <Compile Include="MagicSquare\MagicSquareTests.cs" />
-    <Compile Include="MapColors\Chromosome.cs" />
-    <Compile Include="MapColors\Genetic.cs" />
     <Compile Include="MapColors\MapColorTests.cs" />
     <Compile Include="MapColors\Prototype.cs" />
     <Compile Include="MapColors\Rule.cs" />
@@ -130,8 +118,6 @@
     <Compile Include="SortedNumbers\Chromosome.cs" />
     <Compile Include="SortedNumbers\Genetic.cs" />
     <Compile Include="SortedNumbers\SortedNumbersTests.cs" />
-    <Compile Include="Sudoku\Chromosome.cs" />
-    <Compile Include="Sudoku\Genetic.cs" />
     <Compile Include="Sudoku\Rule.cs" />
     <Compile Include="Sudoku\SudokuTests.cs" />
     <Compile Include="Primes\UnitTest1.cs" />
@@ -139,22 +125,23 @@
     <Compile Include="Primes\yield\EmptyList.cs" />
     <Compile Include="Primes\yield\LazyList.cs" />
     <Compile Include="Primes\yield\MyList.cs" />
+    <Compile Include="TicTacToe\Chromosome.cs" />
+    <Compile Include="TicTacToe\Genetic.cs" />
+    <Compile Include="TicTacToe\SearchTimeoutException.cs" />
     <Compile Include="TravelingSalesmanProblem\Chromosome.cs" />
     <Compile Include="TravelingSalesmanProblem\Genetic.cs" />
     <Compile Include="TravelingSalesmanProblem\TravelingSalesmanProblemTests.cs" />
     <Compile Include="Utilities\ExpectedException.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="mapColors\adjacent_states.csv">
+    <Content Include="MapColors\adjacent_states.csv">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <None Include="Data\exnsd16.ukp" />
     <None Include="packages.config" />
     <None Include="Readme.md" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="TicTacToe\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets" Condition="Exists('$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets')" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
