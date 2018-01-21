@@ -270,7 +270,7 @@ namespace GeneticAlgorithms.RegularExpressions
                 return false;
             var length = Random.Next(1, 3);
             var start = Random.Next(genes.Count - length + 1);
-            var toMove = genes.Skip(start).Take(length);
+            var toMove = genes.Skip(start).Take(length).ToArray();
             genes.RemoveRange(start, length);
             var index = Random.Next(genes.Count);
             genes.InsertRange(index, toMove);
@@ -443,7 +443,7 @@ namespace GeneticAlgorithms.RegularExpressions
             {
                 genes => MutateToCharacterSetLeft(genes, wanted)
             };
-            FindRegex(wanted, unwanted, 120, customOperators);
+            FindRegex(wanted, unwanted, 11, customOperators);
         }
 
         [TestMethod]
@@ -464,7 +464,7 @@ namespace GeneticAlgorithms.RegularExpressions
             {
                 MutateToCharacterSet
             };
-            FindRegex(wanted, unwanted, 120, customOperators);
+            FindRegex(wanted, unwanted, 10, customOperators);
         }
 
         [TestMethod]
