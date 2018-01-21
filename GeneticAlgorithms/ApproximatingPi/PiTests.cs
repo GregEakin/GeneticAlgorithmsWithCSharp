@@ -31,25 +31,16 @@ namespace GeneticAlgorithms.ApproximatingPi
                 watch.ElapsedMilliseconds);
         }
 
-        public static int BitsToInt(bool[] bits, int[] bitValues)
+        public static int BitsToInt(IEnumerable<bool> bits, IEnumerable<int> bitValues)
         {
-            var result = 0;
-            for (var index = 0; index < bits.Length; index++)
-            {
-                if (!bits[index])
-                    continue;
-
-                result += bitValues[index];
-            }
-
-            return result;
+            return bits.Zip(bitValues, (b, v) => new { Bit = b, Value = v }).Where(bv => bv.Bit).Sum(bv => bv.Value);
         }
 
-        public static int GetNumerator(bool[] genes, int[] bitValues) =>
-            1 + BitsToInt(genes.Take(bitValues.Length).ToArray(), bitValues);
+        public static int GetNumerator(IEnumerable<bool> genes, int[] bitValues) =>
+            1 + BitsToInt(genes.Take(bitValues.Length), bitValues);
 
-        public static int GetDenominator(bool[] genes, int[] bitValues) =>
-            BitsToInt(genes.Skip(bitValues.Length).ToArray(), bitValues);
+        public static int GetDenominator(IEnumerable<bool> genes, int[] bitValues) =>
+            BitsToInt(genes.Skip(bitValues.Length), bitValues);
 
         public static bool[] Mutate(bool[] input, int numBits)
         {
