@@ -142,6 +142,7 @@
     <Compile Include="TravelingSalesmanProblem\Chromosome.cs" />
     <Compile Include="TravelingSalesmanProblem\Genetic.cs" />
     <Compile Include="TravelingSalesmanProblem\TravelingSalesmanProblemTests.cs" />
+    <Compile Include="Utilities\ExpectedException.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="mapColors\adjacent_states.csv">

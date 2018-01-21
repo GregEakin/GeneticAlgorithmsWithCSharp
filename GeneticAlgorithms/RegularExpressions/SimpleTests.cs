@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Text.RegularExpressions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using static GeneticAlgorithms.Utilities.ExpectedException;
 
 namespace GeneticAlgorithms.RegularExpressions
 {
@@ -64,23 +65,7 @@ namespace GeneticAlgorithms.RegularExpressions
         [TestMethod]
         public void Test3()
         {
-            var pattern = "[[[**((";
-
-            var wanted = new[] { "01", "11", "10" };
-            var unwanted = new[] { "00", "" };
-
-            var rgx = new Regex(pattern);
-            foreach (var want in wanted)
-            {
-                var matches = rgx.Matches(want);
-                Assert.AreEqual(1, matches.Count);
-            }
-
-            foreach (var unwant in unwanted)
-            {
-                var matches = rgx.Matches(unwant);
-                Assert.AreEqual(0, matches.Count);
-            }
+            AssertThrows<ArgumentException>(() => new Regex("[[[**(("));
         }
     }
 }
