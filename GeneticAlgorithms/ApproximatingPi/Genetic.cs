@@ -38,7 +38,7 @@ namespace GeneticAlgorithms.ApproximatingPi
             do
             {
                 var sampleSize = Math.Min(geneSet.Length, length - genes.Count);
-                var array = geneSet.OrderBy(x => _random.Next()).Take(sampleSize).ToArray();
+                var array = geneSet.OrderBy(x => _random.Next()).Take(sampleSize);
                 genes.AddRange(array);
             } while (genes.Count < length);
 
@@ -75,13 +75,13 @@ namespace GeneticAlgorithms.ApproximatingPi
         }
 
         public Chromosome<TGene, TFitness> Crossover(TGene[] parentGenes, int index,
-            Chromosome<TGene, TFitness>[] parents,
+            List<Chromosome<TGene, TFitness>> parents,
             FitnessFun fitnessFun, CrossoverFun crossover, MutateChromosomeFun mutateGeneFun,
             GenerateParentFun generateParent)
         {
-            var donorIndex = _random.Next(0, parents.Length);
+            var donorIndex = _random.Next(0, parents.Count);
             if (donorIndex == index)
-                donorIndex = (donorIndex + 1) % parents.Length;
+                donorIndex = (donorIndex + 1) % parents.Count;
             var childGenes = crossover(parentGenes, parents[donorIndex].Genes);
             if (childGenes != null)
             {
@@ -107,7 +107,7 @@ namespace GeneticAlgorithms.ApproximatingPi
 
             var strategyLookup =
                 new Dictionary<Chromosome<TGene, TFitness>.Strategies, Func<Chromosome<TGene, TFitness>, int,
-                    Chromosome<TGene, TFitness>[], Chromosome<TGene, TFitness>>>
+                    List<Chromosome<TGene, TFitness>>, Chromosome<TGene, TFitness>>>
                 {
                     {Chromosome<TGene, TFitness>.Strategies.Create, (p, i, o) => FnGenerateParent()},
                     {Chromosome<TGene, TFitness>.Strategies.Mutate, (p, i, o) => FnMutate(p)},
@@ -124,7 +124,7 @@ namespace GeneticAlgorithms.ApproximatingPi
                 usedStrategies.Add(Chromosome<TGene, TFitness>.Strategies.Crossover);
 
             Chromosome<TGene, TFitness> NewChildFun(Chromosome<TGene, TFitness> parent, int index,
-                Chromosome<TGene, TFitness>[] parents) => crossoverFun != null
+                List<Chromosome<TGene, TFitness>> parents) => crossoverFun != null
                 ? strategyLookup[usedStrategies[_random.Next(usedStrategies.Count)]]
                     .Invoke(parent, index, parents)
                 : FnMutate(parent);
@@ -149,7 +149,7 @@ namespace GeneticAlgorithms.ApproximatingPi
         }
 
         public IEnumerable<Chromosome<TGene, TFitness>> GetImprovement(
-            Func<Chromosome<TGene, TFitness>, int, Chromosome<TGene, TFitness>[], Chromosome<TGene, TFitness>>
+            Func<Chromosome<TGene, TFitness>, int, List<Chromosome<TGene, TFitness>>, Chromosome<TGene, TFitness>>
                 newChildFun, GenerateParentFun generateParentFun, int maxAge, int poolSize, int maxSeconds)
         {
             var watch = Stopwatch.StartNew();
@@ -185,7 +185,7 @@ namespace GeneticAlgorithms.ApproximatingPi
 
                 pIndex = pIndex > 0 ? pIndex - 1 : lastParentIndex;
                 var parent = parents[pIndex];
-                var child = newChildFun(parent, pIndex, parents.ToArray());
+                var child = newChildFun(parent, pIndex, parents);
                 if (parent.Fitness.CompareTo(child.Fitness) > 0)
                 {
                     if (maxAge <= 0)

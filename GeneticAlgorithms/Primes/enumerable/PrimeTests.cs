@@ -226,8 +226,8 @@ namespace GeneticAlgorithms.primes.enumerable
         {
             const int limit = 100000;
             var watch = Stopwatch.StartNew();
-            var list = Primes9().Take(limit).ToList();
-            Assert.AreEqual(limit, list.Count);
+            var list = Primes9().Take(limit);
+            Assert.AreEqual(limit, list.Count());
             Console.WriteLine("Time took {0} ms", watch.ElapsedMilliseconds);
         }
     }

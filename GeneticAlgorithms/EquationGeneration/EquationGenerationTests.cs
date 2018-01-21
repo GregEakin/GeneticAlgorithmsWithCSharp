@@ -92,8 +92,7 @@ namespace GeneticAlgorithms.EquationGeneration
         }
 
         public static string[] Mutate(string[] input, string[] numbers, string[] operations, int minNumbers,
-            int maxNumbers,
-            FnFitnessDelegate fnGetFitness)
+            int maxNumbers, FnFitnessDelegate fnGetFitness)
         {
             var genes = new List<string>(input);
 

@@ -270,7 +270,7 @@ namespace GeneticAlgorithms.RegularExpressions
                 return false;
             var length = Random.Next(1, 3);
             var start = Random.Next(genes.Count - length + 1);
-            var toMove = genes.Skip(start).Take(length).ToList();
+            var toMove = genes.Skip(start).Take(length);
             genes.RemoveRange(start, length);
             var index = Random.Next(genes.Count);
             genes.InsertRange(index, toMove);
@@ -332,7 +332,7 @@ namespace GeneticAlgorithms.RegularExpressions
             if (genes.Count < 4)
                 return false;
             var ors = Enumerable.Range(-1, genes.Count - 2).Where(i =>
-                (i == -1 || StartMetas.Contains(genes[genes.Count - 1])) && genes[i + 1].Length == 2 &&
+                (i == -1 || StartMetas.Contains(genes[i])) && genes[i + 1].Length == 2 &&
                 wanted.Contains(genes[i + 1]) &&
                 (genes.Count == i + 1 || genes[i + 2] == "|" || EndMetas.Contains(genes[i + 2]))).ToArray();
 
@@ -367,11 +367,12 @@ namespace GeneticAlgorithms.RegularExpressions
         [TestMethod]
         public void MutateToCharacterSetLeftTest()
         {
-            var genes = new List<string>{"MA", ")", "ME", "|", "]", "?", "MS", "|" };
-            var wanted = new[] {"MA", "ME"};
+            var genes = new List<string>{"MA", "|", "MI", "|", "MS", "|","MD" };
+            var wanted = new[] {"MA", "MI", "MN"};
             var mutated = MutateToCharacterSetLeft(genes, wanted);
+            Console.WriteLine(string.Join(", ", genes));
             Assert.IsTrue(mutated);
-            CollectionAssert.AreEqual(new List<string>{")", "|", "]", "?", "MS", "|", "|", "M", "[", "A", "E", "]" }, genes);
+            CollectionAssert.AreEqual(new List<string>{"|", "|", "MS", "|", "MD", "|", "M", "[", "A", "I", "]" }, genes);
         }
 
         public bool MutateAddWanted(List<string> genes, string[] wanted)
@@ -418,6 +419,9 @@ namespace GeneticAlgorithms.RegularExpressions
             var wanted = new[] {"01", "11", "10"};
             var unwanted = new[] {"00", ""};
             var best = FindRegex(wanted, unwanted, 7);
+            Assert.AreEqual(3, best.Fitness.NumWantedMatched);
+            Assert.AreEqual(0, best.Fitness.NumUnwantedMatched);
+            Assert.AreEqual(7, best.Fitness.Length);
         }
 
         [TestMethod]
@@ -437,7 +441,7 @@ namespace GeneticAlgorithms.RegularExpressions
                 .ToArray();
             var customOperators = new FnMutateDelegate[]
             {
-                (genes) => MutateToCharacterSetLeft(genes, wanted)
+                genes => MutateToCharacterSetLeft(genes, wanted)
             };
             FindRegex(wanted, unwanted, 120, customOperators);
         }
@@ -487,9 +491,9 @@ namespace GeneticAlgorithms.RegularExpressions
                 from i in "ABCDEFGHIJKLMNOPQRSTUVWXYZ" select $"{i}").ToArray();
             var customOperators = new FnMutateDelegate[]
             {
-                (genes) => MutateToCharacterSetLeft(genes, wanted),
+                genes => MutateToCharacterSetLeft(genes, wanted),
                 MutateToCharacterSet,
-                (genes) => MutateAddWanted(genes, wanted)
+                genes => MutateAddWanted(genes, wanted)
             };
             FindRegex(wanted, unwanted, 120, customOperators);
         }
@@ -527,22 +531,18 @@ namespace GeneticAlgorithms.RegularExpressions
 
             var optimalFitness = new Fitness(wanted.Length, wanted.Length, 0, expectedLength);
 
-            var best = genetic.BestFitness(FnFitness, textGenes.Max(i => i.Length), optimalFitness, fullGeneSet,
+                var best = genetic.BestFitness(FnFitness, textGenes.Max(i => i.Length), optimalFitness, fullGeneSet,
                 FnDisplay, FnMutate, null, 0, 10);
 
             Assert.IsTrue(optimalFitness.CompareTo(best.Fitness) <= 0);
 
-            if (true && _regexErrorsSeen.Count > 0)
+            if (_regexErrorsSeen.Count > 0)
             {
                 Console.WriteLine();
                 Console.WriteLine("Errors:");
                 foreach (var error in _regexErrorsSeen)
                     Console.WriteLine("  {0}", error.Message);
             }
-
-            Console.WriteLine();
-            Console.WriteLine("Genes: ");
-            Console.WriteLine("  {0}", string.Join(", ", best.Genes));
 
             return best;
         }

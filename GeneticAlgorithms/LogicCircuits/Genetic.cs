@@ -28,6 +28,8 @@ namespace GeneticAlgorithms.LogicCircuits
 
         public delegate TGene[] CreateFun();
 
+        public delegate TGene[] CrossoverFun(TGene[] genes1, TGene[] genes2);
+
         private readonly Random _random = new Random();
 
         public TGene[] RandomSample(TGene[] geneSet, int length)
@@ -36,7 +38,7 @@ namespace GeneticAlgorithms.LogicCircuits
             do
             {
                 var sampleSize = Math.Min(geneSet.Length, length - genes.Count);
-                var array = geneSet.OrderBy(x => _random.Next()).Take(sampleSize).ToArray();
+                var array = geneSet.OrderBy(x => _random.Next()).Take(sampleSize);
                 genes.AddRange(array);
             } while (genes.Count < length);
 
@@ -72,16 +74,14 @@ namespace GeneticAlgorithms.LogicCircuits
             return new Chromosome<TGene, TFitness>(genes, fitness, Chromosome<TGene, TFitness>.Strategies.Mutate);
         }
 
-        public delegate TGene[] CrossoverFun(TGene[] genes1, TGene[] genes2);
-
         public Chromosome<TGene, TFitness> Crossover(TGene[] parentGenes, int index,
-            Chromosome<TGene, TFitness>[] parents,
+            List<Chromosome<TGene, TFitness>> parents,
             FitnessFun fitnessFun, CrossoverFun crossover, MutateChromosomeFun mutateGeneFun,
             GenerateParentFun generateParent)
         {
-            var donorIndex = _random.Next(0, parents.Length);
+            var donorIndex = _random.Next(0, parents.Count);
             if (donorIndex == index)
-                donorIndex = (donorIndex + 1) % parents.Length;
+                donorIndex = (donorIndex + 1) % parents.Count;
             var childGenes = crossover(parentGenes, parents[donorIndex].Genes);
             if (childGenes != null)
             {
@@ -107,7 +107,7 @@ namespace GeneticAlgorithms.LogicCircuits
 
             var strategyLookup =
                 new Dictionary<Chromosome<TGene, TFitness>.Strategies, Func<Chromosome<TGene, TFitness>, int,
-                    Chromosome<TGene, TFitness>[], Chromosome<TGene, TFitness>>>
+                    List<Chromosome<TGene, TFitness>>, Chromosome<TGene, TFitness>>>
                 {
                     {Chromosome<TGene, TFitness>.Strategies.Create, (p, i, o) => FnGenerateParent()},
                     {Chromosome<TGene, TFitness>.Strategies.Mutate, (p, i, o) => FnMutate(p)},
@@ -124,7 +124,7 @@ namespace GeneticAlgorithms.LogicCircuits
                 usedStrategies.Add(Chromosome<TGene, TFitness>.Strategies.Crossover);
 
             Chromosome<TGene, TFitness> NewChildFun(Chromosome<TGene, TFitness> parent, int index,
-                Chromosome<TGene, TFitness>[] parents) => crossoverFun != null
+                List<Chromosome<TGene, TFitness>> parents) => crossoverFun != null
                 ? strategyLookup[usedStrategies[_random.Next(usedStrategies.Count)]]
                     .Invoke(parent, index, parents)
                 : FnMutate(parent);
@@ -149,14 +149,14 @@ namespace GeneticAlgorithms.LogicCircuits
         }
 
         public IEnumerable<Chromosome<TGene, TFitness>> GetImprovement(
-            Func<Chromosome<TGene, TFitness>, int, Chromosome<TGene, TFitness>[], Chromosome<TGene, TFitness>>
+            Func<Chromosome<TGene, TFitness>, int, List<Chromosome<TGene, TFitness>>, Chromosome<TGene, TFitness>>
                 newChildFun, GenerateParentFun generateParentFun, int maxAge, int poolSize, int maxSeconds)
         {
             var watch = Stopwatch.StartNew();
             var bestParent = generateParentFun();
             if (maxSeconds > 0 && watch.Elapsed.Seconds > maxSeconds)
                 throw new SearchTimeoutException(bestParent);
-            yield return bestParent;
+            //yield return bestParent;
 
             var parents = new List<Chromosome<TGene, TFitness>> {bestParent};
             var historicalFitnesses = new List<TFitness> {bestParent.Fitness};
@@ -165,7 +165,7 @@ namespace GeneticAlgorithms.LogicCircuits
                 var parent = generateParentFun();
                 if (maxSeconds > 0 && watch.Elapsed.Seconds > maxSeconds)
                     throw new SearchTimeoutException(parent);
-                yield return parent;
+                //yield return parent;
 
                 if (parent.Fitness.CompareTo(bestParent.Fitness) > 0)
                 {
@@ -183,11 +183,11 @@ namespace GeneticAlgorithms.LogicCircuits
             {
                 if (maxSeconds > 0 && watch.Elapsed.Seconds > maxSeconds)
                     throw new SearchTimeoutException(bestParent);
-                yield return bestParent;
+                //yield return bestParent;
 
                 pIndex = pIndex > 0 ? pIndex - 1 : lastParentIndex;
                 var parent = parents[pIndex];
-                var child = newChildFun(parent, pIndex, parents.ToArray());
+                var child = newChildFun(parent, pIndex, parents);
                 if (parent.Fitness.CompareTo(child.Fitness) > 0)
                 {
                     if (maxAge <= 0)

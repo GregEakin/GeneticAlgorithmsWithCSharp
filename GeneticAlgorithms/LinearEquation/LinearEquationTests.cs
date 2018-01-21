@@ -54,7 +54,7 @@ namespace GeneticAlgorithms.LinearEquation
             var range = Enumerable.Range(-5, 11).ToArray();
             var geneSet =
                 (from n in range from d in range.Where(i => i != 0) select new Fraction(n, d))
-                .Distinct().OrderBy(g => g).ToArray();
+                .Distinct().OrderBy(g => g);
 
             var genes = geneSet.OrderBy(g => Random.Next()).Take(4).ToArray();
             var fitness = new Fitness(new Fraction(42));
@@ -102,7 +102,7 @@ namespace GeneticAlgorithms.LinearEquation
             var range = Enumerable.Range(-5, 11).ToArray();
             var geneSet =
                 (from n in range from d in range.Where(i => i != 0) select new Fraction(n, d))
-                .Distinct().OrderBy(g => g).ToArray();
+                .Distinct().OrderBy(g => g);
 
             var genes = geneSet.OrderBy(g => Random.Next()).Take(4).ToArray();
             Display(new Chromosome<Fraction, Fitness>(genes, fitness), watch);

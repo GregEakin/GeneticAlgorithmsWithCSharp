@@ -164,7 +164,7 @@ namespace GeneticAlgorithms.Sudoku
             do
             {
                 var sampleSize = Math.Min(geneSet.Length, length - genes.Count);
-                var array = geneSet.OrderBy(x => Random.Next()).Take(sampleSize).ToArray();
+                var array = geneSet.OrderBy(x => Random.Next()).Take(sampleSize);
                 genes.AddRange(array);
             } while (genes.Count < length);
 

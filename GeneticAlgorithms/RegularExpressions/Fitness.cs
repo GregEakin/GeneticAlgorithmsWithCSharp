@@ -58,7 +58,7 @@ namespace GeneticAlgorithms.RegularExpressions
         public override string ToString()
         {
             var wanted = _totalWanted == NumWantedMatched ? "all" : NumWantedMatched.ToString();
-            return $"matches: {wanted} wanted, {NumUnwantedMatched} unwanted, len {Length}";
+            return $"matches: {wanted} wanted, {NumUnwantedMatched} unwanted, length {Length}";
         }
     }
 }

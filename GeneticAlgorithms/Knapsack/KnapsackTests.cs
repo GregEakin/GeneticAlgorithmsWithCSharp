@@ -29,11 +29,13 @@ namespace GeneticAlgorithms.Knapsack
 
         public static void Display(Chromosome<ItemQuantity, Fitness> candidate, Stopwatch watch)
         {
-            var genes = candidate.Genes.OrderByDescending(g => g.Quantity);
-            var descriptions = genes.Select(id => $"{id.Quantity} x {id.Item.Name}").ToArray();
-            if (descriptions.Length > 0)
+            if (candidate.Genes.Length > 0)
+            {
+                var descriptions = candidate.Genes.OrderByDescending(g => g.Quantity)
+                    .Select(id => $"{id.Quantity} x {id.Item.Name}");
                 Console.WriteLine("{0}\t{1}\t{2} ms", string.Join(", ", descriptions), candidate.Fitness,
                     watch.ElapsedMilliseconds);
+            }
             else
                 Console.WriteLine("Empty");
         }
