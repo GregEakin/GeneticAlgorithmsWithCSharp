@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-
-namespace GeneticAlgorithms.Knapsack
+﻿namespace GeneticAlgorithms.Knapsack
 {
     public class KnapsackProblemData
     {

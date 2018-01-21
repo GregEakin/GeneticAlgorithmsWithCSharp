@@ -1,8 +1,9 @@
-﻿using System;
+﻿using GeneticAlgorithms.MagicSquare;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace GeneticAlgorithms.Knapsack
 {

@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace GeneticAlgorithms.LawnmowerProblem
+﻿namespace GeneticAlgorithms.LawnmowerProblem
 {
     public class Location
     {

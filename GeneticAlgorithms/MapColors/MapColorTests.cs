@@ -1,9 +1,10 @@
-﻿using System;
+﻿using GeneticAlgorithms.SortedNumbers;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace GeneticAlgorithms.MapColors
 {
