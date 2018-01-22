@@ -32,7 +32,6 @@ namespace GeneticAlgorithms.Password
             var watch = Stopwatch.StartNew();
             int FitnessFun(string guess) => Fitness(target, guess);
             void DisplayFun(Chromosome candidate) => Display(candidate, watch);
-            // void DisplayFun(Chromosome candidate) { }
             
             var answer = Genetic.BestFitness(FitnessFun, target.Length, target.Length, GeneSet, DisplayFun);
             Assert.AreEqual(target.Length, answer.Fitness);
