@@ -10,25 +10,24 @@ namespace GeneticAlgorithms.Password
 
         public delegate void DisplayFun(Chromosome child);
 
-        private static readonly Random RandomGen = new Random();
+        private static readonly Random Random = new Random();
 
-        public static string RandomSample(string input, int k)
+        public static string RandomSample(string input, int length)
         {
             var result = string.Empty;
-            while (true)
+            while (result.Length < length)
             {
-                var length = Math.Min(input.Length, k - result.Length);
-                var array = input.ToCharArray().OrderBy(x => RandomGen.Next()).Take(length).ToArray();
-                result += new string(array);
-
-                if (result.Length >= k)
-                    return result;
+                var sampleSize = Math.Min(input.Length, length - result.Length);
+                var array = input.ToCharArray().OrderBy(x => Random.Next()).Take(sampleSize);
+                result += new string(array.ToArray());
             }
+
+            return result;
         }
 
         public static Chromosome Mutate(string geneSet, Chromosome parent, FitnessFun fitnessFun)
         {
-            var index = RandomGen.Next(parent.Genes.Length);
+            var index = Random.Next(parent.Genes.Length);
             var childGenes = parent.Genes.ToCharArray();
             var randomSample = RandomSample(geneSet, 2);
             var newGene = randomSample[0];
@@ -51,7 +50,7 @@ namespace GeneticAlgorithms.Password
             var fit = fitnessFun(geneSet);
             return new Chromosome(genes, fit);
         }
-
+0
         public static Chromosome BestFitness(FitnessFun fitnessFun, int targetLen, int optimalFitness, string geneSet,
             DisplayFun displayFun)
         {

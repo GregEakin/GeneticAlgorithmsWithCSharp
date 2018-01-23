@@ -484,11 +484,12 @@ namespace GeneticAlgorithms.RegularExpressions
                 "SD", "TN", "TX", "UT", "VT",
                 "VA", "WA", "WV", "WI", "WY"
             };
-            var unwanted = (from a in "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-                from b in "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+            const string alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+            var unwanted = (from a in alphabet
+                from b in alphabet
                 where !wanted.Contains($"{a}{b}")
                 select $"{a}{b}").Concat(
-                from i in "ABCDEFGHIJKLMNOPQRSTUVWXYZ" select $"{i}").ToArray();
+                from i in alphabet select $"{i}").ToArray();
             var customOperators = new FnMutateDelegate[]
             {
                 genes => MutateToCharacterSetLeft(genes, wanted),

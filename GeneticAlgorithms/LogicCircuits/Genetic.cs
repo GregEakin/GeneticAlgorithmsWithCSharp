@@ -35,12 +35,12 @@ namespace GeneticAlgorithms.LogicCircuits
         public TGene[] RandomSample(TGene[] geneSet, int length)
         {
             var genes = new List<TGene>(length);
-            do
+            while (genes.Count < length)
             {
                 var sampleSize = Math.Min(geneSet.Length, length - genes.Count);
                 var array = geneSet.OrderBy(x => _random.Next()).Take(sampleSize);
                 genes.AddRange(array);
-            } while (genes.Count < length);
+            }
 
             return genes.ToArray();
         }

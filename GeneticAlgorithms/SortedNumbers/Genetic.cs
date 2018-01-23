@@ -16,15 +16,14 @@ namespace GeneticAlgorithms.SortedNumbers
         public TGene[] RandomSample(TGene[] geneSet, int length)
         {
             var genes = new List<TGene>(length);
-            while (true)
+            while (genes.Count < length)
             {
                 var sampleSize = Math.Min(geneSet.Length, length - genes.Count);
                 var array = geneSet.OrderBy(x => _random.Next()).Take(sampleSize);
                 genes.AddRange(array);
-
-                if (genes.Count >= length)
-                    return genes.ToArray();
             }
+
+            return genes.ToArray();
         }
 
         public Chromosome<TGene, TFitness> GenerateParent(TGene[] geneSet, int length, FitnessFun fitnessFun)
