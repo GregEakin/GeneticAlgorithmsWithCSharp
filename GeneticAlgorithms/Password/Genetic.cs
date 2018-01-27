@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Linq;
 
 namespace GeneticAlgorithms.Password
@@ -50,7 +49,7 @@ namespace GeneticAlgorithms.Password
             var fit = fitnessFun(geneSet);
             return new Chromosome(genes, fit);
         }
-0
+
         public static Chromosome BestFitness(FitnessFun fitnessFun, int targetLen, int optimalFitness, string geneSet,
             DisplayFun displayFun)
         {

@@ -14,7 +14,7 @@ namespace GeneticAlgorithms.primes.enumerable
 
         public static IEnumerable<int> Primes1()
         {
-            var ints = Enumerable.Range(2, int.MaxValue - 10);
+            var ints = Enumerable.Range(2, int.MaxValue - 10).ToArray();
             return ints.Where(x => ints.TakeWhile(y => y < x).All(y => x % y != 0));
         }
 
@@ -27,7 +27,7 @@ namespace GeneticAlgorithms.primes.enumerable
 
         public static IEnumerable<int> Primes2()
         {
-            var ints = Enumerable.Range(2, int.MaxValue - 10);
+            var ints = Enumerable.Range(2, int.MaxValue - 10).ToArray();
             return ints.Where(x => ints.TakeWhile(y => y <= Math.Sqrt(x)).All(y => x % y != 0));
         }
 
@@ -40,7 +40,7 @@ namespace GeneticAlgorithms.primes.enumerable
 
         public static IEnumerable<int> Primes3()
         {
-            var ints = Enumerable.Range(2, int.MaxValue - 10);
+            var ints = Enumerable.Range(2, int.MaxValue - 10).ToArray();
             return ints.Where(x =>
             {
                 var sqrt = Math.Sqrt(x);
@@ -165,6 +165,7 @@ namespace GeneticAlgorithms.primes.enumerable
                 var sqrt = Math.Sqrt(x);
                 return memoized.TakeWhile(y => y <= sqrt).All(y => x % y != 0);
             });
+
             foreach (var prime in primes)
             {
                 yield return prime;
@@ -182,6 +183,8 @@ namespace GeneticAlgorithms.primes.enumerable
             yield return k * 6 + 1;
             k++;
             goto loop;
+        
+            // ReSharper disable once IteratorNeverReturns
         }
 
         [TestMethod]

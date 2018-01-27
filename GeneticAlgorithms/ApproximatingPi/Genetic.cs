@@ -58,7 +58,7 @@ namespace GeneticAlgorithms.ApproximatingPi
         public TGene[] MutateGene(TGene[] parentGenes, TGene[] geneSet)
         {
             var childGenes = parentGenes.ToArray();
-            var index = _random.Next(parentGenes.Length);
+            var index = _random.Next(childGenes.Length);
             var randomSample = RandomSample(geneSet, 2);
             var newGene = randomSample[0];
             var alternate = randomSample[1];

@@ -91,6 +91,8 @@ namespace GeneticAlgorithms.Cards
                 if (bestParent.Fitness.CompareTo(child.Fitness) <= 0)
                     yield return child;
             }
+
+            // ReSharper disable once IteratorNeverReturns
         }
     }
 }

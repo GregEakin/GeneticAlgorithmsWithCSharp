@@ -5,6 +5,7 @@ namespace GeneticAlgorithms.TicTacToe
     public partial class Genetic<TGene, TFitness>
         where TFitness : IComparable<TFitness>
     {
+        [Serializable]
         public class SearchTimeoutException : Exception
         {
             public Chromosome<TGene, TFitness> Improvement { get; }

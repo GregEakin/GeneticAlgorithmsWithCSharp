@@ -1,8 +1,4 @@
-﻿using System;
-using System.Diagnostics;
-using System.Linq;
-
-namespace GeneticAlgorithms.Password
+﻿namespace GeneticAlgorithms.Password
 {
     public class Chromosome
     {

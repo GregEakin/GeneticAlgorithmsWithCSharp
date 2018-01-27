@@ -65,7 +65,10 @@ namespace GeneticAlgorithms.RegularExpressions
         [TestMethod]
         public void Test3()
         {
-            AssertThrows<ArgumentException>(() => new Regex("[[[**(("));
+            const string badRegExpression = "[[[**((";
+
+            // ReSharper disable once ObjectCreationAsStatement
+            AssertThrows<ArgumentException>(() => new Regex(badRegExpression));
         }
     }
 }

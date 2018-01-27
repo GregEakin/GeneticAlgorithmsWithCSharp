@@ -23,8 +23,9 @@ namespace GeneticAlgorithms.Sudoku
         {
             for (var row = 0; row < 9; row++)
             {
+                var row9 = row * 9;
                 var line = string.Join(" | ",
-                    new[] {0, 3, 6}.Select(i => string.Join(" ", candidate.Genes.Skip(row * 9 + i).Take(3))));
+                    new[] {0, 3, 6}.Select(i => string.Join(" ", candidate.Genes.Skip(row9 + i).Take(3))));
                 Console.WriteLine(" {0}", line);
                 if (row < 8 && row % 3 == 2)
                     Console.WriteLine(" ----- + ----- + -----");
