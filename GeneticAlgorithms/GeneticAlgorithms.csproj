@@ -135,6 +135,7 @@
     <Compile Include="TicTacToe\SearchTimeoutException.cs" />
     <Compile Include="TicTacToe\Square.cs" />
     <Compile Include="TicTacToe\TicTacToeTests.cs" />
+    <Compile Include="TicTacToe\TicTacToeTests2.cs" />
     <Compile Include="TravelingSalesmanProblem\Chromosome.cs" />
     <Compile Include="TravelingSalesmanProblem\Genetic.cs" />
     <Compile Include="TravelingSalesmanProblem\TravelingSalesmanProblemTests.cs" />

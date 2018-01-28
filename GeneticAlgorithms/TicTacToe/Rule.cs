@@ -10,7 +10,7 @@ namespace GeneticAlgorithms.TicTacToe
         public ContentType? ExpectedContent { get; }
         public int? Count { get; }
 
-        public Rule(string descriptionPrefix, ContentType? expectedContent = null, int? count = null)
+        protected Rule(string descriptionPrefix, ContentType? expectedContent = null, int? count = null)
         {
             DescriptionPrefix = descriptionPrefix;
             ExpectedContent = expectedContent;
@@ -91,7 +91,7 @@ namespace GeneticAlgorithms.TicTacToe
     {
         public Func<Square, int[]> ValueFromSquare { get; }
 
-        public ContentFilter(string descriptionPrefix, ContentType? expectedContent, int? count,
+        protected ContentFilter(string descriptionPrefix, ContentType? expectedContent, int? count,
             Func<Square, int[]> valueFromSquare)
             : base(descriptionPrefix, expectedContent, count)
         {
@@ -132,7 +132,7 @@ namespace GeneticAlgorithms.TicTacToe
     {
         public Func<Square, bool> Function { get; }
 
-        public LocationFilter(string expectedLocation, string containerDescription, Func<Square, bool> func)
+        protected LocationFilter(string expectedLocation, string containerDescription, Func<Square, bool> func)
             : base($"is in {expectedLocation} {containerDescription}")
         {
             Function = func;
@@ -152,7 +152,7 @@ namespace GeneticAlgorithms.TicTacToe
 
     public class RowLocationFilter : LocationFilter
     {
-        public RowLocationFilter(string expectedLocation, Func<Square, bool> func)
+        protected RowLocationFilter(string expectedLocation, Func<Square, bool> func)
             : base(expectedLocation, "ROW", func)
         {
         }
@@ -160,7 +160,7 @@ namespace GeneticAlgorithms.TicTacToe
 
     public class ColumnLocationFilter : LocationFilter
     {
-        public ColumnLocationFilter(string expectedLocation, Func<Square, bool> func)
+        protected ColumnLocationFilter(string expectedLocation, Func<Square, bool> func)
             : base(expectedLocation, "COLUMN", func)
         {
         }

@@ -1,8 +1,8 @@
-﻿using System;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace GeneticAlgorithms.TicTacToe
 {
@@ -22,7 +22,7 @@ namespace GeneticAlgorithms.TicTacToe
 
         public CompetitionResult PlayOneOnOne(Rule[] xGenes, Rule[] oGenes)
         {
-            var board = Enumerable.Range(1, 9 + 1).ToDictionary(i => i, i => new Square(i));
+            var board = Enumerable.Range(1, 9).ToDictionary(i => i, i => new Square(i));
             var empties = board.Values.Where(v => v.Content == ContentType.Empty).ToArray();
             var roundData = new[]
             {
@@ -43,7 +43,7 @@ namespace GeneticAlgorithms.TicTacToe
                 var winResult = playerData.Item4;
 
                 var moveAndRuleIndex = GetMove(genes, board, empties);
-                if (moveAndRuleIndex == null)
+                if (moveAndRuleIndex == null) // could not find a move
                     return lossResult;
 
                 var index = moveAndRuleIndex[0];
@@ -63,7 +63,7 @@ namespace GeneticAlgorithms.TicTacToe
 
         public Fitness GetFitnessForGames(Rule[] genes)
         {
-            string GetBoardString(Dictionary<int, Square> b) =>
+            string GetBoardString(IReadOnlyDictionary<int, Square> b) =>
                 string.Join("",
                     _squareIndexes.Select(i =>
                         b[i].Content == ContentType.Empty ? "." : b[i].Content == ContentType.Mine ? "x" : "o"));
@@ -170,33 +170,11 @@ namespace GeneticAlgorithms.TicTacToe
                 watch.ElapsedMilliseconds);
         }
 
-        [TestMethod]
-        public void DisplayTest()
-        {
-            var geneSet = CreateGeneSet();
-            var fitness = new Fitness(1, 2, 3, 4);
-            var candidate =
-                new Chromosome<Rule, Fitness>(geneSet, fitness, Chromosome<Rule, Fitness>.Strategies.None);
-            var watch = Stopwatch.StartNew();
-            Display(candidate, watch);
-        }
-
         public bool MutateAdd(List<Rule> genes, Rule[] geneSet)
         {
             var index = _random.Next(genes.Count);
             genes.Insert(index, geneSet[_random.Next(geneSet.Length)]);
             return true;
-        }
-
-        [TestMethod]
-        public void MutateAddTest()
-        {
-            var genes = new List<Rule>();
-            var geneSet = CreateGeneSet();
-            Assert.IsTrue(MutateAdd(genes, geneSet));
-            Assert.AreEqual(1, genes.Count);
-            Assert.IsTrue(MutateAdd(genes, geneSet));
-            Assert.AreEqual(2, genes.Count);
         }
 
         public bool MutateRemove(List<Rule> genes)
@@ -378,7 +356,8 @@ namespace GeneticAlgorithms.TicTacToe
                 MutateMove,
             };
 
-            Rule[] FnMutate(Rule[] genes) => Mutate(genes, x => null, mutationOperators, mutationRoundCounts);
+            Rule[] FnMutate(Rule[] genes) =>
+                Mutate(genes, x => new Fitness(0, 0, 0, 0), mutationOperators, mutationRoundCounts);
 
             Rule[] FnCrossover(Rule[] parent, Rule[] doner)
             {
@@ -393,19 +372,12 @@ namespace GeneticAlgorithms.TicTacToe
 
             int FnSortKey(Rule[] genes, int wins, int ties, int losses) => -1000 * losses - ties + 1 / genes.Length;
 
-            var best = genetic.Tournament(FnCreate, FnCrossover, PlayOneOnOne, FnDisplay, FnSortKey, 13);
+            var unused = genetic.Tournament(FnCreate, FnCrossover, PlayOneOnOne, FnDisplay, FnSortKey, 13);
         }
 
         static Rule HaveThreeInRow => new RowContentFilter(ContentType.Mine, 3);
         static Rule HaveThreeInColumn => new ColumnContentFilter(ContentType.Mine, 3);
         static Rule HaveThreeInDiagonal => new DiagonalContentFilter(ContentType.Mine, 3);
         static Rule OpponentHasTwoInARow => new WinFilter(ContentType.Opponent);
-
-        [TestMethod]
-        public void FitnessTest1()
-        {
-            var fitness = new Fitness(10, 10, 10, 100);
-            Assert.AreEqual("33.3% Losses (10), 33.3% Ties (10), 33.3% Wins (10), 100 rules", fitness.ToString());
-        }
     }
 }
