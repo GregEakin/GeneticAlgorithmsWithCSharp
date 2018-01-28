@@ -40,7 +40,7 @@ namespace GeneticAlgorithms.TicTacToe
                 var sampleSize = Math.Min(geneSet.Length, length - genes.Count);
                 var array = geneSet.OrderBy(x => _random.Next()).Take(sampleSize);
                 genes.AddRange(array);
-            } 
+            }
 
             return genes.ToArray();
         }
@@ -252,11 +252,53 @@ namespace GeneticAlgorithms.TicTacToe
             return best;
         }
 
-        public void Tournament()
-        // generate_parent, crossover, compete, display, sort_key,
-        // numParents= 10, max_generations= 100):    }
-
+        internal Rule[] Tournament(Func<Rule[]> fnGenerateParent, Func<Rule[], Rule[], Rule[]> fnCrossover,
+            Func<Rule[], Rule[], CompetitionResult> fnCompete, Action<Rule[], int, int, int, int> fnDisplay,
+            Func<Rule[], int, int, int, int> fnSortKey, int numParents = 10, int maxGenerations = 100)
         {
+            var pool = Enumerable.Range(0, 1 + numParents * numParents)
+                .Select(x => new Tuple<Rule[], int[]>(fnGenerateParent(), new[] {0, 0, 0})).ToList();
+            var best = pool[0].Item1;
+            var bestScore = pool[0].Item2;
+
+            int GetSortKey(Tuple<Rule[], int[]> x) => fnSortKey(x.Item1, x.Item2[(int) CompetitionResult.Win],
+                x.Item2[(int) CompetitionResult.Tie], x.Item2[(int) CompetitionResult.Loss]);
+
+            for (var generation = 0; generation < maxGenerations; generation++)
+            {
+                for (var i = 0; i < pool.Count; i++)
+                for (var j = 0; j < pool.Count; j++)
+                {
+                    if (i == j)
+                        continue;
+                    var playerA = pool[i].Item1;
+                    var scoreA = pool[i].Item2;
+                    var playerB = pool[j].Item1;
+                    var scoreB = pool[j].Item2;
+                    var result = (int) fnCompete(playerA, playerB);
+                    scoreA[result]++;
+                    scoreB[2 - result]++;
+                }
+
+                pool = pool.OrderByDescending(GetSortKey).ToList();
+                if (GetSortKey(pool[0]) > GetSortKey(new Tuple<Rule[], int[]>(best, bestScore)))
+                {
+                    best = pool[0].Item1;
+                    bestScore = pool[0].Item2;
+                    fnDisplay(best, bestScore[(int) CompetitionResult.Win], bestScore[(int) CompetitionResult.Tie],
+                        bestScore[(int) CompetitionResult.Loss], generation);
+                }
+
+                var parents = Enumerable.Range(0, numParents).Select(i => pool[i].Item1).ToList();
+                pool = (from i in Enumerable.Range(0, parents.Count)
+                    from j in Enumerable.Range(0, parents.Count)
+                    where i != j
+                    select new Tuple<Rule[], int[]>(fnCrossover(parents[i], parents[j]), new[] {0, 0, 0})).ToList();
+                pool.AddRange(parents.Select(parent => new Tuple<Rule[], int[]>(parent, new[] {0, 0, 0})));
+                pool.Add(new Tuple<Rule[], int[]>(fnGenerateParent(), new[] {0, 0, 0}));
+            }
+
+            return best;
         }
     }
 }

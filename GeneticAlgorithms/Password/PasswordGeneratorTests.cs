@@ -1,7 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Diagnostics;
-using System.Linq;
 
 namespace GeneticAlgorithms.Password
 {
@@ -39,16 +38,6 @@ namespace GeneticAlgorithms.Password
             Assert.AreEqual(target, answer.Genes);
 
             return watch;
-        }
-
-        [TestMethod]
-        public void Test1()
-        {
-            var x = Genetic.RandomSample("ABC", 21);
-            Console.WriteLine(x);
-            Assert.AreEqual(7, x.Count(v => v == 'A'));
-            Assert.AreEqual(7, x.Count(v => v == 'B'));
-            Assert.AreEqual(7, x.Count(v => v == 'C'));
         }
 
         [TestMethod]

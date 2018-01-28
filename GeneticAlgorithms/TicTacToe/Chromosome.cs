@@ -4,6 +4,7 @@
     {
         public enum Strategies
         {
+            None = -1,
             Create = 0,
             Mutate = 1,
             Crossover = 2

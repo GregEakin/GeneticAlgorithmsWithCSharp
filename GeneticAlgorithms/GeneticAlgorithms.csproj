@@ -126,8 +126,15 @@
     <Compile Include="Primes\yield\LazyList.cs" />
     <Compile Include="Primes\yield\MyList.cs" />
     <Compile Include="TicTacToe\Chromosome.cs" />
+    <Compile Include="TicTacToe\CompetitionResult.cs" />
+    <Compile Include="TicTacToe\ContentType.cs" />
+    <Compile Include="TicTacToe\Fitness.cs" />
     <Compile Include="TicTacToe\Genetic.cs" />
+    <Compile Include="TicTacToe\Rule.cs" />
+    <Compile Include="TicTacToe\RuleTests.cs" />
     <Compile Include="TicTacToe\SearchTimeoutException.cs" />
+    <Compile Include="TicTacToe\Square.cs" />
+    <Compile Include="TicTacToe\TicTacToeTests.cs" />
     <Compile Include="TravelingSalesmanProblem\Chromosome.cs" />
     <Compile Include="TravelingSalesmanProblem\Genetic.cs" />
     <Compile Include="TravelingSalesmanProblem\TravelingSalesmanProblemTests.cs" />
