@@ -11,14 +11,14 @@ namespace GeneticAlgorithms.TicTacToe
     {
         private readonly Random _random = new Random();
 
+        private readonly int[] _squareIndexes = { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+
         public Fitness GetFitness(Rule[] genes)
         {
             var localCopy = genes.ToArray();
             var fitness = GetFitnessForGames(localCopy);
             return new Fitness(fitness.Wins, fitness.Ties, fitness.Losses, genes.Length);
         }
-
-        private readonly int[] _squareIndexes = {1, 2, 3, 4, 5, 6, 7, 8, 9};
 
         public CompetitionResult PlayOneOnOne(Rule[] xGenes, Rule[] oGenes)
         {
@@ -96,7 +96,7 @@ namespace GeneticAlgorithms.TicTacToe
 
                 var candidateIndexAndRuleIndex = GetMove(genes, board, empties);
 
-                if (candidateIndexAndRuleIndex == null)
+                if (candidateIndexAndRuleIndex == null) // could not find a move
                 {
                     // There are empties, but didn't find a move
                     losses++;
@@ -145,7 +145,7 @@ namespace GeneticAlgorithms.TicTacToe
             return new Fitness(wins, ties, losses, genes.Length);
         }
 
-        public int[] GetMove(Rule[] ruleSet, Dictionary<int, Square> board, Square[] empties, int startingRuleIndex = 0)
+        public static int[] GetMove(Rule[] ruleSet, Dictionary<int, Square> board, Square[] empties, int startingRuleIndex = 0)
         {
             var ruleSetCopy = ruleSet.ToArray();
             for (var ruleIndex = startingRuleIndex; ruleIndex < ruleSetCopy.Length; ruleIndex++)
@@ -163,7 +163,7 @@ namespace GeneticAlgorithms.TicTacToe
             return null;
         }
 
-        public void Display(Chromosome<Rule, Fitness> candidate, Stopwatch watch)
+        public static void Display(Chromosome<Rule, Fitness> candidate, Stopwatch watch)
         {
             var localCopy = candidate.Genes.Reverse().Select(g => g.ToString());
             Console.WriteLine("\t{0}\n{1}\n{2} ms", string.Join("\n\t", localCopy), candidate.Fitness,
@@ -246,7 +246,7 @@ namespace GeneticAlgorithms.TicTacToe
             return genes.ToArray();
         }
 
-        public Rule[] CreateGeneSet()
+        public static Rule[] CreateGeneSet()
         {
             var options = new[]
             {

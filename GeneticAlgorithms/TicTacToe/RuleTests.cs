@@ -9,8 +9,7 @@ namespace GeneticAlgorithms.TicTacToe
         [TestMethod]
         public void CreateGeneTest()
         {
-            var ticTacToe = new TicTacToeTests();
-            var genes = ticTacToe.CreateGeneSet();
+            var genes = TicTacToeTests.CreateGeneSet();
             Assert.AreEqual(34, genes.Length);
         }
 
