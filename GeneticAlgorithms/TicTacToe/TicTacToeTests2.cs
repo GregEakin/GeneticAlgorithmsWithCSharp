@@ -1,5 +1,4 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -49,12 +48,6 @@ namespace GeneticAlgorithms.TicTacToe
         {
             var ticTacToe = new TicTacToeTests();
 
-//            var options = new[]
-//            {
-//                new Tuple<ContentType?, int[]>(ContentType.Opponent, new[] {0, 1, 2}),
-//                new Tuple<ContentType?, int[]>(ContentType.Mine, new[] {0, 1, 2}),
-//            };
-//
             var geneSet = new[]
             {
                 new RuleMetadata((expectedContent, count) => new CenterFilter()),
@@ -65,9 +58,8 @@ namespace GeneticAlgorithms.TicTacToe
             var board = Enumerable.Range(1, 9).ToDictionary(i => i, i => new Square(i));
             var empties = board.Values.Where(v => v.Content == ContentType.Empty).ToArray();
 
-            var x = ticTacToe.GetMove(genes, board, empties, 0);
+            var x = ticTacToe.GetMove(genes, board, empties);
             CollectionAssert.AreEqual(new[] {5, 0}, x);
         }
-
     }
 }
