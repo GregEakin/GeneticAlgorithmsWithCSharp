@@ -61,5 +61,33 @@ namespace GeneticAlgorithms.TicTacToe
             var x = ticTacToe.GetMove(genes, board, empties);
             CollectionAssert.AreEqual(new[] {5, 0}, x);
         }
+
+        [TestMethod]
+        public void BoardStringTest()
+        {
+            string GetBoardString(IReadOnlyDictionary<int, Square> b) =>
+                string.Join("",
+                    new[] {1, 2, 3, 4, 5, 6, 7, 8, 9}.Select(i =>
+                        b[i].Content == ContentType.Empty ? "." : b[i].Content == ContentType.Mine ? "x" : "o"));
+
+            var board = Enumerable.Range(1, 9).ToDictionary(i => i, i => new Square(i));
+            board[1] = new Square(board[1].Index, ContentType.Mine);
+            board[5] = new Square(board[5].Index, ContentType.Opponent);
+
+            Assert.AreEqual("x...o....", GetBoardString(board));
+        }
+
+        [TestMethod]
+        public void GetFitnessForGameTest()
+        {
+            var geneSet = new[]
+            {
+                new RuleMetadata((expectedContent, count) => new CenterFilter()),
+            };
+            var genes = geneSet.SelectMany(g => g.CreateRules()).ToArray();
+            var ticTacToe = new TicTacToeTests();
+            var x = ticTacToe.GetFitnessForGames(genes);
+            Assert.AreEqual("100.0% Losses (65), 0.0% Ties (0), 0.0% Wins (0), 1 rules", x.ToString());
+        }
     }
 }
