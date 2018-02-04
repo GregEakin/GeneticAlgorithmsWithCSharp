@@ -33,8 +33,8 @@ namespace GeneticAlgorithms.Password
                 genes += RandomSample(geneSet, sampleSize);
             }
 
-            var fit = getFitness(geneSet);
-            return new Chromosome(genes, fit);
+            var fitness = getFitness(genes);
+            return new Chromosome(genes, fitness);
         }
 
         private static Chromosome Mutate(string geneSet, Chromosome parent, FitnessFun getFitness)

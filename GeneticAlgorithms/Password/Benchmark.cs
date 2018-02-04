@@ -1,34 +1,32 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace GeneticAlgorithms.Password
 {
-    [TestClass]
-    public class Benchmark
+    public static class Benchmark
     {
-        private const string GeneSet = GuessPassordTests.GeneSet;
-
-        private readonly Random _random = new Random();
-
-        //[TestMethod]
-        public void BenchmarkTest()
+        public static void Run(Action function)
         {
-            const int count = 100;
-            const int length = 150;
-
-            var timings = new long[count];
-            for (var i = 0; i < count; i++)
+            var timings = new List<long>();
+            var stdout = Console.Out;
+            for (var i = 0; i < 100; i++)
             {
-                var target = string.Join("",
-                    Enumerable.Range(0, length).Select(x => GeneSet[_random.Next(GeneSet.Length)]));
-                var watch = GuessPassordTests.GuessPassword(target);
-                timings[i] = watch.ElapsedMilliseconds;
-            }
+                Console.SetOut(TextWriter.Null);
+                var watch = Stopwatch.StartNew();
+                function();
+                var milliseconds = watch.ElapsedMilliseconds;
+                Console.SetOut(stdout);
+                timings.Add(milliseconds);
+                var mean = timings.Average();
+                if (i >= 10 && i % 10 < 9)
+                    continue;
 
-            var mean = 0.0;
-            var sd = 0.0;
-            Console.WriteLine("Mean {0}, SD = {1}", mean, sd);
+                var sd = i > 1 ? Math.Sqrt(timings.Average(v => Math.Pow(v - mean, 2))) : 0.0;
+                Console.WriteLine("{0} {1:F2} {2:F2}", i+1, mean, sd);
+            }
         }
     }
 }
