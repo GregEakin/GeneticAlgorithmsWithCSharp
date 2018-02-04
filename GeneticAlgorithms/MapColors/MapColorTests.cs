@@ -61,10 +61,10 @@ namespace GeneticAlgorithms.MapColors
             var geneSet = "OYGB".ToCharArray();
             var watch = Stopwatch.StartNew();
 
-            int FitnessFun(char[] genes, int size) => Fitness(genes, rules);
+            int FitnessFun(char[] genes) => Fitness(genes, rules);
             void DisplayFun(Chromosome<char, int> candidate) => Display(candidate, watch, states);
 
-            var best = genetic.BestFitness(FitnessFun, states.Count, rules.Count, geneSet, DisplayFun);
+            var best = genetic.GetBest(FitnessFun, states.Count, rules.Count, geneSet, DisplayFun);
             Assert.IsTrue(best.Fitness >= 214);
         }
 
@@ -79,10 +79,10 @@ namespace GeneticAlgorithms.MapColors
             var geneSet = "ROYGBI".ToCharArray();
             var watch = Stopwatch.StartNew();
 
-            int FitnessFun(char[] genes, int size) => Fitness(genes, rules);
+            int FitnessFun(char[] genes) => Fitness(genes, rules);
             void DisplayFun(Chromosome<char, int> candidate) => Display(candidate, watch, states);
 
-            var best = genetic.BestFitness(FitnessFun, states.Count, rules.Count, geneSet, DisplayFun);
+            var best = genetic.GetBest(FitnessFun, states.Count, rules.Count, geneSet, DisplayFun);
             Assert.IsTrue(best.Fitness >= 214);
         }
     }

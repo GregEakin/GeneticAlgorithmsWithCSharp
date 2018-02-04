@@ -1,5 +1,5 @@
 ﻿/* File: Benchmark.cs
- *     from chapter 1 of _Genetic Algorithms with Python_
+ *     from chapter 3 of _Genetic Algorithms with Python_
  *     writen by Clinton Sheppard
  *
  * Author: Greg Eakin <gregory.eakin@gmail.com>
@@ -23,7 +23,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 
-namespace GeneticAlgorithms.Password
+namespace GeneticAlgorithms.SortedNumbers
 {
     public static class Benchmark
     {
@@ -44,7 +44,7 @@ namespace GeneticAlgorithms.Password
 
                 var mean = timings.Average();
                 var sd = i > 1 ? Math.Sqrt(timings.Average(v => Math.Pow(v - mean, 2))) : 0.0;
-                Console.WriteLine("{0} {1:F2} {2:F2}", i+1, mean, sd);
+                Console.WriteLine("{0} {1:F2} {2:F2}", i + 1, mean, sd);
             }
         }
     }

@@ -1,5 +1,4 @@
-﻿/*
- * File: OneMaxTests.cs
+﻿/* File: OneMaxTests.cs
  *     from chapter 2 of _Genetic Algorithms with Python_
  *     writen by Clinton Sheppard
  *

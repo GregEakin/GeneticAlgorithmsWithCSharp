@@ -1,5 +1,4 @@
-﻿/*
- * File: genetic.cs
+﻿/* File: genetic.cs
  *     from chapter 1 of _Genetic Algorithms with Python_
  *     writen by Clinton Sheppard
  *

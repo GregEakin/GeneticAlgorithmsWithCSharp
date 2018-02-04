@@ -117,7 +117,9 @@
     <Compile Include="RegularExpressions\FitnessTests.cs" />
     <Compile Include="RegularExpressions\RegexTests.cs" />
     <Compile Include="RegularExpressions\SimpleTests.cs" />
+    <Compile Include="SortedNumbers\Benchmark.cs" />
     <Compile Include="SortedNumbers\Chromosome.cs" />
+    <Compile Include="SortedNumbers\Fitness.cs" />
     <Compile Include="SortedNumbers\Genetic.cs" />
     <Compile Include="SortedNumbers\SortedNumbersTests.cs" />
     <Compile Include="Sudoku\Rule.cs" />

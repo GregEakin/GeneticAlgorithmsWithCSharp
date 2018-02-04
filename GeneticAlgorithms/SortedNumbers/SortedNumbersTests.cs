@@ -1,4 +1,23 @@
-﻿using System;
+﻿/* File: Chromosome.cs
+ *     from chapter 3 of _Genetic Algorithms with Python_
+ *     writen by Clinton Sheppard
+ *
+ * Author: Greg Eakin <gregory.eakin@gmail.com>
+ * Copyright (c) 2018 Greg Eakin
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+ * implied.  See the License for the specific language governing
+ * permissions and limitations under the License.
+ */
+
+using System;
 using System.Diagnostics;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -8,33 +27,51 @@ namespace GeneticAlgorithms.SortedNumbers
     [TestClass]
     public class SortedNumbersTests
     {
-        public static int Fitness(int[] genes, int size)
+        private static Fitness GetFitness(int[] genes)
         {
-            var count = genes.Count(n => n == 1);
-            return count;
+            var count = 1;
+            var gap = 0;
+            for (var i = 1; i < genes.Length; i++)
+            {
+                if (genes[i - 1] < genes[i])
+                    count++;
+                else
+                    gap += genes[i - 1] - genes[i];
+            }
+
+            return new Fitness(count, gap);
         }
 
-        public static void Display(Chromosome<int, int> candidate, Stopwatch watch, int size)
+        private static void Display(Chromosome<int, Fitness> candidate, Stopwatch watch)
         {
-            Console.WriteLine("{0} ... {1}\t{2:3.2f}\t{3}",
-                string.Join(", ", candidate.Genes.Take(5)),
-                string.Join(", ", candidate.Genes.Skip(size - 5)),
-                candidate, watch.ElapsedMilliseconds);
+            Console.WriteLine("{0}\t=> {1}\t{2}",
+                string.Join(", ", candidate.Genes),
+                candidate.Fitness, watch.ElapsedMilliseconds);
         }
 
         [TestMethod]
-        public void Test1()
+        public void SortTenNumbersTest()
         {
-            const int length = 100;
+            SortNumbers(10);
+        }
 
-            var genetic = new Genetic<int, int>();
-            var geneSet = new[] {0, 1};
+        private void SortNumbers(int totalNumbers)
+        {
+            var geneSet = Enumerable.Range(0, 100).ToArray();
             var watch = Stopwatch.StartNew();
-            void DisplayFun(Chromosome<int, int> candidate) => Display(candidate, watch, length);
+            var genetic = new Genetic<int, Fitness>();
 
-            var optimalFitness = length;
-            var best = genetic.BestFitness(Fitness, length, optimalFitness, geneSet, DisplayFun);
-            Assert.IsTrue(best.Fitness >= length);
+            void FnDisplay(Chromosome<int, Fitness> candidate) => Display(candidate, watch);
+            Fitness FnGetFitness(int[] genes) => GetFitness(genes);
+
+            var optimalFitness = new Fitness(totalNumbers, 0);
+            var best = genetic.GetBest(FnGetFitness, totalNumbers, optimalFitness, geneSet, FnDisplay);
+        }
+
+        [TestMethod]
+        public void BenchmarkTest()
+        {
+            Benchmark.Run(() => SortNumbers(40));
         }
     }
 }
