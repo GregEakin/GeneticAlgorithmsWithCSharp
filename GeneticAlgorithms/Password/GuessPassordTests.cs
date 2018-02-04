@@ -1,15 +1,16 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
+﻿using System;
 using System.Diagnostics;
+using System.Linq;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace GeneticAlgorithms.Password
 {
     [TestClass]
-    public class PasswordGeneratorTests
+    public class GuessPassordTests
     {
-        public const string GeneSet = " abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!.,";
+        private const string GeneSet = " abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!.,";
 
-        public static int Fitness(string guess, string target)
+        private static int GetFitness(string guess, string target)
         {
             var lenght = Math.Min(guess.Length, target.Length);
             var sum = 0;
@@ -22,7 +23,7 @@ namespace GeneticAlgorithms.Password
             return sum;
         }
 
-        public static void Display(Chromosome candidate, Stopwatch stopwatch)
+        private static void Display(Chromosome candidate, Stopwatch stopwatch)
         {
             Console.WriteLine("{0}\t{1}\t{2} ms", candidate.Genes, candidate.Fitness, stopwatch.ElapsedMilliseconds);
         }
@@ -30,9 +31,9 @@ namespace GeneticAlgorithms.Password
         private static Stopwatch GuessPassword(string target)
         {
             var watch = Stopwatch.StartNew();
-            int FitnessFun(string guess) => Fitness(target, guess);
+            int FitnessFun(string guess) => GetFitness(target, guess);
             void DisplayFun(Chromosome candidate) => Display(candidate, watch);
-            
+
             var answer = Genetic.BestFitness(FitnessFun, target.Length, target.Length, GeneSet, DisplayFun);
             Assert.AreEqual(target.Length, answer.Fitness);
             Assert.AreEqual(target, answer.Genes);
@@ -54,32 +55,16 @@ namespace GeneticAlgorithms.Password
             GuessPassword(target);
         }
 
+        private readonly Random _random = new Random();
+
         [TestMethod]
         public void RandomPasswordTest()
         {
             const int length = 150;
-            var target = Genetic.RandomSample(GeneSet, length);
+            var target = string.Join("",
+                Enumerable.Range(0, length).Select(x => GeneSet[_random.Next(GeneSet.Length)]));
             Assert.AreEqual(length, target.Length);
             GuessPassword(target);
-        }
-
-        [TestMethod]
-        public void RandomSampleTest()
-        {
-            for (var i = 0; i < 10; i++)
-            {
-                var x = Genetic.RandomSample(GeneSet, 10);
-                Console.WriteLine(x);
-            }
-        }
-
-        [TestMethod]
-        public void GenerateParentTest()
-        {
-            const string target = "Hello World!";
-            int Fitness(string guess) => PasswordGeneratorTests.Fitness(target, guess);
-            var parent = Genetic.GenerateParent(GeneSet, 10, Fitness);
-            Console.WriteLine("{0} : {1}", parent.Fitness, parent.Genes);
         }
 
         //[TestMethod]

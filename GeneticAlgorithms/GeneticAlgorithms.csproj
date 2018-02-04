@@ -70,6 +70,7 @@
     <Compile Include="LogicCircuits\Genetic.cs" />
     <Compile Include="LogicCircuits\Node.cs" />
     <Compile Include="LogicCircuits\SearchTimeoutException.cs" />
+    <Compile Include="Password\GuessPassordTests.cs" />
     <Compile Include="Primes\enumerable\DateTimeFixture.cs" />
     <Compile Include="Primes\enumerable\PrimeFactorTests.cs" />
     <Compile Include="Primes\enumerable\PrimeTests.cs" />
@@ -105,7 +106,6 @@
     <Compile Include="MapColors\State.cs" />
     <Compile Include="Password\Chromosome.cs" />
     <Compile Include="Password\Genetic.cs" />
-    <Compile Include="Password\PasswordGeneratorTests.cs" />
     <Compile Include="Queens\Board.cs" />
     <Compile Include="Queens\Chromosome.cs" />
     <Compile Include="Queens\Fitness.cs" />
