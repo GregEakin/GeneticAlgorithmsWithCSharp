@@ -29,15 +29,15 @@ namespace GeneticAlgorithms.Password
     {
         public static void Run(Action function)
         {
-            var timings = new List<long>();
+            var timings = new List<double>();
             var stdout = Console.Out;
             for (var i = 0; i < 100; i++)
             {
                 Console.SetOut(TextWriter.Null);
                 var watch = Stopwatch.StartNew();
                 function();
-                var milliseconds = watch.ElapsedMilliseconds;
-                timings.Add(milliseconds);
+                var seconds = watch.ElapsedMilliseconds / 1000.0;
+                timings.Add(seconds);
                 Console.SetOut(stdout);
                 if (i >= 10 && i % 10 < 9)
                     continue;
