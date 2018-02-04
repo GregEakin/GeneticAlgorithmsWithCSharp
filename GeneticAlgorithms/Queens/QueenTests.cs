@@ -1,4 +1,24 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿/* File: Benchmark.cs
+ *     from chapter f of _Genetic Algorithms with Python_
+ *     writen by Clinton Sheppard
+ *
+ * Author: Greg Eakin <gregory.eakin@gmail.com>
+ * Copyright (c) 2018 Greg Eakin
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+ * implied.  See the License for the specific language governing
+ * permissions and limitations under the License.
+ */
+
+using GeneticAlgorithms.SortedNumbers;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -9,7 +29,7 @@ namespace GeneticAlgorithms.Queens
     [TestClass]
     public class QueenTests
     {
-        public static Fitness Fitness(int[] genes, int size)
+        private static Fitness Fitness(int[] genes, int size)
         {
             var board = new Board(genes, size);
             var rowsWithQueens = new HashSet<int>();
@@ -26,14 +46,14 @@ namespace GeneticAlgorithms.Queens
                     southEastDiagonalsWithQueens.Add(size - 1 - row + col);
                 }
 
-            var total = size - rowsWithQueens.Count +
-                        size - colsWithQueens.Count +
-                        size - northEastDiagonalsWithQueens.Count +
-                        size - southEastDiagonalsWithQueens.Count;
+            var total = size - rowsWithQueens.Count
+                        + size - colsWithQueens.Count
+                        + size - northEastDiagonalsWithQueens.Count
+                        + size - southEastDiagonalsWithQueens.Count;
             return new Fitness(total);
         }
 
-        public static void Display(Chromosome<int, Fitness> candidate, Stopwatch watch, int size)
+        private static void Display(Chromosome<int, Fitness> candidate, Stopwatch watch, int size)
         {
             var board = new Board(candidate.Genes, size);
             Console.WriteLine(board.ToString());
@@ -103,21 +123,19 @@ namespace GeneticAlgorithms.Queens
             var genetic = new Genetic<int, char>();
             int[] gene;
             do
-                gene = genetic.RandomSample(geneSet, geneSet.Length);
-            while (gene.SequenceEqual(geneSet));
+                gene = genetic.RandomSample(geneSet, geneSet.Length); while (gene.SequenceEqual(geneSet));
             CollectionAssert.AreEqual(new[] {1, 2, 3}, geneSet);
             CollectionAssert.AreNotEqual(new[] {1, 2, 3}, gene);
         }
 
-
         [TestMethod]
         public void GenerateParentTest()
         {
-            int FitnessFun(int[] guess, int size) => 86;
+            int FitnessFun(int[] guess) => 86;
             var genetic = new Genetic<int, int>();
 
             var geneSet = new[] {1, 3, 5, 7, 9};
-            var parent = genetic.GenerateParent(geneSet, 10, FitnessFun);
+            var parent = genetic.GenerateParent(10, geneSet, FitnessFun);
             Assert.IsInstanceOfType(parent, typeof(Chromosome<int, int>));
             Assert.AreEqual(86, parent.Fitness);
             Assert.IsTrue(geneSet.All(c => parent.Genes.Contains(c)));
@@ -126,12 +144,12 @@ namespace GeneticAlgorithms.Queens
         [TestMethod]
         public void MutateTest()
         {
-            int FitnessFun(int[] guess, int size) => 86;
+            int FitnessFun(int[] guess) => 86;
             var genetic = new Genetic<int, int>();
             var geneSet = new[] {0, 1, 2, 3, 4, 5, 6, 7};
             var genes = new[] {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
             var parent = new Chromosome<int, int>(genes, 0);
-            var child = genetic.Mutate(geneSet, parent, FitnessFun);
+            var child = genetic.Mutate(parent, geneSet, FitnessFun);
             Assert.IsTrue(parent.Genes.All(x => x == 0));
             Assert.IsFalse(child.Genes.All(x => x == 0));
         }
@@ -139,25 +157,33 @@ namespace GeneticAlgorithms.Queens
         [TestMethod]
         public void FourQueensTest()
         {
-            var genetic = new Genetic<int, Fitness>();
-            var geneSet = new[] {0, 1, 2, 3};
-            var watch = Stopwatch.StartNew();
-            void DisplayFun(Chromosome<int, Fitness> candidate) => Display(candidate, watch, geneSet.Length);
-
-            var best = genetic.BestFitness(Fitness, geneSet.Length, new Fitness(0), geneSet, DisplayFun);
-            Assert.IsTrue(best.Fitness.Total <= 0);
+            Test(4);
         }
 
         [TestMethod]
         public void EightQueensTest()
         {
-            var genetic = new Genetic<int, Fitness>();
-            var geneSet = new[] {0, 1, 2, 3, 4, 5, 6, 7};
-            var watch = Stopwatch.StartNew();
-            void DisplayFun(Chromosome<int, Fitness> candidate) => Display(candidate, watch, geneSet.Length);
+            Test(8);
+        }
 
-            var best = genetic.BestFitness(Fitness, geneSet.Length, new Fitness(0), geneSet, DisplayFun);
-            Assert.IsTrue(best.Fitness.Total <= 0);
+        private static void Test(int size = 8)
+        {
+            var geneSet = Enumerable.Range(0, size).ToArray();
+            var watch = Stopwatch.StartNew();
+            var genetic = new Genetic<int, Fitness>();
+
+            void DisplayFun(Chromosome<int, Fitness> candidate) => Display(candidate, watch, geneSet.Length);
+            Fitness FitnessFun(int[] genes) => Fitness(genes, size);
+
+            var optimalFitness = new Fitness(0);
+            var best = genetic.GetBest(FitnessFun, 2 * size, optimalFitness, geneSet, DisplayFun);
+            Assert.IsTrue(optimalFitness.CompareTo(best.Fitness) <= 0);
+        }
+
+        [TestMethod]
+        public void BenchmarkTest()
+        {
+            Benchmark.Run(() => Test(20));
         }
     }
 }

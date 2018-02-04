@@ -32,7 +32,7 @@ namespace GeneticAlgorithms.SortedNumbers
 
         private readonly Random _random = new Random();
 
-        private TGene[] RandomSample(TGene[] geneSet, int length)
+        public TGene[] RandomSample(TGene[] geneSet, int length)
         {
             var genes = new List<TGene>(length);
             while (genes.Count < length)
@@ -45,7 +45,7 @@ namespace GeneticAlgorithms.SortedNumbers
             return genes.ToArray();
         }
 
-        private Chromosome<TGene, TFitness> GenerateParent(int length, TGene[] geneSet, GetFitnessFun getFitness)
+        public Chromosome<TGene, TFitness> GenerateParent(int length, TGene[] geneSet, GetFitnessFun getFitness)
         {
             var genes = RandomSample(geneSet, length);
             var fit = getFitness(genes);

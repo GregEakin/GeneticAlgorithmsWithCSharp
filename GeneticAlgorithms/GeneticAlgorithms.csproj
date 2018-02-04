@@ -109,9 +109,7 @@
     <Compile Include="Password\Chromosome.cs" />
     <Compile Include="Password\Genetic.cs" />
     <Compile Include="Queens\Board.cs" />
-    <Compile Include="Queens\Chromosome.cs" />
     <Compile Include="Queens\Fitness.cs" />
-    <Compile Include="Queens\Genetic.cs" />
     <Compile Include="Queens\QueenTests.cs" />
     <Compile Include="RegularExpressions\Fitness.cs" />
     <Compile Include="RegularExpressions\FitnessTests.cs" />
