@@ -72,6 +72,7 @@
     <Compile Include="LogicCircuits\SearchTimeoutException.cs" />
     <Compile Include="Password\Benchmark.cs" />
     <Compile Include="Password\GuessPassordTests.cs" />
+    <Compile Include="Password\OneMaxTests.cs" />
     <Compile Include="Primes\enumerable\DateTimeFixture.cs" />
     <Compile Include="Primes\enumerable\PrimeFactorTests.cs" />
     <Compile Include="Primes\enumerable\PrimeTests.cs" />

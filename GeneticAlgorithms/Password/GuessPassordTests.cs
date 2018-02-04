@@ -28,7 +28,7 @@ namespace GeneticAlgorithms.Password
     [TestClass]
     public class GuessPassordTests
     {
-        private const string GeneSet = " abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!.,";
+        private static readonly char[] GeneSet = " abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!.,".ToCharArray();
 
         private readonly Random _random = new Random();
 
@@ -63,7 +63,7 @@ namespace GeneticAlgorithms.Password
         }
 
         [TestMethod]
-        public void LongPwTest()
+        public void LongPasswordTest()
         {
             const string target = "For I am fearfully and wonderfully made.";
             GuessPassword(target);
@@ -75,7 +75,6 @@ namespace GeneticAlgorithms.Password
             const int length = 150;
             var target = string.Join("",
                 Enumerable.Range(0, length).Select(x => GeneSet[_random.Next(GeneSet.Length)]));
-            Assert.AreEqual(length, target.Length);
             GuessPassword(target);
         }
 
