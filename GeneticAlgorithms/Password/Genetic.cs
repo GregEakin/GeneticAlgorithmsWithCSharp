@@ -11,7 +11,7 @@ namespace GeneticAlgorithms.Password
 
         private static readonly Random Random = new Random();
 
-        public static string RandomSample(string input, int length)
+        private static string RandomSample(string input, int length)
         {
             var result = string.Empty;
             while (result.Length < length)
@@ -24,20 +24,7 @@ namespace GeneticAlgorithms.Password
             return result;
         }
 
-        public static Chromosome Mutate(string geneSet, Chromosome parent, FitnessFun fitnessFun)
-        {
-            var index = Random.Next(parent.Genes.Length);
-            var childGenes = parent.Genes.ToCharArray();
-            var randomSample = RandomSample(geneSet, 2);
-            var newGene = randomSample[0];
-            var alternate = randomSample[1];
-            childGenes[index] = newGene == childGenes[index] ? alternate : newGene;
-            var genes = new string(childGenes);
-            var fit = fitnessFun(genes);
-            return new Chromosome(genes, fit);
-        }
-
-        public static Chromosome GenerateParent(string geneSet, int length, FitnessFun fitnessFun)
+        private static Chromosome GenerateParent(string geneSet, int length, FitnessFun getFitness)
         {
             var genes = string.Empty;
             while (genes.Length < length)
@@ -46,15 +33,28 @@ namespace GeneticAlgorithms.Password
                 genes += RandomSample(geneSet, sampleSize);
             }
 
-            var fit = fitnessFun(geneSet);
+            var fit = getFitness(geneSet);
             return new Chromosome(genes, fit);
         }
 
-        public static Chromosome BestFitness(FitnessFun fitnessFun, int targetLen, int optimalFitness, string geneSet,
-            DisplayFun displayFun)
+        private static Chromosome Mutate(string geneSet, Chromosome parent, FitnessFun getFitness)
+        {
+            var index = Random.Next(parent.Genes.Length);
+            var childGenes = parent.Genes.ToCharArray();
+            var randomSample = RandomSample(geneSet, 2);
+            var newGene = randomSample[0];
+            var alternate = randomSample[1];
+            childGenes[index] = newGene == childGenes[index] ? alternate : newGene;
+            var genes = new string(childGenes);
+            var fitness = getFitness(genes);
+            return new Chromosome(genes, fitness);
+        }
+
+        public static Chromosome GetBest(FitnessFun fitnessFun, int targetLen, int optimalFitness, string geneSet,
+            DisplayFun display)
         {
             var bestParent = GenerateParent(geneSet, targetLen, fitnessFun);
-            displayFun(bestParent);
+            display(bestParent);
 
             if (bestParent.Fitness >= optimalFitness)
                 return bestParent;
@@ -64,7 +64,7 @@ namespace GeneticAlgorithms.Password
                 var child = Mutate(geneSet, bestParent, fitnessFun);
                 if (bestParent.Fitness >= child.Fitness)
                     continue;
-                displayFun(child);
+                display(child);
                 if (child.Fitness >= optimalFitness)
                     return child;
                 bestParent = child;

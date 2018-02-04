@@ -8,7 +8,9 @@ namespace GeneticAlgorithms.Password
     [TestClass]
     public class GuessPassordTests
     {
-        private const string GeneSet = " abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!.,";
+        public const string GeneSet = " abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!.,";
+
+        private readonly Random _random = new Random();
 
         private static int GetFitness(string guess, string target)
         {
@@ -28,13 +30,13 @@ namespace GeneticAlgorithms.Password
             Console.WriteLine("{0}\t{1}\t{2} ms", candidate.Genes, candidate.Fitness, stopwatch.ElapsedMilliseconds);
         }
 
-        private static Stopwatch GuessPassword(string target)
+        public static Stopwatch GuessPassword(string target)
         {
             var watch = Stopwatch.StartNew();
             int FitnessFun(string guess) => GetFitness(target, guess);
             void DisplayFun(Chromosome candidate) => Display(candidate, watch);
 
-            var answer = Genetic.BestFitness(FitnessFun, target.Length, target.Length, GeneSet, DisplayFun);
+            var answer = Genetic.GetBest(FitnessFun, target.Length, target.Length, GeneSet, DisplayFun);
             Assert.AreEqual(target.Length, answer.Fitness);
             Assert.AreEqual(target, answer.Genes);
 
@@ -55,8 +57,6 @@ namespace GeneticAlgorithms.Password
             GuessPassword(target);
         }
 
-        private readonly Random _random = new Random();
-
         [TestMethod]
         public void RandomPasswordTest()
         {
@@ -65,25 +65,6 @@ namespace GeneticAlgorithms.Password
                 Enumerable.Range(0, length).Select(x => GeneSet[_random.Next(GeneSet.Length)]));
             Assert.AreEqual(length, target.Length);
             GuessPassword(target);
-        }
-
-        //[TestMethod]
-        public void Benchmark()
-        {
-            const int count = 100;
-            const int length = 150;
-
-            var timings = new long[count];
-            for (var i = 0; i < count; i++)
-            {
-                var target = Genetic.RandomSample(GeneSet, length);
-                var watch = GuessPassword(target);
-                timings[i] = watch.ElapsedMilliseconds;
-            }
-
-            var mean = 0.0;
-            var sd = 0.0;
-            Console.WriteLine("Mean {0}, SD = {1}", mean, sd);
         }
     }
 }
