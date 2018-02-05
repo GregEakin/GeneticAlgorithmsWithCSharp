@@ -17,7 +17,6 @@
  * permissions and limitations under the License.
  */
 
-using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace GeneticAlgorithms.Knapsack
@@ -37,8 +36,8 @@ namespace GeneticAlgorithms.Knapsack
             // 156 x R288, 5687, 0, 6585
             //   1 x R987, 2131, 0, 2420
 
-            var iq1 = new ItemQuantity(problemInfo.Resources[288-1], 156);
-            var iq2 = new ItemQuantity(problemInfo.Resources[987-1], 1);
+            var iq1 = new ItemQuantity(problemInfo.Resources[288 - 1], 156);
+            var iq2 = new ItemQuantity(problemInfo.Resources[987 - 1], 1);
             CollectionAssert.AreEquivalent(new[] {iq1, iq2}, problemInfo.Solution);
         }
 

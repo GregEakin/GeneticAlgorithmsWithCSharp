@@ -17,8 +17,6 @@
  * permissions and limitations under the License.
  */
 
-using System;
-
 namespace GeneticAlgorithms.Knapsack
 {
     public class ItemQuantity

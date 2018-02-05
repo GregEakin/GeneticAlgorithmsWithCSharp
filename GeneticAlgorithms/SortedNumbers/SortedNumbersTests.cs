@@ -66,6 +66,7 @@ namespace GeneticAlgorithms.SortedNumbers
 
             var optimalFitness = new Fitness(totalNumbers, 0);
             var best = genetic.GetBest(FnGetFitness, totalNumbers, optimalFitness, geneSet, FnDisplay);
+            Assert.IsTrue(optimalFitness.CompareTo(best.Fitness) <= 0);
         }
 
         [TestMethod]

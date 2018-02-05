@@ -103,6 +103,8 @@ namespace GeneticAlgorithms.SortedNumbers
                 yield return child;
                 bestParent = child;
             }
+        
+            // ReSharper disable once IteratorNeverReturns
         }
     }
 }

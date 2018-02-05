@@ -166,17 +166,12 @@ namespace GeneticAlgorithms.Knapsack
 
             var quantities = new[]
             {
-                new ItemQuantity(items[0], 1),
                 new ItemQuantity(items[1], 14),
-                new ItemQuantity(items[2], 6)
+                new ItemQuantity(items[2], 6),
+                new ItemQuantity(items[0], 1),
             };
             var optimal = GetFitness(quantities);
-            var best = FillKnapsack(items, maxWeight, maxvolume, optimal);
-
-            var iq1 = new ItemQuantity(items[1], 14);
-            var iq2 = new ItemQuantity(items[2], 6);
-            var iq3 = new ItemQuantity(items[0], 1);
-            CollectionAssert.AreEquivalent(new[] { iq1, iq2, iq3 }, best.Genes.ToArray());
+            FillKnapsack(items, maxWeight, maxvolume, optimal);
         }
 
         [TestMethod]
@@ -187,9 +182,7 @@ namespace GeneticAlgorithms.Knapsack
             var maxWeight = problemInfo.MaxWeight;
             var maxVolume = 0.0;
             var optimal = GetFitness(problemInfo.Solution);
-            var best = FillKnapsack(items, maxWeight, maxVolume, optimal);
-
-            CollectionAssert.AreEquivalent(problemInfo.Solution, best.Genes.ToArray());
+            FillKnapsack(items, maxWeight, maxVolume, optimal);
         }
 
         [TestMethod]
@@ -198,7 +191,7 @@ namespace GeneticAlgorithms.Knapsack
             Benchmark.Run(Exnsd16Test);
         }
 
-        private static Chromosome<ItemQuantity, Fitness> FillKnapsack(Resource[] items, double maxWeight,
+        private static void FillKnapsack(Resource[] items, double maxWeight,
             double maxVolume, Fitness optimalFitness)
         {
             var genetic = new Genetic<ItemQuantity, Fitness>();
@@ -213,7 +206,6 @@ namespace GeneticAlgorithms.Knapsack
 
             var best = genetic.GetBest(FnGetFitness, 0, optimalFitness, null, FnDisplay, FnMutate, FnCreate, 50);
             Assert.IsTrue(optimalFitness.CompareTo(best.Fitness) <= 0);
-            return best;
         }
     }
 }

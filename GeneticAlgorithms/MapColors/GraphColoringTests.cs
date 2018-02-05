@@ -111,7 +111,7 @@ namespace GeneticAlgorithms.MapColors
         [TestMethod]
         public void BuildRulesTest()
         {
-            var items = new Tuple<string, string[]>[]
+            var items = new[]
             {
                 new Tuple<string, string[]>("AK", new string[0]),
                 new Tuple<string, string[]>("CA", new[] {"TX", "FL"}),
