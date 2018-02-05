@@ -70,7 +70,6 @@
     <Compile Include="LogicCircuits\Genetic.cs" />
     <Compile Include="LogicCircuits\Node.cs" />
     <Compile Include="LogicCircuits\SearchTimeoutException.cs" />
-    <Compile Include="MapColors\MapColorTests.cs" />
     <Compile Include="Password\Benchmark.cs" />
     <Compile Include="Password\GuessPassordTests.cs" />
     <Compile Include="Password\OneMaxTests.cs" />
@@ -104,9 +103,7 @@
     <Compile Include="MagicSquare\Genetic.cs" />
     <Compile Include="MagicSquare\MagicSquareTests.cs" />
     <Compile Include="MapColors\GraphColoringTests.cs" />
-    <Compile Include="MapColors\Prototype.cs" />
     <Compile Include="MapColors\Rule.cs" />
-    <Compile Include="MapColors\State.cs" />
     <Compile Include="Password\Chromosome.cs" />
     <Compile Include="Password\Genetic.cs" />
     <Compile Include="Queens\Board.cs" />
