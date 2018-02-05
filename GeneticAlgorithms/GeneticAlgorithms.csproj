@@ -52,6 +52,7 @@
     <Compile Include="ApproximatingPi\Genetic.cs" />
     <Compile Include="ApproximatingPi\PiTests.cs" />
     <Compile Include="ApproximatingPi\SearchTimeoutException.cs" />
+    <Compile Include="Cards\Benchmark.cs" />
     <Compile Include="Cards\CardTests.cs" />
     <Compile Include="Cards\Chromosome.cs" />
     <Compile Include="Cards\Fitness.cs" />

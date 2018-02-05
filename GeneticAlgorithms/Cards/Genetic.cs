@@ -1,4 +1,23 @@
-﻿using System;
+﻿/* File: Benchmark.cs
+ *     from chapter 6 of _Genetic Algorithms with Python_
+ *     writen by Clinton Sheppard
+ *
+ * Author: Greg Eakin <gregory.eakin@gmail.com>
+ * Copyright (c) 2018 Greg Eakin
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+ * implied.  See the License for the specific language governing
+ * permissions and limitations under the License.
+ */
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -7,13 +26,11 @@ namespace GeneticAlgorithms.Cards
     public class Genetic<TGene, TFitness>
         where TFitness : IComparable<TFitness>
     {
-        public delegate TFitness FitnessFun(TGene[] gene, int size);
+        public delegate TFitness FitnessDelegate(TGene[] gene);
 
-        public delegate void DisplayFun(Chromosome<TGene, TFitness> child);
+        public delegate void DisplayDelegate(Chromosome<TGene, TFitness> child);
 
-        public delegate TGene[] MutateFun(TGene[] genes);
-
-        public delegate TGene[] MutateGeneFun(TGene[] genes);
+        public delegate void MutateGeneDelegate(TGene[] genes);
 
         public delegate Chromosome<TGene, TFitness> MutateDelegate(Chromosome<TGene, TFitness> parent);
 
@@ -24,7 +41,7 @@ namespace GeneticAlgorithms.Cards
         public TGene[] RandomSample(TGene[] geneSet, int length)
         {
             var genes = new List<TGene>(length);
-            while (genes.Count<length)
+            while (genes.Count < length)
             {
                 var sampleSize = Math.Min(geneSet.Length, length - genes.Count);
                 var array = geneSet.OrderBy(x => _random.Next()).Take(sampleSize);
@@ -34,42 +51,48 @@ namespace GeneticAlgorithms.Cards
             return genes.ToArray();
         }
 
-        public Chromosome<TGene, TFitness> GenerateParent(int length, TGene[] geneSet, FitnessFun fitnessFun)
+        private Chromosome<TGene, TFitness> GenerateParent(int length, TGene[] geneSet, FitnessDelegate fitnessDelegate)
         {
             var genes = RandomSample(geneSet, length);
-            var fit = fitnessFun(genes, length);
-            return new Chromosome<TGene, TFitness>(genes, fit);
+            var fitness = fitnessDelegate(genes);
+            return new Chromosome<TGene, TFitness>(genes, fitness);
         }
 
-        public TGene[] MutateGene(TGene[] parentGenes, TGene[] geneSet)
+        private Chromosome<TGene, TFitness> Mutate(Chromosome<TGene, TFitness> parent, TGene[] geneSet,
+            FitnessDelegate getFitness)
         {
-            var childGenes = parentGenes.ToArray();
+            var childGenes = parent.Genes.ToArray();
             var index = _random.Next(childGenes.Length);
             var randomSample = RandomSample(geneSet, 2);
             var newGene = randomSample[0];
             var alternate = randomSample[1];
             childGenes[index] = newGene.Equals(childGenes[index]) ? alternate : newGene;
-            return childGenes;
+            var fitness = getFitness(childGenes);
+            return new Chromosome<TGene, TFitness>(childGenes, fitness);
         }
 
-        public Chromosome<TGene, TFitness> Mutate(Chromosome<TGene, TFitness> parent, FitnessFun fitnessFun,
-            TGene[] geneSet, MutateGeneFun mutateGeneFun)
+        private static Chromosome<TGene, TFitness> MutateCustom(Chromosome<TGene, TFitness> parent,
+            MutateGeneDelegate customMutate,
+            FitnessDelegate getFitness)
         {
-            var genese = mutateGeneFun != null ? mutateGeneFun(parent.Genes) : MutateGene(parent.Genes, geneSet);
-            var fitness = fitnessFun(genese, genese.Length);
-            return new Chromosome<TGene, TFitness>(genese, fitness);
+            var childGenes = parent.Genes.ToArray();
+            customMutate(childGenes);
+            var fitness = getFitness(childGenes);
+            return new Chromosome<TGene, TFitness>(childGenes, fitness);
         }
 
-        public Chromosome<TGene, TFitness> BestFitness(FitnessFun fitnessFun, int targetLen, TFitness optimalFitness,
-            TGene[] geneSet, DisplayFun displayFun, MutateGeneFun mutateGeneFun = null)
+        public Chromosome<TGene, TFitness> GetBest(FitnessDelegate getFitness, int targetLen, TFitness optimalFitness,
+            TGene[] geneSet, DisplayDelegate display, MutateGeneDelegate customMutate = null)
         {
-            Chromosome<TGene, TFitness> FnMutate(Chromosome<TGene, TFitness> parent) => Mutate(parent, fitnessFun, geneSet, mutateGeneFun);
+            Chromosome<TGene, TFitness> FnMutate(Chromosome<TGene, TFitness> parent) => customMutate == null
+                ? Mutate(parent, geneSet, getFitness)
+                : MutateCustom(parent, customMutate, getFitness);
 
-            Chromosome<TGene, TFitness> FnGenerateParent() => GenerateParent(targetLen, geneSet, fitnessFun);
+            Chromosome<TGene, TFitness> FnGenerateParent() => GenerateParent(targetLen, geneSet, getFitness);
 
             foreach (var improvement in GetImprovement(FnMutate, FnGenerateParent))
             {
-                displayFun(improvement);
+                display(improvement);
                 if (optimalFitness.CompareTo(improvement.Fitness) <= 0)
                     return improvement;
             }
@@ -77,14 +100,14 @@ namespace GeneticAlgorithms.Cards
             throw new UnauthorizedAccessException();
         }
 
-        public IEnumerable<Chromosome<TGene, TFitness>> GetImprovement(MutateDelegate mutate,
+        public IEnumerable<Chromosome<TGene, TFitness>> GetImprovement(MutateDelegate newChild,
             GenerateParentDelegate generateParent)
         {
             var bestParent = generateParent();
             yield return bestParent;
             while (true)
             {
-                var child = mutate(bestParent);
+                var child = newChild(bestParent);
                 if (bestParent.Fitness.CompareTo(child.Fitness) > 0)
                     continue;
                 bestParent = child;
