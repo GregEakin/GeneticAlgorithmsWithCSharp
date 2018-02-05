@@ -260,3 +260,4 @@ paket-files/
 __pycache__/
 *.pyc
 /PrimeTesting/Data/exnsd16.ukp
+/GeneticAlgorithms/MapColors/R100_1gb.col

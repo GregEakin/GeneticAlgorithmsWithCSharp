@@ -1,16 +1,35 @@
-﻿using GeneticAlgorithms.SortedNumbers;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿/* File: Chromosome.cs
+ *     from chapter 5 of _Genetic Algorithms with Python_
+ *     writen by Clinton Sheppard
+ *
+ * Author: Greg Eakin <gregory.eakin@gmail.com>
+ * Copyright (c) 2018 Greg Eakin
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+ * implied.  See the License for the specific language governing
+ * permissions and limitations under the License.
+ */
+
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace GeneticAlgorithms.MapColors
 {
     [TestClass]
     public class MapColorTests
     {
+
+
         [TestMethod]
         public void ParseRules()
         {
@@ -37,53 +56,40 @@ namespace GeneticAlgorithms.MapColors
                 Console.WriteLine("n {0} 0", rule.Item1);
         }
 
-        public static int Fitness(char[] genes, ISet<Rule> rules)
-        {
-            var rulesThatPass = rules.Count(r => r.Valid(genes));
-            return rulesThatPass;
-        }
-
-        public static void Display(Chromosome<char, int> candidate, Stopwatch watch, IDictionary<string, State> states)
-        {
-            foreach (var state in states.Values)
-                Console.Write(state.Color(candidate.Genes));
-            Console.WriteLine(", {0}, {1} ms", candidate.Fitness, watch.ElapsedMilliseconds);
-        }
-
         [TestMethod]
         public void FourColorTest()
         {
-            var states = new SortedDictionary<string, State>();
-            var rules = new SortedSet<Rule>();
-            Prototype.SetupRules(states, rules);
+            //var states = new SortedDictionary<string, State>();
+            //var rules = new SortedSet<Rule>();
+            //Prototype.SetupRules(states, rules);
 
-            var genetic = new Genetic<char, int>();
-            var geneSet = "OYGB".ToCharArray();
-            var watch = Stopwatch.StartNew();
+            //var genetic = new Genetic<char, int>();
+            //var geneSet = "OYGB".ToCharArray();
+            //var watch = Stopwatch.StartNew();
 
-            int FitnessFun(char[] genes) => Fitness(genes, rules);
-            void DisplayFun(Chromosome<char, int> candidate) => Display(candidate, watch, states);
+            //int FitnessFun(char[] genes) => Fitness(genes, rules);
+            //void DisplayFun(Chromosome<char, int> candidate) => Display(candidate, watch, states);
 
-            var best = genetic.GetBest(FitnessFun, states.Count, rules.Count, geneSet, DisplayFun);
-            Assert.IsTrue(best.Fitness >= 214);
+            //var best = genetic.GetBest(FitnessFun, states.Count, rules.Count, geneSet, DisplayFun);
+            //Assert.IsTrue(best.Fitness >= 214);
         }
 
         [TestMethod]
         public void SixColorTest()
         {
-            var states = new SortedDictionary<string, State>();
-            var rules = new SortedSet<Rule>();
-            Prototype.SetupRules(states, rules);
+            //var states = new SortedDictionary<string, State>();
+            //var rules = new SortedSet<Rule>();
+            //Prototype.SetupRules(states, rules);
 
-            var genetic = new Genetic<char, int>();
-            var geneSet = "ROYGBI".ToCharArray();
-            var watch = Stopwatch.StartNew();
+            //var genetic = new Genetic<char, int>();
+            //var geneSet = "ROYGBI".ToCharArray();
+            //var watch = Stopwatch.StartNew();
 
-            int FitnessFun(char[] genes) => Fitness(genes, rules);
-            void DisplayFun(Chromosome<char, int> candidate) => Display(candidate, watch, states);
+            //int FitnessFun(char[] genes) => Fitness(genes, rules);
+            //void DisplayFun(Chromosome<char, int> candidate) => Display(candidate, watch, states);
 
-            var best = genetic.GetBest(FitnessFun, states.Count, rules.Count, geneSet, DisplayFun);
-            Assert.IsTrue(best.Fitness >= 214);
+            //var best = genetic.GetBest(FitnessFun, states.Count, rules.Count, geneSet, DisplayFun);
+            //Assert.IsTrue(best.Fitness >= 214);
         }
     }
 }

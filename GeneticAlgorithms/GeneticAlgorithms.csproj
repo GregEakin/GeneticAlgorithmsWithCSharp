@@ -70,6 +70,7 @@
     <Compile Include="LogicCircuits\Genetic.cs" />
     <Compile Include="LogicCircuits\Node.cs" />
     <Compile Include="LogicCircuits\SearchTimeoutException.cs" />
+    <Compile Include="MapColors\MapColorTests.cs" />
     <Compile Include="Password\Benchmark.cs" />
     <Compile Include="Password\GuessPassordTests.cs" />
     <Compile Include="Password\OneMaxTests.cs" />
@@ -102,7 +103,7 @@
     <Compile Include="MagicSquare\Fitness.cs" />
     <Compile Include="MagicSquare\Genetic.cs" />
     <Compile Include="MagicSquare\MagicSquareTests.cs" />
-    <Compile Include="MapColors\MapColorTests.cs" />
+    <Compile Include="MapColors\GraphColoringTests.cs" />
     <Compile Include="MapColors\Prototype.cs" />
     <Compile Include="MapColors\Rule.cs" />
     <Compile Include="MapColors\State.cs" />
@@ -148,6 +149,12 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <None Include="Data\exnsd16.ukp" />
+    <None Include="MapColors\adjacent_states.col">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="MapColors\R100_1gb.col">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="packages.config" />
     <None Include="Readme.md" />
   </ItemGroup>

@@ -1,44 +1,68 @@
-﻿using System;
+﻿/* File: Chromosome.cs
+ *     from chapter 5 of _Genetic Algorithms with Python_
+ *     writen by Clinton Sheppard
+ *
+ * Author: Greg Eakin <gregory.eakin@gmail.com>
+ * Copyright (c) 2018 Greg Eakin
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+ * implied.  See the License for the specific language governing
+ * permissions and limitations under the License.
+ */
+
+using System;
 using System.Collections.Generic;
 
 namespace GeneticAlgorithms.MapColors
 {
-    public class Rule : IComparable, IComparable<Rule>
+    public class Rule
     {
-        public State From { get; }
-        public State To { get; }
+        public string Node { get; }
+        public string Adjacent { get; }
 
-        public Rule(State from, State to)
+        public Rule(string node, string adjacent)
         {
-            From = from;
-            To = to;
+            if (node.CompareTo(adjacent) < 0)
+            {
+                var temp = node;
+                node = adjacent;
+                adjacent = temp;
+            }
 
-            From.Neighbors.Add(To);
-            To.Neighbors.Add(From);
+            Node = node;
+            Adjacent = adjacent;
         }
 
-        public bool Valid(char[] genes) => genes[From.Index] != genes[To.Index];
-
-        public int CompareTo(object obj)
+        public override bool Equals(object obj)
         {
             switch (obj)
             {
                 case null:
-                    return 1;
+                    return false;
                 case Rule that:
-                    return CompareTo(that);
+                    return Node == that.Node && Adjacent == that.Adjacent;
                 default:
-                    throw new ArgumentException("Object is not a Rule");
+                    return false;
             }
         }
 
-        public int CompareTo(Rule that)
+        public override int GetHashCode() => Node.GetHashCode() * 397 ^ Adjacent.GetHashCode();
+
+        public override string ToString() => $"{Node} -> {Adjacent}";
+
+        public bool Valid(char[] genes, Dictionary<string, int> nodeIndexLookup)
         {
-            if (ReferenceEquals(this, that)) return 0;
-            if (that is null) return 1;
-            var fromComparison = Comparer<State>.Default.Compare(From, that.From);
-            if (fromComparison != 0) return fromComparison;
-            return Comparer<State>.Default.Compare(To, that.To);
+            var index = nodeIndexLookup[Node];
+            var adjacentNodeIndex = nodeIndexLookup[Adjacent];
+
+            return !Equals(genes[index], genes[adjacentNodeIndex]);
         }
     }
 }
