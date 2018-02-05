@@ -178,10 +178,10 @@ namespace GeneticAlgorithms.Knapsack
 
             Fitness FitnessFun(ItemQuantity[] genes) => Fitness(genes);
             void DisplayFun(Chromosome<ItemQuantity, Fitness> candidate) => Display(candidate, watch);
-            ItemQuantity[] MutateFun(ItemQuantity[] genes) => Mutate(genes, sortedItems, maxWeight, maxVolume, window);
+            void MutateFun(ItemQuantity[] genes) => Mutate(genes, sortedItems, maxWeight, maxVolume, window);
             ItemQuantity[] CreateFun() => Create(items, maxWeight, maxVolume);
 
-            var best = genetic.BestFitness(FitnessFun, 0, optimalFitness, null, DisplayFun, MutateFun, CreateFun, 50);
+            var best = genetic.GetBest(FitnessFun, 0, optimalFitness, null, DisplayFun, MutateFun, CreateFun, 50);
             Assert.IsTrue(optimalFitness.CompareTo(best.Fitness) <= 0);
         }
     }

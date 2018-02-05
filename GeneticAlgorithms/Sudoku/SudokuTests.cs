@@ -114,9 +114,9 @@ namespace GeneticAlgorithms.Sudoku
             void FnDispaly(Chromosome<int, int> candidate) => Display(candidate, watch);
             int FnFitness(int[] genes) => Fitness(genes, validationRules);
             int[] FnCreate() => RandomSample(geneSet, 81);
-            int[] FnMutate(int[] genes) => Mutate(genes, validationRules);
+            void FnMutate(int[] genes) => Mutate(genes, validationRules);
 
-            var best = generic.BestFitness(FnFitness, 0, optimalValue, null, FnDispaly, FnMutate, FnCreate, 50);
+            var best = generic.GetBest(FnFitness, 0, optimalValue, null, FnDispaly, FnMutate, FnCreate, 50);
             Assert.AreEqual(optimalValue, best.Fitness);
         }
 

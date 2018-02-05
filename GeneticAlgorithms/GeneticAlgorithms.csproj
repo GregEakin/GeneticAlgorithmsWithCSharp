@@ -72,6 +72,7 @@
     <Compile Include="LogicCircuits\Genetic.cs" />
     <Compile Include="LogicCircuits\Node.cs" />
     <Compile Include="LogicCircuits\SearchTimeoutException.cs" />
+    <Compile Include="MagicSquare\Benchmark.cs" />
     <Compile Include="Password\Benchmark.cs" />
     <Compile Include="Password\GuessPassordTests.cs" />
     <Compile Include="Password\OneMaxTests.cs" />

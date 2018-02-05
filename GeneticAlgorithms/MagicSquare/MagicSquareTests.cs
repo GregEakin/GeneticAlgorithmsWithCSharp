@@ -1,4 +1,23 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿/* File: Benchmark.cs
+ *     from chapter 8 of _Genetic Algorithms with Python_
+ *     writen by Clinton Sheppard
+ *
+ * Author: Greg Eakin <gregory.eakin@gmail.com>
+ * Copyright (c) 2018 Greg Eakin
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+ * implied.  See the License for the specific language governing
+ * permissions and limitations under the License.
+ */
+
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -11,7 +30,7 @@ namespace GeneticAlgorithms.MagicSquare
     {
         private static readonly Random Random = new Random();
 
-        public static Fitness Fitness(int[] genes, int diagonalSize, int expectedSum)
+        public static Fitness GetFitness(int[] genes, int diagonalSize, int expectedSum)
         {
             var sums = Sums(genes, diagonalSize);
             var a1 = sums.Item1.Where(r => r != expectedSum).Select(s => Math.Abs(s - expectedSum)).Sum();
@@ -57,19 +76,17 @@ namespace GeneticAlgorithms.MagicSquare
             return new Tuple<int[], int[], int, int>(rows, columns, northeastDiagonalSum, southeastDiagonalSum);
         }
 
-        public static int[] Mutate(int[] input, int[] allPositions)
+        private static void Mutate(int[] genes, int[] allPositions)
         {
-            var genes = input.ToArray();
             var randomSample = RandomSample(allPositions, 2);
             var indexA = randomSample[0];
             var indexB = randomSample[1];
             var temp = genes[indexA];
             genes[indexA] = genes[indexB];
             genes[indexB] = temp;
-            return genes;
         }
 
-        public static int[] RandomSample(int[] geneSet, int length)
+        private static int[] RandomSample(int[] geneSet, int length)
         {
             var genes = new List<int>(length);
             do
@@ -80,27 +97,6 @@ namespace GeneticAlgorithms.MagicSquare
             } while (genes.Count < length);
 
             return genes.ToArray();
-        }
-
-        public static void Generate(int diagonalSize, int maxAge)
-        {
-            var watch = Stopwatch.StartNew();
-            var genetic = new Genetic<int, Fitness>();
-
-            var nSquared = diagonalSize * diagonalSize;
-            var geneSet = Enumerable.Range(1, nSquared).ToArray();
-            var expectedSum = diagonalSize * (nSquared + 1) / 2;
-            var geneIndexes = Enumerable.Range(0, geneSet.Length).ToArray();
-
-            Fitness FitnessFun(int[] genes) => Fitness(genes, diagonalSize, expectedSum);
-            void DisplayFun(Chromosome<int, Fitness> candidate) => Display(candidate, watch, diagonalSize);
-            int[] MutateFun(int[] genes) => Mutate(genes, geneIndexes);
-            int[] CreateFun() => geneSet.OrderBy(i => Random.Next(geneSet.Length)).ToArray();
-
-            var optimalValue = new Fitness(0);
-            var best = genetic.BestFitness(FitnessFun, nSquared, optimalValue, geneSet, DisplayFun, MutateFun,
-                CreateFun, maxAge);
-            Assert.IsTrue(optimalValue.CompareTo(best.Fitness) <= 0);
         }
 
         [TestMethod]
@@ -125,6 +121,33 @@ namespace GeneticAlgorithms.MagicSquare
         public void Size10Test()
         {
             Generate(10, 5000);
+        }
+
+        [TestMethod]
+        public void BenchmarkTest()
+        {
+            Benchmark.Run(Size4Test);
+        }
+
+        private static void Generate(int diagonalSize, int maxAge)
+        {
+            var watch = Stopwatch.StartNew();
+            var genetic = new Genetic<int, Fitness>();
+
+            var nSquared = diagonalSize * diagonalSize;
+            var geneSet = Enumerable.Range(1, nSquared).ToArray();
+            var expectedSum = diagonalSize * (nSquared + 1) / 2;
+            var geneIndexes = Enumerable.Range(0, geneSet.Length).ToArray();
+
+            Fitness FnGetFitness(int[] genes) => GetFitness(genes, diagonalSize, expectedSum);
+            void FnDisplay(Chromosome<int, Fitness> candidate) => Display(candidate, watch, diagonalSize);
+            void FnMutate(int[] genes) => Mutate(genes, geneIndexes);
+            int[] FnCreate() => geneSet.OrderBy(i => Random.Next(geneSet.Length)).ToArray();
+
+            var optimalValue = new Fitness(0);
+            var best = genetic.GetBest(FnGetFitness, nSquared, optimalValue, geneSet, FnDisplay, FnMutate,
+                FnCreate, maxAge);
+            Assert.IsTrue(optimalValue.CompareTo(best.Fitness) <= 0);
         }
 
         [TestMethod]

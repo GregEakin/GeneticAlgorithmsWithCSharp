@@ -196,10 +196,10 @@ namespace GeneticAlgorithms.LinearEquation
 
             void FnDispaly(Chromosome<Fraction, Fitness> candidate) => Display(candidate, watch);
             Fitness FnFitness(Fraction[] genes) => Fitness(genes, equations);
-            Fraction[] FnMutate(Fraction[] genes) => Mutate(genes, sortedGeneSet, window, geneIndexes);
+            void FnMutate(Fraction[] genes) => Mutate(genes, sortedGeneSet, window, geneIndexes);
 
             var optimalFitness = new Fitness(new Fraction(0));
-            var best = genetic.BestFitness(FnFitness, numUnknowns, optimalFitness, geneSet, FnDispaly, FnMutate,
+            var best = genetic.GetBest(FnFitness, numUnknowns, optimalFitness, geneSet, FnDispaly, FnMutate,
                 null, maxAge);
             Assert.IsTrue(optimalFitness.CompareTo(best.Fitness) <= 0);
             return best;
