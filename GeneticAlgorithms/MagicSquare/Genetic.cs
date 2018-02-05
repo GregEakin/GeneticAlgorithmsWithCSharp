@@ -34,21 +34,21 @@ namespace GeneticAlgorithms.MagicSquare
             }
         }
 
-        public delegate TFitness FitnessDelegate(TGene[] gene);
+        public delegate TFitness FitnessDelegate(List<TGene> gene);
 
         public delegate void DisplayDelegate(Chromosome<TGene, TFitness> child);
 
-        public delegate void MutateGeneDelegate(TGene[] genes);
+        public delegate void MutateGeneDelegate(List<TGene> genes);
 
         public delegate Chromosome<TGene, TFitness> MutateChromosomeDelegate(Chromosome<TGene, TFitness> parent);
 
         public delegate Chromosome<TGene, TFitness> GenerateParentDelegate();
 
-        public delegate TGene[] CreateDelegate();
+        public delegate List<TGene> CreateDelegate();
 
         private readonly Random _random = new Random();
 
-        public TGene[] RandomSample(TGene[] geneSet, int length)
+        public List<TGene> RandomSample(TGene[] geneSet, int length)
         {
             var genes = new List<TGene>(length);
             while (genes.Count < length)
@@ -58,7 +58,7 @@ namespace GeneticAlgorithms.MagicSquare
                 genes.AddRange(array);
             }
 
-            return genes.ToArray();
+            return genes.ToList();
         }
         private Chromosome<TGene, TFitness> GenerateParent(int length, TGene[] geneSet, FitnessDelegate getFitness)
         {
@@ -71,8 +71,8 @@ namespace GeneticAlgorithms.MagicSquare
         private Chromosome<TGene, TFitness> Mutate(Chromosome<TGene, TFitness> parent, TGene[] geneSet,
             FitnessDelegate getFitness)
         {
-            var childGenes = parent.Genes.ToArray();
-            var index = _random.Next(childGenes.Length);
+            var childGenes = parent.Genes.ToList();
+            var index = _random.Next(childGenes.Count);
             var randomSample = RandomSample(geneSet, 2);
             var newGene = randomSample[0];
             var alternate = randomSample[1];
@@ -84,7 +84,7 @@ namespace GeneticAlgorithms.MagicSquare
         private static Chromosome<TGene, TFitness> MutateCustom(Chromosome<TGene, TFitness> parent,
             MutateGeneDelegate customMutate, FitnessDelegate getFitness)
         {
-            var childGenes = parent.Genes.ToArray();
+            var childGenes = parent.Genes.ToList();
             customMutate(childGenes);
             var fitness = getFitness(childGenes);
             return new Chromosome<TGene, TFitness>(childGenes, fitness);

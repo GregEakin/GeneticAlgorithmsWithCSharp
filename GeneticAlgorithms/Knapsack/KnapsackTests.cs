@@ -1,4 +1,23 @@
-﻿using GeneticAlgorithms.MagicSquare;
+﻿/* File: Benchmark.cs
+ *     from chapter 9 of _Genetic Algorithms with Python_
+ *     writen by Clinton Sheppard
+ *
+ * Author: Greg Eakin <gregory.eakin@gmail.com>
+ * Copyright (c) 2018 Greg Eakin
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+ * implied.  See the License for the specific language governing
+ * permissions and limitations under the License.
+ */
+
+using GeneticAlgorithms.MagicSquare;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
@@ -12,7 +31,7 @@ namespace GeneticAlgorithms.Knapsack
     {
         private static readonly Random Random = new Random();
 
-        public static Fitness Fitness(ItemQuantity[] genes)
+        public static Fitness GetFitness(IEnumerable<ItemQuantity> genes)
         {
             var totalWeight = 0.0;
             var totalVolume = 0.0;
@@ -30,10 +49,10 @@ namespace GeneticAlgorithms.Knapsack
 
         public static void Display(Chromosome<ItemQuantity, Fitness> candidate, Stopwatch watch)
         {
-            if (candidate.Genes.Length > 0)
+            if (candidate.Genes.Count > 0)
             {
                 var descriptions = candidate.Genes.OrderByDescending(g => g.Quantity)
-                    .Select(id => $"{id.Quantity} x {id.Item.Name}");
+                    .Select(iq => $"{iq.Quantity} x {iq.Item.Name}");
                 Console.WriteLine("{0}\t{1}\t{2} ms", string.Join(", ", descriptions), candidate.Fitness,
                     watch.ElapsedMilliseconds);
             }
@@ -41,12 +60,46 @@ namespace GeneticAlgorithms.Knapsack
                 Console.WriteLine("Empty");
         }
 
-        public static ItemQuantity[] Mutate(ItemQuantity[] input, Resource[] items, double maxWeight, double maxVolume,
+        public static int MaxQuantity(Resource item, double maxWeight, double maxVolume)
+        {
+            var weight = item.Weight > 0 ? (int) (maxWeight / item.Weight) : int.MaxValue;
+            var volume = item.Volume > 0 ? (int) (maxVolume / item.Volume) : int.MaxValue;
+            return Math.Min(weight, volume);
+        }
+
+        public static List<ItemQuantity> Create(Resource[] items, double maxWeight, double maxVolume)
+        {
+            var genes = new List<ItemQuantity>();
+            var remainingWeight = maxWeight;
+            var remainingVolume = maxVolume;
+            foreach (var unused in Enumerable.Range(1, Random.Next(items.Length)))
+            {
+                var newGene = Add(genes.ToArray(), items, remainingWeight, remainingVolume);
+                if (newGene == null) continue;
+                genes.Add(newGene);
+                remainingWeight -= newGene.Quantity * newGene.Item.Weight;
+                remainingVolume -= newGene.Quantity * newGene.Item.Volume;
+            }
+
+            return genes;
+        }
+
+        public static ItemQuantity Add(ItemQuantity[] genes, Resource[] items, double maxWeight, double maxVolume)
+        {
+            var usedItems = genes.Select(iq => iq.Item).ToList();
+            var item = items[Random.Next(items.Length)];
+            while (usedItems.Contains(item))
+                item = items[Random.Next(items.Length)];
+
+            var maxQuantity = MaxQuantity(item, maxWeight, maxVolume);
+            return maxQuantity > 0 ? new ItemQuantity(item, maxQuantity) : null;
+        }
+
+        private static void Mutate(List<ItemQuantity> genes, Resource[] items, double maxWeight, double maxVolume,
             Window window)
         {
             window.Slide();
-            var fitness = Fitness(input);
-            var genes = input.ToList();
+            var fitness = GetFitness(genes.ToArray());
             var remainingWeight = maxWeight - fitness.TotalWeight;
             var remainingVolume = maxVolume - fitness.TotalVolume;
 
@@ -69,7 +122,7 @@ namespace GeneticAlgorithms.Knapsack
                 if (newGene != null)
                 {
                     genes.Add(newGene);
-                    return genes.ToArray();
+                    return;
                 }
             }
 
@@ -96,43 +149,6 @@ namespace GeneticAlgorithms.Knapsack
             }
             else
                 genes.RemoveAt(index);
-
-            return genes.ToArray();
-        }
-
-        public static ItemQuantity[] Create(Resource[] items, double maxWeight, double maxVolume)
-        {
-            var genes = new List<ItemQuantity>();
-            var remainingWeight = maxWeight;
-            var remainingVolume = maxVolume;
-            foreach (var unused in Enumerable.Range(1, Random.Next(items.Length)))
-            {
-                var newGene = Add(genes.ToArray(), items, remainingWeight, remainingVolume);
-                if (newGene == null) continue;
-                genes.Add(newGene);
-                remainingWeight -= newGene.Quantity * newGene.Item.Weight;
-                remainingVolume -= newGene.Quantity * newGene.Item.Volume;
-            }
-
-            return genes.ToArray();
-        }
-
-        public static ItemQuantity Add(ItemQuantity[] genes, Resource[] items, double maxWeight, double maxVolume)
-        {
-            var usedItems = genes.Select(iq => iq.Item).ToArray();
-            var item = items[Random.Next(items.Length)];
-            while (usedItems.Contains(item))
-                item = items[Random.Next(items.Length)];
-
-            var maxQuantity = MaxQuantity(item, maxWeight, maxVolume);
-            return maxQuantity > 0 ? new ItemQuantity(item, maxQuantity) : null;
-        }
-
-        public static int MaxQuantity(Resource item, double maxWeight, double maxVolume)
-        {
-            var weight = item.Weight > 0 ? (int) (maxWeight / item.Weight) : int.MaxValue;
-            var volume = item.Volume > 0 ? (int) (maxVolume / item.Volume) : int.MaxValue;
-            return Math.Min(weight, volume);
         }
 
         [TestMethod]
@@ -154,8 +170,13 @@ namespace GeneticAlgorithms.Knapsack
                 new ItemQuantity(items[1], 14),
                 new ItemQuantity(items[2], 6)
             };
-            var optimal = Fitness(quantities);
-            FillKnapsack(items, maxWeight, maxvolume, optimal);
+            var optimal = GetFitness(quantities);
+            var best = FillKnapsack(items, maxWeight, maxvolume, optimal);
+
+            var iq1 = new ItemQuantity(items[1], 14);
+            var iq2 = new ItemQuantity(items[2], 6);
+            var iq3 = new ItemQuantity(items[0], 1);
+            CollectionAssert.AreEquivalent(new[] { iq1, iq2, iq3 }, best.Genes.ToArray());
         }
 
         [TestMethod]
@@ -165,24 +186,34 @@ namespace GeneticAlgorithms.Knapsack
             var items = problemInfo.Resources;
             var maxWeight = problemInfo.MaxWeight;
             var maxVolume = 0.0;
-            var optimal = Fitness(problemInfo.Solution);
-            FillKnapsack(items, maxWeight, maxVolume, optimal);
+            var optimal = GetFitness(problemInfo.Solution);
+            var best = FillKnapsack(items, maxWeight, maxVolume, optimal);
+
+            CollectionAssert.AreEquivalent(problemInfo.Solution, best.Genes.ToArray());
         }
 
-        public static void FillKnapsack(Resource[] items, double maxWeight, double maxVolume, Fitness optimalFitness)
+        [TestMethod]
+        public void BenchmarkTest()
+        {
+            Benchmark.Run(Exnsd16Test);
+        }
+
+        private static Chromosome<ItemQuantity, Fitness> FillKnapsack(Resource[] items, double maxWeight,
+            double maxVolume, Fitness optimalFitness)
         {
             var genetic = new Genetic<ItemQuantity, Fitness>();
             var watch = Stopwatch.StartNew();
             var window = new Window(1, Math.Max(1, items.Length / 3), items.Length / 2);
             var sortedItems = items.OrderBy(i => i.Value).ToArray();
 
-            Fitness FitnessFun(ItemQuantity[] genes) => Fitness(genes);
-            void DisplayFun(Chromosome<ItemQuantity, Fitness> candidate) => Display(candidate, watch);
-            void MutateFun(ItemQuantity[] genes) => Mutate(genes, sortedItems, maxWeight, maxVolume, window);
-            ItemQuantity[] CreateFun() => Create(items, maxWeight, maxVolume);
+            void FnDisplay(Chromosome<ItemQuantity, Fitness> candidate) => Display(candidate, watch);
+            Fitness FnGetFitness(List<ItemQuantity> genes) => GetFitness(genes);
+            List<ItemQuantity> FnCreate() => Create(items, maxWeight, maxVolume);
+            void FnMutate(List<ItemQuantity> genes) => Mutate(genes, sortedItems, maxWeight, maxVolume, window);
 
-            var best = genetic.GetBest(FitnessFun, 0, optimalFitness, null, DisplayFun, MutateFun, CreateFun, 50);
+            var best = genetic.GetBest(FnGetFitness, 0, optimalFitness, null, FnDisplay, FnMutate, FnCreate, 50);
             Assert.IsTrue(optimalFitness.CompareTo(best.Fitness) <= 0);
+            return best;
         }
     }
 }

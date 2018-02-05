@@ -30,7 +30,7 @@ namespace GeneticAlgorithms.MagicSquare
     {
         private static readonly Random Random = new Random();
 
-        public static Fitness GetFitness(int[] genes, int diagonalSize, int expectedSum)
+        public static Fitness GetFitness(List<int> genes, int diagonalSize, int expectedSum)
         {
             var sums = Sums(genes, diagonalSize);
             var a1 = sums.Item1.Where(r => r != expectedSum).Select(s => Math.Abs(s - expectedSum)).Sum();
@@ -54,7 +54,7 @@ namespace GeneticAlgorithms.MagicSquare
             Console.WriteLine(" - - - - - - - - - - - {0}, {1} ms", candidate.Fitness, watch.ElapsedMilliseconds);
         }
 
-        public static Tuple<int[], int[], int, int> Sums(int[] genes, int diagonalSize)
+        public static Tuple<int[], int[], int, int> Sums(List<int> genes, int diagonalSize)
         {
             var rows = new int[diagonalSize];
             var columns = new int[diagonalSize];
@@ -76,7 +76,7 @@ namespace GeneticAlgorithms.MagicSquare
             return new Tuple<int[], int[], int, int>(rows, columns, northeastDiagonalSum, southeastDiagonalSum);
         }
 
-        private static void Mutate(int[] genes, int[] allPositions)
+        private static void Mutate(List<int> genes, int[] allPositions)
         {
             var randomSample = RandomSample(allPositions, 2);
             var indexA = randomSample[0];
@@ -139,10 +139,10 @@ namespace GeneticAlgorithms.MagicSquare
             var expectedSum = diagonalSize * (nSquared + 1) / 2;
             var geneIndexes = Enumerable.Range(0, geneSet.Length).ToArray();
 
-            Fitness FnGetFitness(int[] genes) => GetFitness(genes, diagonalSize, expectedSum);
+            Fitness FnGetFitness(List<int> genes) => GetFitness(genes, diagonalSize, expectedSum);
             void FnDisplay(Chromosome<int, Fitness> candidate) => Display(candidate, watch, diagonalSize);
-            void FnMutate(int[] genes) => Mutate(genes, geneIndexes);
-            int[] FnCreate() => geneSet.OrderBy(i => Random.Next(geneSet.Length)).ToArray();
+            void FnMutate(List<int> genes) => Mutate(genes, geneIndexes);
+            List<int> FnCreate() => geneSet.OrderBy(i => Random.Next(geneSet.Length)).ToList();
 
             var optimalValue = new Fitness(0);
             var best = genetic.GetBest(FnGetFitness, nSquared, optimalValue, geneSet, FnDisplay, FnMutate,

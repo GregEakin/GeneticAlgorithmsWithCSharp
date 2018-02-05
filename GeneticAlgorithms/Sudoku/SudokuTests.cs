@@ -12,7 +12,7 @@ namespace GeneticAlgorithms.Sudoku
     {
         private static readonly Random Random = new Random();
 
-        public static int Fitness(int[] genes, Rule[] validationRules)
+        public static int Fitness(List<int> genes, Rule[] validationRules)
         {
 //            firstFailingRule = next(rule for rule in validationRules 
 //              if genes[rule.Index] == genes[rule.OtherIndex])
@@ -35,7 +35,7 @@ namespace GeneticAlgorithms.Sudoku
             Console.WriteLine();
         }
 
-        public static int[] Mutate(int[] parent, Rule[] validationRules)
+        public static void Mutate(List<int> parent, Rule[] validationRules)
         {
             var genes = parent.ToArray();
             foreach (var selectedRule in validationRules)
@@ -56,8 +56,6 @@ namespace GeneticAlgorithms.Sudoku
                 genes[indexA] = genes[indexB];
                 genes[indexB] = temp;
             }
-
-            return genes;
         }
 
         public static void ShuffleInPlace(int[] genes, int first, int last)
@@ -80,7 +78,7 @@ namespace GeneticAlgorithms.Sudoku
             for (var j = 0; j < 9; j++)
                 genes.Add(j);
 
-            var candidate = new Chromosome<int, int>(genes.ToArray(), 0);
+            var candidate = new Chromosome<int, int>(genes, 0);
             var watch = Stopwatch.StartNew();
             Display(candidate, watch);
         }
@@ -95,11 +93,10 @@ namespace GeneticAlgorithms.Sudoku
             var fitness = Fitness(genes, validationRules);
 
             Display(new Chromosome<int, int>(genes, fitness), watch);
-            var child = Mutate(genes, validationRules);
+            Mutate(genes, validationRules);
 
-            var fitness2 = Fitness(child, validationRules);
-            Display(new Chromosome<int, int>(child, fitness2), watch);
-            CollectionAssert.AreNotEqual(genes, child);
+            var fitness2 = Fitness(genes, validationRules);
+            Display(new Chromosome<int, int>(genes, fitness2), watch);
         }
 
         [TestMethod]
@@ -112,9 +109,9 @@ namespace GeneticAlgorithms.Sudoku
             var validationRules = BuildValidationRules();
 
             void FnDispaly(Chromosome<int, int> candidate) => Display(candidate, watch);
-            int FnFitness(int[] genes) => Fitness(genes, validationRules);
-            int[] FnCreate() => RandomSample(geneSet, 81);
-            void FnMutate(int[] genes) => Mutate(genes, validationRules);
+            int FnFitness(List<int> genes) => Fitness(genes, validationRules);
+            List<int> FnCreate() => RandomSample(geneSet, 81);
+            void FnMutate(List<int> genes) => Mutate(genes, validationRules);
 
             var best = generic.GetBest(FnFitness, 0, optimalValue, null, FnDispaly, FnMutate, FnCreate, 50);
             Assert.AreEqual(optimalValue, best.Fitness);
@@ -160,7 +157,7 @@ namespace GeneticAlgorithms.Sudoku
 
         public static int SectionStart(int index) => ((IndexRow(index) % 9) / 3) * 27 + (IndexColumn(index) / 3) * 3;
 
-        public static int[] RandomSample(int[] geneSet, int length)
+        public static List<int> RandomSample(int[] geneSet, int length)
         {
             var genes = new List<int>(length);
             do
@@ -170,7 +167,7 @@ namespace GeneticAlgorithms.Sudoku
                 genes.AddRange(array);
             } while (genes.Count < length);
 
-            return genes.ToArray();
+            return genes.ToList();
         }
     }
 }

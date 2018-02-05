@@ -14,7 +14,7 @@ namespace GeneticAlgorithms.LinearEquation
 
         private static readonly Random Random = new Random();
 
-        public static Fitness Fitness(Fraction[] genes, Equation[] equations)
+        public static Fitness Fitness(List<Fraction> genes, Equation[] equations)
         {
             try
             {
@@ -32,7 +32,7 @@ namespace GeneticAlgorithms.LinearEquation
         [TestMethod]
         public void FitnessTest()
         {
-            var child = new[] {new Fraction(2), new Fraction(-1)};
+            var child = new List<Fraction> {new Fraction(2), new Fraction(-1)};
             Fraction E1(IReadOnlyList<Fraction> genes) => genes[0] + 2 * genes[1] - 4;
             Fraction E2(IReadOnlyList<Fraction> genes) => 4 * genes[0] + 4 * genes[1] - 12;
             var equations = new Equation[] {E1, E2};
@@ -43,7 +43,7 @@ namespace GeneticAlgorithms.LinearEquation
         public static void Display(Chromosome<Fraction, Fitness> candidate, Stopwatch watch)
         {
             var symbols = "xyza".ToCharArray();
-            var values = Enumerable.Range(0, candidate.Genes.Length)
+            var values = Enumerable.Range(0, candidate.Genes.Count)
                 .Select(i => $"{symbols[i]} = {candidate.Genes[i]}");
             var result = string.Join(", ", values);
             Console.WriteLine("{0}\t{1}\t{2} ms", result, candidate.Fitness, watch.ElapsedMilliseconds);
@@ -57,7 +57,7 @@ namespace GeneticAlgorithms.LinearEquation
                 (from n in range from d in range.Where(i => i != 0) select new Fraction(n, d))
                 .Distinct().OrderBy(g => g);
 
-            var genes = geneSet.OrderBy(g => Random.Next()).Take(4).ToArray();
+            var genes = geneSet.OrderBy(g => Random.Next()).Take(4).ToList();
             var fitness = new Fitness(new Fraction(42));
             var chromosome = new Chromosome<Fraction, Fitness>(genes, fitness);
             var watch = Stopwatch.StartNew();
@@ -75,7 +75,7 @@ namespace GeneticAlgorithms.LinearEquation
                 Console.WriteLine("{0}, {1}", gene, (double) gene);
         }
 
-        public static Fraction[] Mutate(Fraction[] input, Fraction[] sortedGeneSet, Window window, int[] geneIndexes)
+        public static void Mutate(List<Fraction> input, Fraction[] sortedGeneSet, Window window, int[] geneIndexes)
         {
             var genes = input.ToArray();
             window.Slide();
@@ -90,8 +90,6 @@ namespace GeneticAlgorithms.LinearEquation
                 var genesetIndex2 = Random.Next(start, stop);
                 genes[index] = sortedGeneSet[genesetIndex2];
             }
-
-            return genes;
         }
 
         [TestMethod]
@@ -105,16 +103,16 @@ namespace GeneticAlgorithms.LinearEquation
                 (from n in range from d in range.Where(i => i != 0) select new Fraction(n, d))
                 .Distinct().OrderBy(g => g);
 
-            var genes = geneSet.OrderBy(g => Random.Next()).Take(4).ToArray();
+            var genes = geneSet.OrderBy(g => Random.Next()).Take(4).ToList();
             Display(new Chromosome<Fraction, Fitness>(genes, fitness), watch);
 
             var sortedGeneSet = genes.OrderBy(g => g).ToArray();
-            Display(new Chromosome<Fraction, Fitness>(sortedGeneSet, fitness), watch);
+            // Display(new Chromosome<Fraction, Fitness>(sortedGeneSet, fitness), watch);
 
-            var geneIndexes = Enumerable.Range(0, genes.Length).ToArray();
-            var window = new Window(1, genes.Length, genes.Length);
-            var child = Mutate(genes, sortedGeneSet, window, geneIndexes);
-            Display(new Chromosome<Fraction, Fitness>(child, fitness), watch);
+            var geneIndexes = Enumerable.Range(0, genes.Count).ToArray();
+            var window = new Window(1, genes.Count, genes.Count);
+            Mutate(genes, sortedGeneSet, window, geneIndexes);
+            Display(new Chromosome<Fraction, Fitness>(genes, fitness), watch);
         }
 
         [TestMethod]
@@ -195,8 +193,8 @@ namespace GeneticAlgorithms.LinearEquation
             var sortedGeneSet = geneSet.OrderBy(gene => gene).ToArray();
 
             void FnDispaly(Chromosome<Fraction, Fitness> candidate) => Display(candidate, watch);
-            Fitness FnFitness(Fraction[] genes) => Fitness(genes, equations);
-            void FnMutate(Fraction[] genes) => Mutate(genes, sortedGeneSet, window, geneIndexes);
+            Fitness FnFitness(List<Fraction> genes) => Fitness(genes, equations);
+            void FnMutate(List<Fraction> genes) => Mutate(genes, sortedGeneSet, window, geneIndexes);
 
             var optimalFitness = new Fitness(new Fraction(0));
             var best = genetic.GetBest(FnFitness, numUnknowns, optimalFitness, geneSet, FnDispaly, FnMutate,
