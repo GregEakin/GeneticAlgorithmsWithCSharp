@@ -1,4 +1,23 @@
-﻿using System;
+﻿/* File: Benchmark.cs
+ *     from chapter 6 of _Genetic Algorithms with Python_
+ *     writen by Clinton Sheppard
+ *
+ * Author: Greg Eakin <gregory.eakin@gmail.com>
+ * Copyright (c) 2018 Greg Eakin
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+ * implied.  See the License for the specific language governing
+ * permissions and limitations under the License.
+ */
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -7,17 +26,17 @@ namespace GeneticAlgorithms.Knights
     public class Genetic<TGene, TFitness>
         where TFitness : IComparable<TFitness>
     {
-        public delegate TFitness FitnessFun(TGene[] gene);
+        public delegate TFitness FitnessDelegate(TGene[] gene);
 
-        public delegate void DisplayFun(Chromosome<TGene, TFitness> child);
+        public delegate void DisplayDelegate(Chromosome<TGene, TFitness> child);
 
-        public delegate TGene[] MutateGeneFun(TGene[] genes);
+        public delegate void MutateGeneDelegate(TGene[] genes);
 
-        public delegate Chromosome<TGene, TFitness> MutateChromosomeFun(Chromosome<TGene, TFitness> parent);
+        public delegate Chromosome<TGene, TFitness> MutateChromosomeDelegate(Chromosome<TGene, TFitness> parent);
 
-        public delegate Chromosome<TGene, TFitness> GenerateParentFun();
+        public delegate Chromosome<TGene, TFitness> GenerateParentDelegate();
 
-        public delegate TGene[] CreateFun();
+        public delegate TGene[] CreateDelegate();
 
         private readonly Random _random = new Random();
 
@@ -34,46 +53,55 @@ namespace GeneticAlgorithms.Knights
             return genes.ToArray();
         }
 
-        public Chromosome<TGene, TFitness> GenerateParent(int length, TGene[] geneSet, FitnessFun fitnessFun,
-            CreateFun createFun = null)
+        public Chromosome<TGene, TFitness> GenerateParent(int length, TGene[] geneSet, FitnessDelegate getFitness)
         {
-            var genes = createFun != null ? createFun() : RandomSample(geneSet, length);
-            var fitness = fitnessFun(genes);
+            var genes = RandomSample(geneSet, length);
+            var fitness = getFitness(genes);
             var chromosome = new Chromosome<TGene, TFitness>(genes, fitness);
             return chromosome;
         }
 
-        public TGene[] MutateGene(TGene[] parentGenes, TGene[] geneSet)
+        private Chromosome<TGene, TFitness> Mutate(Chromosome<TGene, TFitness> parent, TGene[] geneSet,
+            FitnessDelegate getFitness)
         {
-            var childGenes = parentGenes.ToArray();
+            var childGenes = parent.Genes.ToArray();
             var index = _random.Next(childGenes.Length);
             var randomSample = RandomSample(geneSet, 2);
             var newGene = randomSample[0];
             var alternate = randomSample[1];
             childGenes[index] = newGene.Equals(childGenes[index]) ? alternate : newGene;
-            return childGenes;
+            var fitness = getFitness(childGenes);
+            return new Chromosome<TGene, TFitness>(childGenes, fitness);
         }
 
-        public Chromosome<TGene, TFitness> Mutate(Chromosome<TGene, TFitness> parent, FitnessFun fitnessFun,
-            TGene[] geneSet, MutateGeneFun mutateGeneFun)
+        private static Chromosome<TGene, TFitness> MutateCustom(Chromosome<TGene, TFitness> parent,
+            MutateGeneDelegate customMutate, FitnessDelegate getFitness)
         {
-            var genese = mutateGeneFun != null ? mutateGeneFun(parent.Genes) : MutateGene(parent.Genes, geneSet);
-            var fitness = fitnessFun(genese);
-            return new Chromosome<TGene, TFitness>(genese, fitness);
+            var childGenes = parent.Genes.ToArray();
+            customMutate(childGenes);
+            var fitness = getFitness(childGenes);
+            return new Chromosome<TGene, TFitness>(childGenes, fitness);
         }
 
-        internal Chromosome<TGene, TFitness> BestFitness(FitnessFun fitnessFun, int length, TFitness optimalFitness,
-            TGene[] geneSet, DisplayFun displayFun, MutateGeneFun mutateGeneFun = null, CreateFun createFun = null)
+        internal Chromosome<TGene, TFitness> GetBest(FitnessDelegate getFitness, int targetLen, TFitness optimalFitness,
+            TGene[] geneSet, DisplayDelegate display, MutateGeneDelegate customMutate = null, CreateDelegate customCreate = null)
         {
-            Chromosome<TGene, TFitness> FnMutate(Chromosome<TGene, TFitness> parent) =>
-                Mutate(parent, fitnessFun, geneSet, mutateGeneFun);
+            Chromosome<TGene, TFitness> FnMutate(Chromosome<TGene, TFitness> parent) => customMutate == null
+                ? Mutate(parent, geneSet, getFitness)
+                : MutateCustom(parent, customMutate, getFitness);
 
-            Chromosome<TGene, TFitness> FnGenerateParent() =>
-                GenerateParent(length, geneSet, fitnessFun, createFun);
+            Chromosome<TGene, TFitness> FnGenerateParent()
+            {
+                if (customCreate == null)
+                    return GenerateParent(targetLen, geneSet, getFitness);
+
+                var genes = customCreate();
+                return new Chromosome<TGene, TFitness>(genes, getFitness(genes));
+            }
 
             foreach (var improvement in GetImprovement(FnMutate, FnGenerateParent))
             {
-                displayFun(improvement);
+                display(improvement);
                 if (optimalFitness.CompareTo(improvement.Fitness) <= 0)
                     return improvement;
             }
@@ -81,15 +109,15 @@ namespace GeneticAlgorithms.Knights
             throw new UnauthorizedAccessException();
         }
 
-        public IEnumerable<Chromosome<TGene, TFitness>> GetImprovement(MutateChromosomeFun mutateChromosomeFun,
-            GenerateParentFun generateParentFun)
+        public IEnumerable<Chromosome<TGene, TFitness>> GetImprovement(MutateChromosomeDelegate newChild,
+            GenerateParentDelegate generateParent)
         {
-            var bestParent = generateParentFun();
+            var bestParent = generateParent();
             yield return bestParent;
 
             while (true)
             {
-                var child = mutateChromosomeFun(bestParent);
+                var child = newChild(bestParent);
                 if (bestParent.Fitness.CompareTo(child.Fitness) > 0)
                     continue;
 

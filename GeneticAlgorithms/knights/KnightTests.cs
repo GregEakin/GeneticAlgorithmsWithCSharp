@@ -1,4 +1,23 @@
-﻿using System;
+﻿/* File: Benchmark.cs
+ *     from chapter 6 of _Genetic Algorithms with Python_
+ *     writen by Clinton Sheppard
+ *
+ * Author: Greg Eakin <gregory.eakin@gmail.com>
+ * Copyright (c) 2018 Greg Eakin
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+ * implied.  See the License for the specific language governing
+ * permissions and limitations under the License.
+ */
+
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -16,7 +35,7 @@ namespace GeneticAlgorithms.Knights
         public static int Fitness(Position[] genes, int width, int height)
         {
             var attacks = from kn in genes
-                from pos in Attacks(kn, width, height)
+                from pos in GetAttacks(kn, width, height)
                 select pos;
             return attacks.Distinct().Count();
         }
@@ -32,17 +51,16 @@ namespace GeneticAlgorithms.Knights
                 watch.ElapsedMilliseconds);
         }
 
-        public static Position[] Mutate(Position[] input, int width, int height, Position[] allPositions,
+        public static void Mutate(Position[] genes, int width, int height, Position[] allPositions,
             Position[] nonEdgePositions)
         {
-            var genes = input.ToArray();
             var loops = Random.Next(10) == 0 ? 2 : 1;
             for (var count = 0; count < loops; count++)
             {
                 var positionToKnightIndexes =
-                    allPositions.ToDictionary(position => position, position => new List<int>());
+                    allPositions.ToDictionary(k => k, v => new List<int>());
                 for (var i = 0; i < genes.Length; i++)
-                    foreach (var position in Attacks(genes[i], width, height))
+                    foreach (var position in GetAttacks(genes[i], width, height))
                         positionToKnightIndexes[position].Add(i);
 
                 var knightIndexes = new HashSet<int>(Enumerable.Range(0, genes.Length));
@@ -61,7 +79,7 @@ namespace GeneticAlgorithms.Knights
                         knightIndexes.Remove(p);
                 }
 
-                var knightPositions = unattacked.SelectMany(x => Attacks(x, width, height))
+                var knightPositions = unattacked.SelectMany(x => GetAttacks(x, width, height))
                     .Where(nonEdgePositions.Contains).Distinct();
                 var potentialKnightPositions = unattacked.Count > 0
                     ? knightPositions.ToArray()
@@ -74,8 +92,6 @@ namespace GeneticAlgorithms.Knights
                 var position1 = potentialKnightPositions[Random.Next(potentialKnightPositions.Length)];
                 genes[geneIndex] = position1;
             }
-
-            return genes;
         }
 
         public Position[] Create(RandomPosition randomPositionFun, int expectedKnights)
@@ -84,7 +100,7 @@ namespace GeneticAlgorithms.Knights
             return genes.ToArray();
         }
 
-        public static Position[] Attacks(Position location, int width, int height)
+        public static Position[] GetAttacks(Position location, int width, int height)
         {
             var indexes = new[] {-2, -1, 1, 2};
             var attacks = from x in indexes
@@ -126,13 +142,19 @@ namespace GeneticAlgorithms.Knights
             FindKnightPositions(13, 13, 32);
         }
 
+        [TestMethod]
+        public void BenchmarkTest()
+        {
+            Benchmark.Run(Knight_10x10Test);
+        }
+
         public void FindKnightPositions(int width, int height, int expectedKnights)
         {
             var generic = new Genetic<Position, int>();
             var watch = Stopwatch.StartNew();
 
-            int FitnessFun(Position[] genes) => Fitness(genes, width, height);
-            void DisplayFun(Chromosome<Position, int> candidate) => Display(candidate, watch, width, height);
+            void FnDisplay(Chromosome<Position, int> candidate) => Display(candidate, watch, width, height);
+            int FnFitness(Position[] genes) => Fitness(genes, width, height);
 
             var allPositions = (from x in Enumerable.Range(0, width)
                 from y in Enumerable.Range(0, height)
@@ -144,20 +166,20 @@ namespace GeneticAlgorithms.Knights
                     where 0 < p.X && p.X < width - 1 && 0 < p.Y && p.Y < height - 1
                     select p)).ToArray();
 
-            Position RandomPositionFun() => nonEdgePositions[Random.Next(nonEdgePositions.Length)];
-            Position[] MutateFun(Position[] genes) => Mutate(genes, width, height, allPositions, nonEdgePositions);
-            Position[] CreateFun() => Create(RandomPositionFun, expectedKnights);
+            Position FnGetRandomPosition() => nonEdgePositions[Random.Next(nonEdgePositions.Length)];
+            void FnMutate(Position[] genes) => Mutate(genes, width, height, allPositions, nonEdgePositions);
+            Position[] FnCreate() => Create(FnGetRandomPosition, expectedKnights);
 
             var optimalFitness = width * height;
-            var best = generic.BestFitness(FitnessFun, 0, optimalFitness, null, DisplayFun, MutateFun, CreateFun);
-            Assert.IsFalse(optimalFitness > best.Fitness);
+            var best = generic.GetBest(FnFitness, 0, optimalFitness, null, FnDisplay, FnMutate, FnCreate);
+            Assert.IsTrue(optimalFitness <= best.Fitness);
         }
 
         [TestMethod]
         public void AttacksTest1()
         {
             var position = new Position(0, 0);
-            var attacks = Attacks(position, 8, 8);
+            var attacks = GetAttacks(position, 8, 8);
             CollectionAssert.AreEquivalent(new[]
             {
                 new Position(1, 2),
@@ -169,7 +191,7 @@ namespace GeneticAlgorithms.Knights
         public void AttacksTest2()
         {
             var position = new Position(4, 4);
-            var attacks = Attacks(position, 8, 8);
+            var attacks = GetAttacks(position, 8, 8);
             CollectionAssert.AreEquivalent(new[]
             {
                 new Position(6, 5),
@@ -240,9 +262,11 @@ namespace GeneticAlgorithms.Knights
             var b1 = new Board(genes, width, height);
             Console.WriteLine(b1);
 
-            genes = Mutate(genes, width, height, allPositionsArray, allPositionsArray);
+            Mutate(genes, width, height, allPositionsArray, allPositionsArray);
             var b2 = new Board(genes, width, height);
             Console.WriteLine(b2);
+
+            Assert.AreNotEqual(b1.ToString(), b2.ToString());
         }
     }
 }

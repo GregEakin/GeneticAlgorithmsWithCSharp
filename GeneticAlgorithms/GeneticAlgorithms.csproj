@@ -58,6 +58,7 @@
     <Compile Include="Cards\Fitness.cs" />
     <Compile Include="Cards\Genetic.cs" />
     <Compile Include="EquationGeneration\EquationGenerationTests.cs" />
+    <Compile Include="Knights\Benchmark.cs" />
     <Compile Include="LawnmowerProblem\DirectionTests.cs" />
     <Compile Include="LawnmowerProblem\Fitness.cs" />
     <Compile Include="LawnmowerProblem\Lawnmower.cs" />
