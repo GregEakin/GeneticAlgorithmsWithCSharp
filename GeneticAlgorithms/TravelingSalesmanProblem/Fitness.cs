@@ -1,5 +1,5 @@
-﻿/* File: ItemQuantity.cs
- *     from chapter 9 of _Genetic Algorithms with Python_
+﻿/* File: Fitness.cs
+ *     from chapter 12 of _Genetic Algorithms with Python_
  *     writen by Clinton Sheppard
  *
  * Author: Greg Eakin <gregory.eakin@gmail.com>
@@ -17,35 +17,37 @@
  * permissions and limitations under the License.
  */
 
-namespace GeneticAlgorithms.Knapsack
-{
-    public class ItemQuantity
-    {
-        public Resource Item { get; }
-        public int Quantity { get; }
+using System;
 
-        public ItemQuantity(Resource item, int quantity)
+namespace GeneticAlgorithms.TravelingSalesmanProblem
+{
+    public class Fitness : IComparable, IComparable<Fitness>
+    {
+        public double TotalDistance { get; }
+
+        public Fitness(double totalDistance)
         {
-            Item = item;
-            Quantity = quantity;
+            TotalDistance = totalDistance;
         }
 
-        public override bool Equals(object obj)
+        public int CompareTo(object obj)
         {
             switch (obj)
             {
                 case null:
-                    return false;
-                case ItemQuantity that:
-                    return Item == that.Item && Quantity == that.Quantity;
+                    return 1;
+                case Fitness that:
+                    return CompareTo(that);
                 default:
-                    return false;
+                    throw new ArgumentException("Object is not a Fitness");
             }
         }
 
-        public override int GetHashCode()
+        public int CompareTo(Fitness that)
         {
-            return Item.GetHashCode() * 397 ^ Quantity;
+            return -TotalDistance.CompareTo(that.TotalDistance);
         }
+
+        public override string ToString() => $"{TotalDistance:F2}";
     }
 }

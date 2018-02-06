@@ -1,4 +1,23 @@
-﻿using System;
+﻿/* File: Genetic.cs
+ *     from chapter 12 of _Genetic Algorithms with Python_
+ *     writen by Clinton Sheppard
+ *
+ * Author: Greg Eakin <gregory.eakin@gmail.com>
+ * Copyright (c) 2018 Greg Eakin
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+ * implied.  See the License for the specific language governing
+ * permissions and limitations under the License.
+ */
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -7,7 +26,7 @@ namespace GeneticAlgorithms.TravelingSalesmanProblem
     public class Genetic<TGene, TFitness>
         where TFitness : IComparable<TFitness>
     {
-        public class ReverseComparer<T> : IComparer<T>
+        private class ReverseComparer<T> : IComparer<T>
         {
             public int Compare(T x, T y)
             {
@@ -15,23 +34,23 @@ namespace GeneticAlgorithms.TravelingSalesmanProblem
             }
         }
 
-        public delegate TFitness FitnessFun(TGene[] gene);
+        public delegate TFitness GetFitnessDelegate(TGene[] gene);
 
-        public delegate void DisplayFun(Chromosome<TGene, TFitness> child);
+        public delegate void DisplayDelegate(Chromosome<TGene, TFitness> child);
 
-        public delegate TGene[] MutateGeneFun(TGene[] genes);
+        public delegate void MutateGeneDelegate(TGene[] genes);
 
-        public delegate Chromosome<TGene, TFitness> MutateChromosomeFun(Chromosome<TGene, TFitness> parent);
+        public delegate Chromosome<TGene, TFitness> MutateChromosomeDelegate(Chromosome<TGene, TFitness> parent);
 
-        public delegate Chromosome<TGene, TFitness> GenerateParentFun();
+        public delegate Chromosome<TGene, TFitness> GenerateParentDelegate();
 
-        public delegate TGene[] CreateFun();
+        public delegate TGene[] CreateDelegate();
 
         public delegate TGene[] CrossoverFun(TGene[] genes1, TGene[] genes2);
 
         private readonly Random _random = new Random();
 
-        public TGene[] RandomSample(TGene[] geneSet, int length)
+        private TGene[] RandomSample(TGene[] geneSet, int length)
         {
             var genes = new List<TGene>(length);
             while (genes.Count < length)
@@ -44,65 +63,78 @@ namespace GeneticAlgorithms.TravelingSalesmanProblem
             return genes.ToArray();
         }
 
-        public Chromosome<TGene, TFitness> GenerateParent(int length, TGene[] geneSet, FitnessFun fitnessFun,
-            CreateFun createFun = null)
+        private Chromosome<TGene, TFitness> GenerateParent(int length, TGene[] geneSet,
+            GetFitnessDelegate getGetFitness)
         {
-            var genes = createFun != null ? createFun() : RandomSample(geneSet, length);
-            var fitness = fitnessFun(genes);
+            var genes = RandomSample(geneSet, length);
+            var fitness = getGetFitness(genes);
             var chromosome =
                 new Chromosome<TGene, TFitness>(genes, fitness, Chromosome<TGene, TFitness>.Strategies.Create);
             return chromosome;
         }
 
-        public TGene[] MutateGene(TGene[] parentGenes, TGene[] geneSet)
+        private Chromosome<TGene, TFitness> Mutate(Chromosome<TGene, TFitness> parent, TGene[] geneSet,
+            GetFitnessDelegate getFitness)
         {
-            var childGenes = parentGenes.ToArray();
+            var childGenes = parent.Genes.ToArray();
             var index = _random.Next(childGenes.Length);
             var randomSample = RandomSample(geneSet, 2);
             var newGene = randomSample[0];
             var alternate = randomSample[1];
             childGenes[index] = newGene.Equals(childGenes[index]) ? alternate : newGene;
-            return childGenes;
+            var fitness = getFitness(childGenes);
+            return new Chromosome<TGene, TFitness>(childGenes, fitness, Chromosome<TGene, TFitness>.Strategies.Mutate);
         }
 
-        public Chromosome<TGene, TFitness> Mutate(Chromosome<TGene, TFitness> parent, FitnessFun fitnessFun,
-            TGene[] geneSet, MutateGeneFun mutateGeneFun)
+        private Chromosome<TGene, TFitness> MutateCustom(Chromosome<TGene, TFitness> parent,
+            MutateGeneDelegate customMutate, GetFitnessDelegate getFitness)
         {
-            var genes = (mutateGeneFun != null) ? mutateGeneFun(parent.Genes) : MutateGene(parent.Genes, geneSet);
-            var fitness = fitnessFun(genes);
-            return new Chromosome<TGene, TFitness>(genes, fitness, Chromosome<TGene, TFitness>.Strategies.Mutate);
+            var childGenes = parent.Genes.ToArray();
+            customMutate(childGenes);
+            var fitness = getFitness(childGenes);
+            return new Chromosome<TGene, TFitness>(childGenes, fitness, Chromosome<TGene, TFitness>.Strategies.Mutate);
         }
 
-        public Chromosome<TGene, TFitness> Crossover(TGene[] parentGenes, int index,
+        private Chromosome<TGene, TFitness> Crossover(TGene[] parentGenes, int index,
             List<Chromosome<TGene, TFitness>> parents,
-            FitnessFun fitnessFun, CrossoverFun crossover, MutateChromosomeFun mutateGeneFun,
-            GenerateParentFun generateParent)
+            GetFitnessDelegate getFitness, CrossoverFun crossover, MutateChromosomeDelegate mutate,
+            GenerateParentDelegate generateParent)
         {
             var donorIndex = _random.Next(0, parents.Count);
             if (donorIndex == index)
                 donorIndex = (donorIndex + 1) % parents.Count;
             var childGenes = crossover(parentGenes, parents[donorIndex].Genes);
-            if (childGenes != null)
+            if (childGenes == null)
             {
-                var fitness = fitnessFun(parentGenes);
-                return new Chromosome<TGene, TFitness>(parentGenes, fitness,
-                    Chromosome<TGene, TFitness>.Strategies.Crossover);
+                // parent and donor are indistinguishable
+                parents[donorIndex] = generateParent();
+                return mutate(parents[index]);
             }
 
-            // parent and donor are indistinguishable
-            parents[donorIndex] = generateParent();
-            return mutateGeneFun(parents[index]);
+            var fitness = getFitness(parentGenes);
+            return new Chromosome<TGene, TFitness>(childGenes, fitness,
+                Chromosome<TGene, TFitness>.Strategies.Crossover);
         }
 
-        internal Chromosome<TGene, TFitness> BestFitness(FitnessFun fitnessFun, int length, TFitness optimalFitness,
-            TGene[] geneSet, DisplayFun displayFun, MutateGeneFun mutateGeneFun = null, CreateFun createFun = null,
-            int maxAge = 0, int poolSize = 1, CrossoverFun crossoverFun = null, int maxSeconds = 0)
+        internal Chromosome<TGene, TFitness> GetBest(GetFitnessDelegate getFitness, int targetLen,
+            TFitness optimalFitness, TGene[] geneSet, DisplayDelegate display, MutateGeneDelegate customMutate = null,
+            CreateDelegate customCreate = null,
+            int maxAge = 0, int poolSize = 1, CrossoverFun crossover = null)
         {
             Chromosome<TGene, TFitness> FnMutate(Chromosome<TGene, TFitness> parent) =>
-                Mutate(parent, fitnessFun, geneSet, mutateGeneFun);
+                customMutate == null
+                    ? Mutate(parent, geneSet, getFitness)
+                    : MutateCustom(parent, customMutate, getFitness);
 
-            Chromosome<TGene, TFitness> FnGenerateParent() =>
-                GenerateParent(length, geneSet, fitnessFun, createFun);
+            Chromosome<TGene, TFitness> FnGenerateParent()
+            {
+                if (customCreate == null)
+                    return GenerateParent(targetLen, geneSet, getFitness);
+
+                var genes = customCreate();
+                return new Chromosome<TGene, TFitness>(genes, getFitness(genes),
+                    Chromosome<TGene, TFitness>.Strategies.Create);
+            }
 
             var strategyLookup =
                 new Dictionary<Chromosome<TGene, TFitness>.Strategies, Func<Chromosome<TGene, TFitness>, int,
@@ -112,26 +144,31 @@ namespace GeneticAlgorithms.TravelingSalesmanProblem
                     {Chromosome<TGene, TFitness>.Strategies.Mutate, (p, i, o) => FnMutate(p)},
                     {
                         Chromosome<TGene, TFitness>.Strategies.Crossover,
-                        (p, i, o) => Crossover(p.Genes, i, o, fitnessFun, crossoverFun, FnMutate, FnGenerateParent)
+                        (p, i, o) => Crossover(p.Genes, i, o, getFitness, crossover, FnMutate, FnGenerateParent)
                     }
                 };
 
             var usedStrategies =
-                new List<Chromosome<TGene, TFitness>.Strategies> {Chromosome<TGene, TFitness>.Strategies.Mutate};
+                new List<Func<Chromosome<TGene, TFitness>, int, List<Chromosome<TGene, TFitness>>,
+                    Chromosome<TGene, TFitness>>> {strategyLookup[Chromosome<TGene, TFitness>.Strategies.Mutate]};
 
-            if (crossoverFun != null)
-                usedStrategies.Add(Chromosome<TGene, TFitness>.Strategies.Crossover);
-
-            Chromosome<TGene, TFitness> NewChildFun(Chromosome<TGene, TFitness> parent, int index,
-                List<Chromosome<TGene, TFitness>> parents) => crossoverFun != null
-                ? strategyLookup[usedStrategies[_random.Next(usedStrategies.Count)]]
-                    .Invoke(parent, index, parents)
-                : FnMutate(parent);
-
-            foreach (var improvement in GetImprovement(NewChildFun, FnGenerateParent, maxAge, poolSize, maxSeconds))
+            Chromosome<TGene, TFitness> FnNewChild(Chromosome<TGene, TFitness> parent, int index,
+                List<Chromosome<TGene, TFitness>> parents)
             {
-                displayFun(improvement);
-                usedStrategies.Add(improvement.Strategy);
+                if (crossover != null)
+                {
+                    usedStrategies.Add(strategyLookup[Chromosome<TGene, TFitness>.Strategies.Crossover]);
+                    return usedStrategies[_random.Next(usedStrategies.Count)](parent, index, parents);
+                }
+
+                return FnMutate(parent);
+            }
+
+            foreach (var improvement in GetImprovement(FnNewChild, FnGenerateParent, maxAge, poolSize))
+            {
+                display(improvement);
+                var f = strategyLookup[improvement.Strategy];
+                usedStrategies.Add(f);
                 if (optimalFitness.CompareTo(improvement.Fitness) <= 0)
                     return improvement;
             }
@@ -139,17 +176,17 @@ namespace GeneticAlgorithms.TravelingSalesmanProblem
             throw new UnauthorizedAccessException();
         }
 
-        public IEnumerable<Chromosome<TGene, TFitness>> GetImprovement(
+        private IEnumerable<Chromosome<TGene, TFitness>> GetImprovement(
             Func<Chromosome<TGene, TFitness>, int, List<Chromosome<TGene, TFitness>>, Chromosome<TGene, TFitness>>
-                newChildFun, GenerateParentFun generateParentFun, int maxAge, int poolSize, int maxSeconds)
+                newChild, GenerateParentDelegate generateParent, int maxAge, int poolSize)
         {
-            var bestParent = generateParentFun();
+            var bestParent = generateParent();
             yield return bestParent;
             var parents = new List<Chromosome<TGene, TFitness>> {bestParent};
             var historicalFitnesses = new List<TFitness> {bestParent.Fitness};
             for (var i = 0; i < poolSize - 1; i++)
             {
-                var parent = generateParentFun();
+                var parent = generateParent();
                 if (parent.Fitness.CompareTo(bestParent.Fitness) > 0)
                 {
                     yield return parent;
@@ -166,7 +203,7 @@ namespace GeneticAlgorithms.TravelingSalesmanProblem
             {
                 pIndex = pIndex > 0 ? pIndex - 1 : lastParentIndex;
                 var parent = parents[pIndex];
-                var child = newChildFun(parent, pIndex, parents);
+                var child = newChild(parent, pIndex, parents);
                 if (parent.Fitness.CompareTo(child.Fitness) > 0)
                 {
                     if (maxAge <= 0)
@@ -208,7 +245,7 @@ namespace GeneticAlgorithms.TravelingSalesmanProblem
                 bestParent = child;
                 historicalFitnesses.Add(child.Fitness);
             }
-         
+
             // ReSharper disable once IteratorNeverReturns
         }
     }

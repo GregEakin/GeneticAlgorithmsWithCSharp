@@ -4,7 +4,7 @@
     {
         public int Min { get; }
         public int Max { get; }
-        public int Size { get; set; }
+        public int Size { get; private set; }
 
         public Window(int min, int max, int size)
         {

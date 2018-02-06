@@ -66,6 +66,7 @@
     <Compile Include="LawnmowerProblem\LawnmowerTests.cs" />
     <Compile Include="LawnmowerProblem\Location.cs" />
     <Compile Include="LawnmowerProblem\Mow.cs" />
+    <Compile Include="LinearEquation\FitnessTests.cs" />
     <Compile Include="LogicCircuits\Chromosome.cs" />
     <Compile Include="LogicCircuits\Circuits.cs" />
     <Compile Include="LogicCircuits\CircuitTests.cs" />
@@ -140,20 +141,28 @@
     <Compile Include="TicTacToe\Square.cs" />
     <Compile Include="TicTacToe\TicTacToeTests.cs" />
     <Compile Include="TicTacToe\TicTacToeTests2.cs" />
+    <Compile Include="TravelingSalesmanProblem\Benchmark.cs" />
     <Compile Include="TravelingSalesmanProblem\Chromosome.cs" />
+    <Compile Include="TravelingSalesmanProblem\Fitness.cs" />
     <Compile Include="TravelingSalesmanProblem\Genetic.cs" />
+    <Compile Include="TravelingSalesmanProblem\Pair.cs" />
     <Compile Include="TravelingSalesmanProblem\TravelingSalesmanProblemTests.cs" />
     <Compile Include="Utilities\ExpectedException.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="MapColors\adjacent_states.csv">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <None Include="Data\exnsd16.ukp" />
-    <None Include="MapColors\adjacent_states.col">
+    <None Include="Data\adjacent_states.csv">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="MapColors\R100_1gb.col">
+    <None Include="Data\exnsd16.ukp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Data\ulysses16.tsp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Data\adjacent_states.col">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Data\R100_1gb.col">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="packages.config" />

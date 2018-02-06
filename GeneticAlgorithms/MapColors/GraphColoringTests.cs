@@ -1,4 +1,4 @@
-﻿/* File: Chromosome.cs
+﻿/* File: GraphColoringTests.cs
  *     from chapter 5 of _Genetic Algorithms with Python_
  *     writen by Clinton Sheppard
  *
@@ -66,7 +66,7 @@ namespace GeneticAlgorithms.MapColors
         [TestMethod]
         public void LoadDataAdjacentStatesTest()
         {
-            var data = LoadData(@"MapColors\adjacent_states.col");
+            var data = LoadData(@"Data\adjacent_states.col");
             var rules = data.Item1;
             Assert.AreEqual(107, rules.Count);
             var states = data.Item2;
@@ -76,7 +76,7 @@ namespace GeneticAlgorithms.MapColors
         [TestMethod]
         public void LoadDataR100_1gbTest()
         {
-            var data = LoadData(@"MapColors\R100_1gb.col");
+            var data = LoadData(@"Data\R100_1gb.col");
             var rules = data.Item1;
             Assert.AreEqual(509, rules.Count);
             var states = data.Item2;
@@ -138,13 +138,13 @@ namespace GeneticAlgorithms.MapColors
         [TestMethod]
         public void StateTests()
         {
-            Color(@"MapColors\adjacent_states.col", new[] {"Orange", "Yellow", "Green", "Blue"});
+            Color(@"Data\adjacent_states.col", new[] {"Orange", "Yellow", "Green", "Blue"});
         }
 
         [TestMethod]
         public void R100_1gbTest()
         {
-            Color(@"MapColors\R100_1gb.col", new[] {"Red", "Orange", "Yellow", "Green", "Blue", "Indigo"});
+            Color(@"Data\R100_1gb.col", new[] {"Red", "Orange", "Yellow", "Green", "Blue", "Indigo"});
         }
 
         [TestMethod]

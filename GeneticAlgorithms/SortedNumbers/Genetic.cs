@@ -1,4 +1,4 @@
-﻿/* File: Chromosome.cs
+﻿/* File: Genetic.cs
  *     from chapter 3 of _Genetic Algorithms with Python_
  *     writen by Clinton Sheppard
  *

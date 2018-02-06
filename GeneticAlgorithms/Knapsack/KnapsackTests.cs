@@ -1,4 +1,4 @@
-﻿/* File: Benchmark.cs
+﻿/* File: KnapsackTests.cs
  *     from chapter 9 of _Genetic Algorithms with Python_
  *     writen by Clinton Sheppard
  *

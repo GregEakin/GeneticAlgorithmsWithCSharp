@@ -1,5 +1,5 @@
-﻿/* File: ItemQuantity.cs
- *     from chapter 9 of _Genetic Algorithms with Python_
+﻿/* File: Pair.cs
+ *     from chapter 12 of _Genetic Algorithms with Python_
  *     writen by Clinton Sheppard
  *
  * Author: Greg Eakin <gregory.eakin@gmail.com>
@@ -17,17 +17,25 @@
  * permissions and limitations under the License.
  */
 
-namespace GeneticAlgorithms.Knapsack
+namespace GeneticAlgorithms.TravelingSalesmanProblem
 {
-    public class ItemQuantity
+    public class Pair
     {
-        public Resource Item { get; }
-        public int Quantity { get; }
+        public int Node { get; }
 
-        public ItemQuantity(Resource item, int quantity)
+        public int Adjacent { get; }
+
+        public Pair(int node, int adjacent)
         {
-            Item = item;
-            Quantity = quantity;
+            if (node < adjacent)
+            {
+                var temp = node;
+                node = adjacent;
+                adjacent = temp;
+            }
+
+            Node = node;
+            Adjacent = adjacent;
         }
 
         public override bool Equals(object obj)
@@ -36,8 +44,8 @@ namespace GeneticAlgorithms.Knapsack
             {
                 case null:
                     return false;
-                case ItemQuantity that:
-                    return Item == that.Item && Quantity == that.Quantity;
+                case Pair that:
+                    return Node == that.Node && Adjacent == that.Adjacent;
                 default:
                     return false;
             }
@@ -45,7 +53,7 @@ namespace GeneticAlgorithms.Knapsack
 
         public override int GetHashCode()
         {
-            return Item.GetHashCode() * 397 ^ Quantity;
+            return Node.GetHashCode() * 397 ^ Adjacent.GetHashCode();
         }
     }
 }

@@ -1,5 +1,5 @@
-﻿/* File: Benchmark.cs
- *     from chapter f of _Genetic Algorithms with Python_
+﻿/* File: QueenTests.cs
+ *     from chapter 4 of _Genetic Algorithms with Python_
  *     writen by Clinton Sheppard
  *
  * Author: Greg Eakin <gregory.eakin@gmail.com>
