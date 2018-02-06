@@ -48,6 +48,7 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ApproximatingPi\Benchmark.cs" />
     <Compile Include="ApproximatingPi\Chromosome.cs" />
     <Compile Include="ApproximatingPi\Genetic.cs" />
     <Compile Include="ApproximatingPi\PiTests.cs" />

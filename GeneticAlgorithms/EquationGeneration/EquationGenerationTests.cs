@@ -190,11 +190,11 @@ namespace GeneticAlgorithms.EquationGeneration
             int FnGetFitness(string[] genes) => Fitness(genes, expectedTotal, FnEvaluate);
             string[] FnCreate() => Create(numbers, operations, minNumbers, maxNumbers);
 
-            string[] FnMutate(string[] genes) =>
+            void FnMutate(string[] genes) =>
                 Mutate(genes, numbers, operations, minNumbers, maxNumbers, FnGetFitness);
 
             var optimalFitness = FnGetFitness(optimalLengthSolution);
-            var best = genetic.BestFitness(FnGetFitness, 0, optimalFitness, null, FnDisplay, FnMutate, FnCreate, 50);
+            var best = genetic.GetBest(FnGetFitness, 0, optimalFitness, null, FnDisplay, FnMutate, FnCreate, 50);
             Assert.IsTrue(optimalFitness.CompareTo(best.Fitness) <= 0);
         }
     }

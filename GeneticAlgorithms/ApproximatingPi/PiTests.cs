@@ -1,7 +1,27 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿/* File: PiTest.cs
+ *     from chapter 13 of _Genetic Algorithms with Python_
+ *     writen by Clinton Sheppard
+ *
+ * Author: Greg Eakin <gregory.eakin@gmail.com>
+ * Copyright (c) 2018 Greg Eakin
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+ * implied.  See the License for the specific language governing
+ * permissions and limitations under the License.
+ */
+
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 
 namespace GeneticAlgorithms.ApproximatingPi
@@ -11,7 +31,7 @@ namespace GeneticAlgorithms.ApproximatingPi
     {
         private static readonly Random Random = new Random();
 
-        public static double Fitness(bool[] genes, int[] bitValues)
+        private static double GetFitness(bool[] genes, int[] bitValues)
         {
             var denominator = GetDenominator(genes, bitValues);
             if (denominator == 0)
@@ -21,74 +41,145 @@ namespace GeneticAlgorithms.ApproximatingPi
             return Math.PI - Math.Abs(Math.PI - ratio);
         }
 
-        public static void Display(Chromosome<bool, double> candidate, Stopwatch watch, int[] bitValues, bool display)
+        [TestMethod]
+        public void GetFitnessTest()
         {
-            if (!display) return;
+            // 355 / 113
+            var genes = new[]
+            {
+                false, true, false, true, true, false, false, false, true, false,
+                false, false, false, true, true, true, false, false, false, true,
+            };
+            var bitValues = new[] {512, 256, 128, 64, 32, 16, 8, 4, 2, 1};
+            var fitness = GetFitness(genes, bitValues);
+            Assert.AreEqual(3.1415923868256, fitness, 0.00000001);
+        }
 
+        private static void Display(Chromosome<bool, double> candidate, Stopwatch watch, int[] bitValues)
+        {
             var numerator = GetNumerator(candidate.Genes, bitValues);
             var denominator = GetDenominator(candidate.Genes, bitValues);
             Console.WriteLine("{0}/{1}\t{2}\t{3} ms", numerator, denominator, candidate.Fitness,
                 watch.ElapsedMilliseconds);
         }
 
-        public static int BitsToInt(IEnumerable<bool> bits, IEnumerable<int> bitValues)
+        [TestMethod]
+        public void DisplayTest()
         {
-            return bits.Zip(bitValues, (b, v) => new { Bit = b, Value = v }).Where(bv => bv.Bit).Sum(bv => bv.Value);
+            var genes = new[]
+            {
+                false, true, false, true, true, false, false, false, true, false,
+                false, false, false, true, true, true, false, false, false, true,
+            };
+            var bitValues = new[] {512, 256, 128, 64, 32, 16, 8, 4, 2, 1};
+            var candidate =
+                new Chromosome<bool, double>(genes, 3.1415923868256, Chromosome<bool, double>.Strategies.Create);
+            var watch = Stopwatch.StartNew();
+            Display(candidate, watch, bitValues);
         }
 
-        public static int GetNumerator(IEnumerable<bool> genes, int[] bitValues) =>
+        private static int BitsToInt(IEnumerable<bool> bits, IEnumerable<int> bitValues)
+        {
+            return bits.Zip(bitValues, (b, v) => new {Bit = b, Value = v}).Where(bv => bv.Bit).Sum(bv => bv.Value);
+        }
+
+        [TestMethod]
+        public void BitsToIntTest()
+        {
+            var bits = new[]
+            {
+                true, true, false, false
+            };
+            var bitValues = new[] {8, 4, 2, 1};
+            var value = BitsToInt(bits, bitValues);
+            Assert.AreEqual(0x0C, value);
+        }
+
+        private static int GetNumerator(IEnumerable<bool> genes, int[] bitValues) =>
             1 + BitsToInt(genes.Take(bitValues.Length), bitValues);
 
-        public static int GetDenominator(IEnumerable<bool> genes, int[] bitValues) =>
+        [TestMethod]
+        public void GetNumeratorTest()
+        {
+            var bits = new[]
+            {
+                true, true, false, false,
+                false, false, false, false
+            };
+            var bitValues = new[] {8, 4, 2, 1};
+            var value = GetNumerator(bits, bitValues);
+            Assert.AreEqual(0x0D, value);
+        }
+
+        private static int GetDenominator(IEnumerable<bool> genes, int[] bitValues) =>
             BitsToInt(genes.Skip(bitValues.Length), bitValues);
 
-        public static bool[] Mutate(bool[] input, int numBits)
+        [TestMethod]
+        public void GetDenominatorTest()
         {
-            var genes = input.ToArray();
+            var bits = new[]
+            {
+                false, false, false, false,
+                true, true, false, false
+            };
+            var bitValues = new[] {8, 4, 2, 1};
+            var value = GetDenominator(bits, bitValues);
+            Assert.AreEqual(0x0C, value);
+        }
+
+        private static void Mutate(bool[] genes, int numBits)
+        {
             var numeratorIndex = Random.Next(0, numBits);
             var denominatorIndex = Random.Next(numBits, genes.Length);
             genes[numeratorIndex] = !genes[numeratorIndex];
             genes[denominatorIndex] = !genes[denominatorIndex];
-            return genes;
         }
 
-        public bool ApproximatePi(int[] bitValues, int maxSeconds, bool display = true)
+        [TestMethod]
+        public void MutateTest()
         {
+            var bits = new[]
+            {
+                false, false, false, false,
+                true, true, false, false
+            };
+            var save = bits.ToArray();
+            Mutate(bits, bits.Length / 2);
+            CollectionAssert.AreNotEqual(save, bits);
+        }
+
+        private static bool ApproximatePi(int[] bitValues = null, int maxSeconds = 0)
+        {
+            if (bitValues == null)
+                bitValues = new[] {512, 256, 128, 64, 32, 16, 8, 4, 2, 1};
+
             var genetic = new Genetic<bool, double>();
             var geneSet = new[] {false, true};
             var watch = Stopwatch.StartNew();
-            var optimalFitness = 3.14159; // Math.PI;
 
-            void FnDispaly(Chromosome<bool, double> candidate) => Display(candidate, watch, bitValues, display);
-            double FnFitness(bool[] genes) => Fitness(genes, bitValues);
-            bool[] FnMutate(bool[] genes) => Mutate(genes, bitValues.Length);
+            void FnDispaly(Chromosome<bool, double> candidate) =>
+                Display(candidate, watch, bitValues);
+
+            double FnGetFitness(bool[] genes) =>
+                GetFitness(genes, bitValues);
+
+            var optimalFitness = Math.Round(355.0 / 113.0, 5);  // = 3.14159;
+
+            void FnMutate(bool[] genes) =>
+                Mutate(genes, bitValues.Length);
 
             var length = 2 * bitValues.Length;
-            var best = genetic.BestFitness(FnFitness, length, optimalFitness, geneSet, FnDispaly, FnMutate, null, 250,
+            var best = genetic.GetBest(FnGetFitness, length, optimalFitness, geneSet, FnDispaly, FnMutate, null, 250,
                 1, null, maxSeconds);
 
             return best.Fitness >= optimalFitness;
         }
 
         [TestMethod]
-        public void ApproximatePiTest()
+        public void OptimizeTest()
         {
-            var found = ApproximatePi(new[] {512, 256, 128, 64, 32, 16, 8, 4, 2, 1}, 5);
-            Assert.IsTrue(found);
-        }
-
-        [TestMethod]
-        public void FastPiSearch()
-        {
-            var found = ApproximatePi(new[] {211, 84, 134, 193, 142, 159, 274, 209, 161, 33}, 5);
-            Assert.IsTrue(found);
-        }
-
-        [TestMethod]
-        public void OptimizePi()
-        {
-            var genetic = new Genetic<int, double>();
-            var geneSet = Enumerable.Range(1, 514).ToArray();
+            var generic = new Genetic<int, double>();
+            var geneSet = Enumerable.Range(1, 512).ToArray();
             var length = 10;
             var maxSeconds = 2;
 
@@ -96,12 +187,15 @@ namespace GeneticAlgorithms.ApproximatingPi
             {
                 var watch = Stopwatch.StartNew();
                 var count = 0.0;
+                var stdout = Console.Out;
+                Console.SetOut(TextWriter.Null);
                 while (watch.Elapsed.Seconds < maxSeconds)
                 {
-                    var found = ApproximatePi(genes, maxSeconds, false);
-                    if (found) count++;
+                    var found = ApproximatePi(genes, maxSeconds);
+                    if (found) count += 1.0;
                 }
 
+                Console.SetOut(stdout);
                 var distance = Math.Abs(genes.Sum() - 1023);
                 var fraction = distance > 0 ? 1.0 / distance : distance;
                 count += Math.Round(fraction, 4);
@@ -112,10 +206,20 @@ namespace GeneticAlgorithms.ApproximatingPi
                 string.Join(", ", chromosome.Genes), chromosome.Fitness);
 
             var initial = new[] {512, 256, 128, 64, 32, 16, 8, 4, 2, 1};
-            Console.WriteLine("initial: {0}, {1}", string.Join(", ", initial), FnGetFitness(initial));
+            Console.WriteLine("initial: {0} {1}", initial, FnGetFitness(initial));
 
             var optimalFitness = 10 * maxSeconds;
-            genetic.BestFitness(FnGetFitness, length, optimalFitness, geneSet, FnDisplay, null, null, 0, 1, null, 600);
+            var unused = generic.GetBest(FnGetFitness, length, optimalFitness, geneSet, FnDisplay, null, null, 0, 1,
+                null, 600);
+        }
+
+        [TestMethod]
+        public void BenchmarkTest()
+        {
+            Benchmark.Run(() => ApproximatePi(new[]
+            {
+                98, 334, 38, 339, 117, 39, 145, 123, 40, 129
+            }));
         }
 
         [TestMethod]
@@ -125,8 +229,8 @@ namespace GeneticAlgorithms.ApproximatingPi
             var watch = Stopwatch.StartNew();
 
             var best = new Dictionary<double, Tuple<int, int>>();
-            for (var numerator = 1; numerator < (1 << 10) + 1; numerator++)
-            for (var denominator = 1; denominator < (1 << 10) + 1; denominator++)
+            for (var numerator = 1; numerator < 1 << 10; numerator++)
+            for (var denominator = 1; denominator < 1 << 10; denominator++)
             {
                 var ratio = (double) numerator / denominator;
                 var piDist = Math.PI - Math.Abs(Math.PI - ratio);
@@ -142,6 +246,20 @@ namespace GeneticAlgorithms.ApproximatingPi
             }
 
             Console.WriteLine("Found best Pi {0}, in {1} ms.", Math.PI, watch.ElapsedMilliseconds);
+        }
+
+        [TestMethod]
+        public void ApproximatePiTest()
+        {
+            var found = ApproximatePi(new[] { 512, 256, 128, 64, 32, 16, 8, 4, 2, 1 }, 5);
+            Assert.IsTrue(found);
+        }
+
+        [TestMethod]
+        public void FastPiSearch()
+        {
+            var found = ApproximatePi(new[] { 211, 84, 134, 193, 142, 159, 274, 209, 161, 33 }, 5);
+            Assert.IsTrue(found);
         }
     }
 }

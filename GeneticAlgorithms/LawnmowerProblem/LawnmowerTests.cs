@@ -300,11 +300,11 @@ namespace GeneticAlgorithms.LawnmowerProblem
 
             void FnDisplay(Chromosome<INode, Fitness> candidate) => Display(candidate, watch, FnEvaluate);
 
-            INode[] FnMutate(INode[] child) => Mutate(child, geneSet, minGenes, maxGenes, FnFitness, maxMutationRounds);
+            void FnMutate(INode[] child) => Mutate(child, geneSet, minGenes, maxGenes, FnFitness, maxMutationRounds);
 
             var optimalFitness = new Fitness(width * height, expectedNumberOfInstructions, expectedNumberOfSteps);
 
-            var best = genetic.BestFitness(FnFitness, 0, optimalFitness, null, FnDisplay, FnMutate, FnCreate, 0, 10,
+            var best = genetic.GetBest(FnFitness, 0, optimalFitness, null, FnDisplay, FnMutate, FnCreate, 0, 10,
                 Crossover, 30);
 
             Assert.IsTrue(best.Fitness.CompareTo(optimalFitness) <= 0);
