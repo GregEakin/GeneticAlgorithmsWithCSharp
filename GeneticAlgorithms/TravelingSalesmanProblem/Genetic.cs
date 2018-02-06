@@ -111,7 +111,7 @@ namespace GeneticAlgorithms.TravelingSalesmanProblem
                 return mutate(parents[index]);
             }
 
-            var fitness = getFitness(parentGenes);
+            var fitness = getFitness(childGenes);
             return new Chromosome<TGene, TFitness>(childGenes, fitness,
                 Chromosome<TGene, TFitness>.Strategies.Crossover);
         }
@@ -229,8 +229,9 @@ namespace GeneticAlgorithms.TravelingSalesmanProblem
                     continue;
                 }
 
-                if (parent.Fitness.CompareTo(child.Fitness) >= 0)
+                if (child.Fitness.CompareTo(parent.Fitness) <= 0)
                 {
+                    // same fitness
                     child.Age = parent.Age + 1;
                     parents[pIndex] = child;
                     continue;
