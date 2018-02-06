@@ -35,23 +35,23 @@ namespace GeneticAlgorithms.ApproximatingPi
             }
         }
 
-        public delegate TFitness GetFitnessDelegate(TGene[] gene);
+        public delegate TFitness GetFitnessDelegate(List<TGene> gene);
 
         public delegate void DisplayDelegate(Chromosome<TGene, TFitness> child);
 
-        public delegate void MutateGeneDelegate(TGene[] genes);
+        public delegate void MutateGeneDelegate(List<TGene> genes);
 
         public delegate Chromosome<TGene, TFitness> MutateChromosomeDelegate(Chromosome<TGene, TFitness> parent);
 
         public delegate Chromosome<TGene, TFitness> GenerateParentDelegate();
 
-        public delegate TGene[] CreateDelegate();
+        public delegate List<TGene> CreateDelegate();
 
-        public delegate TGene[] CrossoverFun(TGene[] genes1, TGene[] genes2);
+        public delegate List<TGene> CrossoverFun(List<TGene> genes1, List<TGene> genes2);
 
         private readonly Random _random = new Random();
 
-        private TGene[] RandomSample(TGene[] geneSet, int length)
+        private List<TGene> RandomSample(TGene[] geneSet, int length)
         {
             var genes = new List<TGene>(length);
             while (genes.Count < length)
@@ -61,7 +61,7 @@ namespace GeneticAlgorithms.ApproximatingPi
                 genes.AddRange(array);
             }
 
-            return genes.ToArray();
+            return genes;
         }
 
         private Chromosome<TGene, TFitness> GenerateParent(int length, TGene[] geneSet,
@@ -77,8 +77,8 @@ namespace GeneticAlgorithms.ApproximatingPi
         private Chromosome<TGene, TFitness> Mutate(Chromosome<TGene, TFitness> parent, TGene[] geneSet,
             GetFitnessDelegate getFitness)
         {
-            var childGenes = parent.Genes.ToArray();
-            var index = _random.Next(childGenes.Length);
+            var childGenes = parent.Genes.ToList();
+            var index = _random.Next(childGenes.Count);
             var randomSample = RandomSample(geneSet, 2);
             var newGene = randomSample[0];
             var alternate = randomSample[1];
@@ -90,13 +90,13 @@ namespace GeneticAlgorithms.ApproximatingPi
         private Chromosome<TGene, TFitness> MutateCustom(Chromosome<TGene, TFitness> parent,
             MutateGeneDelegate customMutate, GetFitnessDelegate getFitness)
         {
-            var childGenes = parent.Genes.ToArray();
+            var childGenes = parent.Genes.ToList();
             customMutate(childGenes);
             var fitness = getFitness(childGenes);
             return new Chromosome<TGene, TFitness>(childGenes, fitness, Chromosome<TGene, TFitness>.Strategies.Mutate);
         }
 
-        private Chromosome<TGene, TFitness> Crossover(TGene[] parentGenes, int index,
+        private Chromosome<TGene, TFitness> Crossover(List<TGene> parentGenes, int index,
             List<Chromosome<TGene, TFitness>> parents,
             GetFitnessDelegate getFitness, CrossoverFun crossover, MutateChromosomeDelegate mutate,
             GenerateParentDelegate generateParent)
@@ -119,8 +119,8 @@ namespace GeneticAlgorithms.ApproximatingPi
 
         internal Chromosome<TGene, TFitness> GetBest(GetFitnessDelegate getFitness, int targetLen,
             TFitness optimalFitness, TGene[] geneSet, DisplayDelegate display, MutateGeneDelegate customMutate = null,
-            CreateDelegate customCreate = null,
-            int maxAge = 0, int poolSize = 1, CrossoverFun crossover = null, int maxSeconds = 0)
+            CreateDelegate customCreate = null, int maxAge = 0, int poolSize = 1, CrossoverFun crossover = null,
+            int maxSeconds = 0)
         {
             Chromosome<TGene, TFitness> FnMutate(Chromosome<TGene, TFitness> parent) =>
                 customMutate == null

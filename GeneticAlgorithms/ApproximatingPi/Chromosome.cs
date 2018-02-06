@@ -17,6 +17,8 @@
  * permissions and limitations under the License.
  */
 
+using System.Collections.Generic;
+
 namespace GeneticAlgorithms.ApproximatingPi
 {
     public class Chromosome<TGene, TFitness>
@@ -28,7 +30,7 @@ namespace GeneticAlgorithms.ApproximatingPi
             Crossover = 2
         }
 
-        public TGene[] Genes { get; }
+        public List<TGene> Genes { get; }
 
         public TFitness Fitness { get; }
 
@@ -36,7 +38,7 @@ namespace GeneticAlgorithms.ApproximatingPi
 
         public int Age { get; set; }
 
-        public Chromosome(TGene[] genes, TFitness fitness, Strategies strategy)
+        public Chromosome(List<TGene> genes, TFitness fitness, Strategies strategy)
         {
             Genes = genes;
             Fitness = fitness;

@@ -154,7 +154,7 @@ namespace GeneticAlgorithms.LawnmowerProblem
         public INode[] Main { get; }
         public Func[] Funcs { get; }
 
-        public Program(INode[] genes)
+        public Program(List<INode> genes)
         {
             var temp = new List<INode>(genes);
             var funcs = new List<Func>();

@@ -12,16 +12,16 @@ namespace GeneticAlgorithms.LawnmowerProblem
     {
         private static readonly Random Random = new Random();
 
-        public delegate Tuple<Field, Mower, Program> FnEvaluateDelegate(INode[] genes);
+        public delegate Tuple<Field, Mower, Program> FnEvaluateDelegate(List<INode> genes);
 
-        public delegate Fitness FnFitnessDelegate(INode[] genes);
+        public delegate Fitness FnFitnessDelegate(List<INode> genes);
 
         public delegate Field CreateFieldFun();
 
-        public static Fitness Fitness(INode[] genes, FnEvaluateDelegate fnEvaluate)
+        public static Fitness Fitness(List<INode> genes, FnEvaluateDelegate fnEvaluate)
         {
             var tuple = fnEvaluate(genes);
-            return new Fitness(tuple.Item1.CountMowed(), genes.Length, tuple.Item2.StepCount);
+            return new Fitness(tuple.Item1.CountMowed(), genes.Count, tuple.Item2.StepCount);
         }
 
         public static void Display(Chromosome<INode, Fitness> candidate, Stopwatch watch, FnEvaluateDelegate fnEvaluate)
@@ -33,17 +33,16 @@ namespace GeneticAlgorithms.LawnmowerProblem
             Console.WriteLine();
         }
 
-        public static INode[] Mutate(INode[] input, Func<INode>[] geneSet, int minGenes, int maxGenes,
+        public static List<INode> Mutate(List<INode> genes, Func<INode>[] geneSet, int minGenes, int maxGenes,
             FnFitnessDelegate fnFitness, int maxRounds)
         {
-            var genes = new List<INode>(input);
             var count = Random.Next(1, maxRounds + 1);
-            var initialFitness = fnFitness(input);
+            var initialFitness = fnFitness(genes);
             while (count-- > 0)
             {
-                var fitness = fnFitness(genes.ToArray());
+                var fitness = fnFitness(genes);
                 if (fitness.CompareTo(initialFitness) > 0)
-                    return genes.ToArray();
+                    return genes;
 
                 var adding = genes.Count == 0 || genes.Count <= maxGenes && Random.Next(0, 6) == 0;
                 if (adding)
@@ -63,41 +62,41 @@ namespace GeneticAlgorithms.LawnmowerProblem
                 genes[index] = geneSet[Random.Next(geneSet.Length)]();
             }
 
-            return genes.ToArray();
+            return genes;
         }
 
-        public static INode[] Create(Func<INode>[] geneSet, int minGenes, int maxGenes)
+        public static List<INode> Create(Func<INode>[] geneSet, int minGenes, int maxGenes)
         {
             var numGenes = Random.Next(minGenes, maxGenes + 1);
-            var genes = new INode[numGenes];
+            var genes = new List<INode>(numGenes);
             for (var i = 0; i < numGenes; i++)
                 genes[i] = geneSet[Random.Next(geneSet.Length)]();
             return genes;
         }
 
-        public static INode[] Crossover(INode[] mother, INode[] father)
+        public static List<INode> Crossover(List<INode> mother, List<INode> father)
         {
-            if (mother.Length <= 2)
+            if (mother.Count <= 2)
                 return mother;
-            var length = Random.Next(1, mother.Length - 1);
-            var start = Random.Next(0, mother.Length - length + 1);
-            if (father.Length < start + length)
+            var length = Random.Next(1, mother.Count - 1);
+            var start = Random.Next(0, mother.Count - length + 1);
+            if (father.Count < start + length)
                 return mother;
 
-            var child = new INode[mother.Length];
-            Array.Copy(mother, child, start);
-            Array.Copy(father, start, child, start, length);
-            Array.Copy(mother, start + length, child, start + length, mother.Length - start - length);
+            var child = mother.Take(start)
+                .Concat(father.Skip(start).Take(length))
+                .Concat(mother.Skip(start + length).Take(mother.Count - start - length))
+                .ToList();
             return child;
         }
 
         [TestMethod]
         public void MutateTest()
         {
-            var parent = new INode[] {new Mow(), new Mow(), new Mow(), new Mow(),};
+            var parent = new List<INode> {new Mow(), new Mow(), new Mow(), new Mow()};
             var geneSet = new Func<INode>[] {() => new Turn()};
 
-            Tuple<Field, Mower, Program> FnEvaluate(INode[] instructions)
+            Tuple<Field, Mower, Program> FnEvaluate(List<INode> instructions)
             {
                 var field = new ToroidField(10, 10, FieldContents.Grass);
                 var location = new Location(5, 5);
@@ -109,7 +108,7 @@ namespace GeneticAlgorithms.LawnmowerProblem
                 return new Tuple<Field, Mower, Program>(field, mower, program);
             }
 
-            Fitness FnFitness(INode[] genes) => Fitness(genes, FnEvaluate);
+            Fitness FnFitness(List<INode> genes) => Fitness(genes, FnEvaluate);
 
             var child = Mutate(parent, geneSet, 2, 5, FnFitness, 1);
             Assert.IsTrue(child.Any(c => c.GetType() == typeof(Mow)));
@@ -121,17 +120,17 @@ namespace GeneticAlgorithms.LawnmowerProblem
         {
             var geneSet = new Func<INode>[] {() => new Mow(), () => new Turn()};
             var child = Create(geneSet, 2, 5);
-            Assert.IsTrue(child.Length >= 2);
-            Assert.IsTrue(child.Length <= 5);
+            Assert.IsTrue(child.Count >= 2);
+            Assert.IsTrue(child.Count <= 5);
         }
 
         [TestMethod]
         public void CrossoverTest()
         {
-            var mother = new INode[] {new Mow(), new Mow(), new Mow(),};
-            var father = new INode[] {new Turn(), new Turn(), new Turn(), new Turn(),};
+            var mother = new List<INode> {new Mow(), new Mow(), new Mow(),};
+            var father = new List<INode> {new Turn(), new Turn(), new Turn(), new Turn(),};
             var child = Crossover(mother, father);
-            Assert.AreEqual(mother.Length, child.Length);
+            Assert.AreEqual(mother.Count, child.Count);
             Assert.AreEqual(1, child.Count(c => c.GetType() == typeof(Turn)));
         }
 
@@ -282,9 +281,9 @@ namespace GeneticAlgorithms.LawnmowerProblem
             var mowerStartLocation = new Location(width / 2, height / 2);
             var mowerStartDirection = Directions.South;
 
-            INode[] FnCreate() => Create(geneSet, 1, height);
+            List<INode> FnCreate() => Create(geneSet, 1, height);
 
-            Tuple<Field, Mower, Program> FnEvaluate(INode[] instructions)
+            Tuple<Field, Mower, Program> FnEvaluate(List<INode> instructions)
             {
                 var program = new Program(instructions);
                 var mower = new Mower(mowerStartLocation, mowerStartDirection);
@@ -294,13 +293,14 @@ namespace GeneticAlgorithms.LawnmowerProblem
                 return new Tuple<Field, Mower, Program>(field, mower, program);
             }
 
-            Fitness FnFitness(INode[] genes) => Fitness(genes, FnEvaluate);
+            Fitness FnFitness(List<INode> genes) => Fitness(genes, FnEvaluate);
 
             var watch = Stopwatch.StartNew();
 
             void FnDisplay(Chromosome<INode, Fitness> candidate) => Display(candidate, watch, FnEvaluate);
 
-            void FnMutate(INode[] child) => Mutate(child, geneSet, minGenes, maxGenes, FnFitness, maxMutationRounds);
+            void FnMutate(List<INode> child) =>
+                Mutate(child, geneSet, minGenes, maxGenes, FnFitness, maxMutationRounds);
 
             var optimalFitness = new Fitness(width * height, expectedNumberOfInstructions, expectedNumberOfSteps);
 

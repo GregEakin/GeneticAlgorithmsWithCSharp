@@ -31,7 +31,7 @@ namespace GeneticAlgorithms.ApproximatingPi
     {
         private static readonly Random Random = new Random();
 
-        private static double GetFitness(bool[] genes, int[] bitValues)
+        private static double GetFitness(List<bool> genes, List<int> bitValues)
         {
             var denominator = GetDenominator(genes, bitValues);
             if (denominator == 0)
@@ -45,17 +45,17 @@ namespace GeneticAlgorithms.ApproximatingPi
         public void GetFitnessTest()
         {
             // 355 / 113
-            var genes = new[]
+            var genes = new List<bool>
             {
                 false, true, false, true, true, false, false, false, true, false,
                 false, false, false, true, true, true, false, false, false, true,
             };
-            var bitValues = new[] {512, 256, 128, 64, 32, 16, 8, 4, 2, 1};
+            var bitValues = new List<int> {512, 256, 128, 64, 32, 16, 8, 4, 2, 1};
             var fitness = GetFitness(genes, bitValues);
             Assert.AreEqual(3.1415923868256, fitness, 0.00000001);
         }
 
-        private static void Display(Chromosome<bool, double> candidate, Stopwatch watch, int[] bitValues)
+        private static void Display(Chromosome<bool, double> candidate, Stopwatch watch, List<int> bitValues)
         {
             var numerator = GetNumerator(candidate.Genes, bitValues);
             var denominator = GetDenominator(candidate.Genes, bitValues);
@@ -66,12 +66,12 @@ namespace GeneticAlgorithms.ApproximatingPi
         [TestMethod]
         public void DisplayTest()
         {
-            var genes = new[]
+            var genes = new List<bool>
             {
                 false, true, false, true, true, false, false, false, true, false,
                 false, false, false, true, true, true, false, false, false, true,
             };
-            var bitValues = new[] {512, 256, 128, 64, 32, 16, 8, 4, 2, 1};
+            var bitValues = new List<int> {512, 256, 128, 64, 32, 16, 8, 4, 2, 1};
             var candidate =
                 new Chromosome<bool, double>(genes, 3.1415923868256, Chromosome<bool, double>.Strategies.Create);
             var watch = Stopwatch.StartNew();
@@ -95,42 +95,42 @@ namespace GeneticAlgorithms.ApproximatingPi
             Assert.AreEqual(0x0C, value);
         }
 
-        private static int GetNumerator(IEnumerable<bool> genes, int[] bitValues) =>
-            1 + BitsToInt(genes.Take(bitValues.Length), bitValues);
+        private static int GetNumerator(IEnumerable<bool> genes, List<int> bitValues) =>
+            1 + BitsToInt(genes.Take(bitValues.Count), bitValues);
 
         [TestMethod]
         public void GetNumeratorTest()
         {
-            var bits = new[]
+            var bits = new List<bool>
             {
                 true, true, false, false,
                 false, false, false, false
             };
-            var bitValues = new[] {8, 4, 2, 1};
+            var bitValues = new List<int> {8, 4, 2, 1};
             var value = GetNumerator(bits, bitValues);
             Assert.AreEqual(0x0D, value);
         }
 
-        private static int GetDenominator(IEnumerable<bool> genes, int[] bitValues) =>
-            BitsToInt(genes.Skip(bitValues.Length), bitValues);
+        private static int GetDenominator(IEnumerable<bool> genes, List<int> bitValues) =>
+            BitsToInt(genes.Skip(bitValues.Count), bitValues);
 
         [TestMethod]
         public void GetDenominatorTest()
         {
-            var bits = new[]
+            var bits = new List<bool>
             {
                 false, false, false, false,
                 true, true, false, false
             };
-            var bitValues = new[] {8, 4, 2, 1};
+            var bitValues = new List<int> {8, 4, 2, 1};
             var value = GetDenominator(bits, bitValues);
             Assert.AreEqual(0x0C, value);
         }
 
-        private static void Mutate(bool[] genes, int numBits)
+        private static void Mutate(List<bool> genes, int numBits)
         {
             var numeratorIndex = Random.Next(0, numBits);
-            var denominatorIndex = Random.Next(numBits, genes.Length);
+            var denominatorIndex = Random.Next(numBits, genes.Count);
             genes[numeratorIndex] = !genes[numeratorIndex];
             genes[denominatorIndex] = !genes[denominatorIndex];
         }
@@ -138,20 +138,20 @@ namespace GeneticAlgorithms.ApproximatingPi
         [TestMethod]
         public void MutateTest()
         {
-            var bits = new[]
+            var bits = new List<bool>
             {
                 false, false, false, false,
                 true, true, false, false
             };
             var save = bits.ToArray();
-            Mutate(bits, bits.Length / 2);
+            Mutate(bits, bits.Count / 2);
             CollectionAssert.AreNotEqual(save, bits);
         }
 
-        private static bool ApproximatePi(int[] bitValues = null, int maxSeconds = 0)
+        private static bool ApproximatePi(List<int> bitValues = null, int maxSeconds = 0)
         {
             if (bitValues == null)
-                bitValues = new[] {512, 256, 128, 64, 32, 16, 8, 4, 2, 1};
+                bitValues = new List<int> {512, 256, 128, 64, 32, 16, 8, 4, 2, 1};
 
             var genetic = new Genetic<bool, double>();
             var geneSet = new[] {false, true};
@@ -160,15 +160,15 @@ namespace GeneticAlgorithms.ApproximatingPi
             void FnDispaly(Chromosome<bool, double> candidate) =>
                 Display(candidate, watch, bitValues);
 
-            double FnGetFitness(bool[] genes) =>
+            double FnGetFitness(List<bool> genes) =>
                 GetFitness(genes, bitValues);
 
-            var optimalFitness = Math.Round(355.0 / 113.0, 5);  // = 3.14159;
+            var optimalFitness = Math.Round(355.0 / 113.0, 5); // = 3.14159;
 
-            void FnMutate(bool[] genes) =>
-                Mutate(genes, bitValues.Length);
+            void FnMutate(List<bool> genes) =>
+                Mutate(genes, bitValues.Count);
 
-            var length = 2 * bitValues.Length;
+            var length = 2 * bitValues.Count;
             var best = genetic.GetBest(FnGetFitness, length, optimalFitness, geneSet, FnDispaly, FnMutate, null, 250,
                 1, null, maxSeconds);
 
@@ -183,7 +183,7 @@ namespace GeneticAlgorithms.ApproximatingPi
             var length = 10;
             var maxSeconds = 2;
 
-            double FnGetFitness(int[] genes)
+            double FnGetFitness(List<int> genes)
             {
                 var watch = Stopwatch.StartNew();
                 var count = 0.0;
@@ -205,7 +205,7 @@ namespace GeneticAlgorithms.ApproximatingPi
             void FnDisplay(Chromosome<int, double> chromosome) => Console.WriteLine("{0}\t{1}",
                 string.Join(", ", chromosome.Genes), chromosome.Fitness);
 
-            var initial = new[] {512, 256, 128, 64, 32, 16, 8, 4, 2, 1};
+            var initial = new List<int> {512, 256, 128, 64, 32, 16, 8, 4, 2, 1};
             Console.WriteLine("initial: {0} {1}", initial, FnGetFitness(initial));
 
             var optimalFitness = 10 * maxSeconds;
@@ -216,7 +216,7 @@ namespace GeneticAlgorithms.ApproximatingPi
         [TestMethod]
         public void BenchmarkTest()
         {
-            Benchmark.Run(() => ApproximatePi(new[]
+            Benchmark.Run(() => ApproximatePi(new List<int>
             {
                 98, 334, 38, 339, 117, 39, 145, 123, 40, 129
             }));
@@ -251,14 +251,14 @@ namespace GeneticAlgorithms.ApproximatingPi
         [TestMethod]
         public void ApproximatePiTest()
         {
-            var found = ApproximatePi(new[] { 512, 256, 128, 64, 32, 16, 8, 4, 2, 1 }, 5);
+            var found = ApproximatePi(new List<int> {512, 256, 128, 64, 32, 16, 8, 4, 2, 1}, 5);
             Assert.IsTrue(found);
         }
 
         [TestMethod]
         public void FastPiSearch()
         {
-            var found = ApproximatePi(new[] { 211, 84, 134, 193, 142, 159, 274, 209, 161, 33 }, 5);
+            var found = ApproximatePi(new List<int> {211, 84, 134, 193, 142, 159, 274, 209, 161, 33}, 5);
             Assert.IsTrue(found);
         }
     }

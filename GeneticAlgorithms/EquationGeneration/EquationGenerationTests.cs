@@ -1,4 +1,23 @@
-﻿using GeneticAlgorithms.ApproximatingPi;
+﻿/* File: EquationGenerationTests.cs
+ *     from chapter 10 of _Genetic Algorithms with Python_
+ *     writen by Clinton Sheppard
+ *
+ * Author: Greg Eakin <gregory.eakin@gmail.com>
+ * Copyright (c) 2018 Greg Eakin
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+ * implied.  See the License for the specific language governing
+ * permissions and limitations under the License.
+ */
+
+using GeneticAlgorithms.ApproximatingPi;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
@@ -12,29 +31,30 @@ namespace GeneticAlgorithms.EquationGeneration
     {
         private static readonly Random Random = new Random();
 
-        public delegate int FnEvaluateDelegate(string[] genes);
+        private delegate int FnEvaluateDelegate(List<string> genes);
 
-        public delegate int FnFitnessDelegate(string[] genes);
+        private delegate int FnFitnessDelegate(List<string> genes);
 
-        public static int Evaluate(string[] genes, Dictionary<string, Func<int, int, int>> prioritizedOperations)
+        private delegate int OperationDelegate(int lhs, int rhs);
+
+        private static int Evaluate(List<string> genes, Dictionary<string, OperationDelegate> prioritizedOperations)
         {
-            var equation = new List<string>(genes);
-
+            var equation = genes.ToList();
             foreach (var operationSet in prioritizedOperations)
             {
                 for (var i = 1; i < equation.Count; i += 2)
                 {
                     var opToken = equation[i];
-                    if (opToken == operationSet.Key)
-                    {
-                        var leftOperand = int.Parse(equation[i - 1]);
-                        var rightOperand = int.Parse(equation[i + 1]);
-                        equation[i - 1] = Convert.ToString(operationSet.Value(leftOperand, rightOperand));
+                    if (opToken != operationSet.Key)
+                        continue;
 
-                        equation.RemoveAt(i + 1);
-                        equation.RemoveAt(i);
-                        i += -2;
-                    }
+                    var leftOperand = int.Parse(equation[i - 1]);
+                    var rightOperand = int.Parse(equation[i + 1]);
+                    equation[i - 1] = Convert.ToString(operationSet.Value(leftOperand, rightOperand));
+
+                    equation.RemoveAt(i + 1);
+                    equation.RemoveAt(i);
+                    i -= 2;
                 }
             }
 
@@ -44,8 +64,8 @@ namespace GeneticAlgorithms.EquationGeneration
         [TestMethod]
         public void EvaluateTest()
         {
-            var genes = new[] {"20", "+", "2", "-", "-1"};
-            var prioritizedOperations = new Dictionary<string, Func<int, int, int>>
+            var genes = new List<string> {"20", "+", "2", "-", "-1"};
+            var prioritizedOperations = new Dictionary<string, OperationDelegate>
             {
                 {"+", Add},
                 {"-", Subratct},
@@ -54,23 +74,32 @@ namespace GeneticAlgorithms.EquationGeneration
             Assert.AreEqual(23, total);
         }
 
+        private static int Add(int a, int b) =>
+            a + b;
 
-        public int Add(int a, int b) => a + b;
+        private static int Subratct(int a, int b) =>
+            a - b;
 
-        public int Subratct(int a, int b) => a - b;
+        private static int Multiply(int a, int b) =>
+            a * b;
 
-        public int Multiply(int a, int b) => a * b;
-
-        public static int Fitness(string[] genes, int expectedTotal, FnEvaluateDelegate fnEvaluate)
+        private static int GetFitness(List<string> genes, int expectedTotal, FnEvaluateDelegate fnEvaluate)
         {
-            var result = fnEvaluate(genes);
-            var fitness = result != expectedTotal
-                ? expectedTotal - Math.Abs(result - expectedTotal)
-                : 1000 - genes.Length;
-            return fitness;
+            try
+            {
+                var result = fnEvaluate(genes);
+                var fitness = result != expectedTotal
+                    ? expectedTotal - Math.Abs(result - expectedTotal)
+                    : 1000 - genes.Count;
+                return fitness;
+            }
+            catch (OverflowException)
+            {
+                return 1000;
+            }
         }
 
-        public static void Display(Chromosome<string, int> candidate, Stopwatch watch)
+        private static void Display(Chromosome<string, int> candidate, Stopwatch watch)
         {
             Console.WriteLine("{0}\t{1}\t{2} ms",
                 string.Join(" ", candidate.Genes),
@@ -78,7 +107,7 @@ namespace GeneticAlgorithms.EquationGeneration
                 watch.ElapsedMilliseconds);
         }
 
-        public static string[] Create(string[] numbers, string[] operators, int minNumbers, int maxNumbers)
+        private static List<string> Create(List<string> numbers, string[] operators, int minNumbers, int maxNumbers)
         {
             var genes = numbers.OrderBy(n => Random.Next()).Take(1).ToList();
             var count = Random.Next(minNumbers, 1 + maxNumbers);
@@ -89,28 +118,26 @@ namespace GeneticAlgorithms.EquationGeneration
                 genes.Add(numbers.OrderBy(n => Random.Next()).First());
             }
 
-            return genes.ToArray();
+            return genes;
         }
 
-        public static string[] Mutate(string[] input, string[] numbers, string[] operations, int minNumbers,
+        private static void Mutate(List<string> genes, List<string> numbers, string[] operations, int minNumbers,
             int maxNumbers, FnFitnessDelegate fnGetFitness)
         {
-            var genes = new List<string>(input);
-
             var count = Random.Next(1, 10);
-            var initialFitness = fnGetFitness(genes.ToArray());
+            var initialFitness = fnGetFitness(genes);
             while (count > 0)
             {
                 count--;
-                if (fnGetFitness(genes.ToArray()) > initialFitness)
-                    return genes.ToArray();
+                if (fnGetFitness(genes) > initialFitness)
+                    return;
 
                 var numberCount = (1 + genes.Count) / 2;
                 var adding = numberCount < maxNumbers && Random.Next(0, 100) == 0;
                 if (adding)
                 {
                     genes.Add(operations[Random.Next(operations.Length)]);
-                    genes.Add(numbers[Random.Next(numbers.Length)]);
+                    genes.Add(numbers[Random.Next(numbers.Count)]);
                     continue;
                 }
 
@@ -126,76 +153,87 @@ namespace GeneticAlgorithms.EquationGeneration
                 var index2 = Random.Next(0, genes.Count);
                 genes[index2] = (index2 & 1) == 1
                     ? operations[Random.Next(operations.Length)]
-                    : numbers[Random.Next(numbers.Length)];
+                    : numbers[Random.Next(numbers.Count)];
             }
-
-            return genes.ToArray();
         }
 
         [TestMethod]
         public void AddTest()
         {
             var operations = new[] {"+", "-"};
-            var prioritizedOperations = new Dictionary<string, Func<int, int, int>>
+            var prioritizedOperations = new Dictionary<string, OperationDelegate>
             {
                 {"+", Add},
                 {"-", Subratct},
             };
-            var optimalLengthSolution = new[] {"7", "+", "7", "+", "7", "+", "7", "+", "7", "-", "6"};
+            var optimalLengthSolution = new List<string> {"7", "+", "7", "+", "7", "+", "7", "+", "7", "-", "6"};
             Solve(operations, prioritizedOperations, optimalLengthSolution);
         }
 
         [TestMethod]
         public void MultiplicationTest()
         {
-            var operations = new[] { "+", "-", "*" };
-            var prioritizedOperations = new Dictionary<string, Func<int, int, int>>
+            var operations = new[] {"+", "-", "*"};
+            var prioritizedOperations = new Dictionary<string, OperationDelegate>
             {
-                {"*", Multiply },
+                {"*", Multiply},
                 {"+", Add},
                 {"-", Subratct},
             };
-            var optimalLengthSolution = new[] { "6", "*", "3", "*", "3", "*", "6", "-", "7" };
+            var optimalLengthSolution = new List<string> {"6", "*", "3", "*", "3", "*", "6", "-", "7"};
             Solve(operations, prioritizedOperations, optimalLengthSolution);
         }
 
         [TestMethod]
         public void ExponentTest()
         {
-            var operations = new[] { "^", "+", "-", "*" };
-            var prioritizedOperations = new Dictionary<string, Func<int, int, int>>
+            var operations = new[] {"^", "+", "-", "*"};
+            var prioritizedOperations = new Dictionary<string, OperationDelegate>
             {
-                {"^", (a, b) => (int)Math.Pow(a, b)},
-                {"*", Multiply },
+                {"^", (a, b) => (int) Math.Pow(a, b)},
+                {"*", Multiply},
                 {"+", Add},
                 {"-", Subratct},
             };
-            var optimalLengthSolution = new[] { "6", "^", "3", "*", "2", "-", "5" };
+            var optimalLengthSolution = new List<string> {"6", "^", "3", "*", "2", "-", "5"};
             Solve(operations, prioritizedOperations, optimalLengthSolution);
         }
 
-        public void Solve(string[] operations, Dictionary<string, Func<int, int, int>> prioritizedOperations,
-            string[] optimalLengthSolution)
+        private static void Solve(string[] operations, Dictionary<string, OperationDelegate> prioritizedOperations,
+            List<string> optimalLengthSolution)
         {
             var genetic = new Genetic<string, int>();
 
-            var numbers = new[] {"1", "2", "3", "4", "5", "6", "7"};
+            var numbers = new List<string> {"1", "2", "3", "4", "5", "6", "7"};
             var expectedTotal = Evaluate(optimalLengthSolution, prioritizedOperations);
-            var minNumbers = (1 + optimalLengthSolution.Length) / 2;
+            var minNumbers = (1 + optimalLengthSolution.Count) / 2;
             var maxNumbers = 6 * minNumbers;
             var watch = Stopwatch.StartNew();
 
-            void FnDisplay(Chromosome<string, int> candidate) => Display(candidate, watch);
-            int FnEvaluate(string[] genes) => Evaluate(genes, prioritizedOperations);
-            int FnGetFitness(string[] genes) => Fitness(genes, expectedTotal, FnEvaluate);
-            string[] FnCreate() => Create(numbers, operations, minNumbers, maxNumbers);
+            void FnDisplay(Chromosome<string, int> candidate) =>
+                Display(candidate, watch);
 
-            void FnMutate(string[] genes) =>
-                Mutate(genes, numbers, operations, minNumbers, maxNumbers, FnGetFitness);
+            int FnEvaluate(List<string> genes) =>
+                Evaluate(genes, prioritizedOperations);
+
+            int FnGetFitness(List<string> genes) =>
+                GetFitness(genes, expectedTotal, FnEvaluate);
+
+            List<string> FnCreate() =>
+                Create(numbers, operations, minNumbers, maxNumbers);
+
+            void FnMutate(List<string> child) =>
+                Mutate(child, numbers, operations, minNumbers, maxNumbers, FnGetFitness);
 
             var optimalFitness = FnGetFitness(optimalLengthSolution);
             var best = genetic.GetBest(FnGetFitness, 0, optimalFitness, null, FnDisplay, FnMutate, FnCreate, 50);
             Assert.IsTrue(optimalFitness.CompareTo(best.Fitness) <= 0);
+        }
+
+        [TestMethod]
+        public void BenchmarkTest()
+        {
+            Benchmark.Run(ExponentTest);
         }
     }
 }
