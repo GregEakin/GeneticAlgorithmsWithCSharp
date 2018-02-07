@@ -49,7 +49,7 @@ namespace GeneticAlgorithms.MagicSquare
 
         private Chromosome<TGene, TFitness> GenerateParent(int length, TGene[] geneSet, FitnessDelegate getFitness)
         {
-            var genes = RandomFn.RandomSampleList(geneSet, length);
+            var genes = Rand.RandomSampleList(geneSet, length);
             var fitness = getFitness(genes);
             var chromosome = new Chromosome<TGene, TFitness>(genes, fitness);
             return chromosome;
@@ -59,8 +59,8 @@ namespace GeneticAlgorithms.MagicSquare
             FitnessDelegate getFitness)
         {
             var childGenes = parent.Genes.ToList();
-            var index = RandomFn.Rand.Next(childGenes.Count);
-            var randomSample = RandomFn.RandomSampleList(geneSet, 2);
+            var index = Rand.Random.Next(childGenes.Count);
+            var randomSample = Rand.RandomSampleList(geneSet, 2);
             var newGene = randomSample[0];
             var alternate = randomSample[1];
             childGenes[index] = newGene.Equals(childGenes[index]) ? alternate : newGene;
@@ -129,7 +129,7 @@ namespace GeneticAlgorithms.MagicSquare
                     var difference = historicalFitnesses.Count - index;
                     var proportionSimilar = (double)difference / historicalFitnesses.Count;
                     var exp = Math.Exp(-proportionSimilar);
-                    if (RandomFn.Rand.NextDouble() < exp)
+                    if (Rand.Random.NextDouble() < exp)
                     {
                         parent = child;
                         continue;

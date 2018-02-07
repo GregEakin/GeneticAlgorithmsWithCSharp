@@ -35,7 +35,7 @@ namespace GeneticAlgorithms.Password
             while (genes.Length < length)
             {
                 var sampleSize = Math.Min(length - genes.Length, geneSet.Length);
-                genes += RandomFn.RandomSampleString(geneSet, sampleSize);
+                genes += Rand.RandomSampleString(geneSet, sampleSize);
             }
 
             var fitness = getFitness(genes);
@@ -44,9 +44,9 @@ namespace GeneticAlgorithms.Password
 
         private static Chromosome Mutate(char[] geneSet, Chromosome parent, GetFitnessDelegate getFitness)
         {
-            var index = RandomFn.Rand.Next(parent.Genes.Length);
+            var index = Rand.Random.Next(parent.Genes.Length);
             var childGenes = parent.Genes.ToCharArray();
-            var randomSample = RandomFn.RandomSampleString(geneSet, 2);
+            var randomSample = Rand.RandomSampleString(geneSet, 2);
             var newGene = randomSample[0];
             var alternate = randomSample[1];
             childGenes[index] = newGene == childGenes[index] ? alternate : newGene;

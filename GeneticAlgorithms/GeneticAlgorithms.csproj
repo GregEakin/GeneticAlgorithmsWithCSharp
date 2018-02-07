@@ -151,7 +151,7 @@
     <Compile Include="TravelingSalesmanProblem\Pair.cs" />
     <Compile Include="TravelingSalesmanProblem\TravelingSalesmanProblemTests.cs" />
     <Compile Include="Utilities\ExpectedException.cs" />
-    <Compile Include="Utilities\RandomFn.cs" />
+    <Compile Include="Utilities\Rand.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Data\adjacent_states.csv">

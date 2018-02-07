@@ -52,7 +52,7 @@ namespace GeneticAlgorithms.TravelingSalesmanProblem
         private Chromosome<TGene, TFitness> GenerateParent(int length, TGene[] geneSet,
             GetFitnessDelegate getGetFitness)
         {
-            var genes = RandomFn.RandomSampleArray(geneSet, length);
+            var genes = Rand.RandomSampleArray(geneSet, length);
             var fitness = getGetFitness(genes);
             var chromosome =
                 new Chromosome<TGene, TFitness>(genes, fitness, Chromosome<TGene, TFitness>.Strategies.Create);
@@ -63,8 +63,8 @@ namespace GeneticAlgorithms.TravelingSalesmanProblem
             GetFitnessDelegate getFitness)
         {
             var childGenes = parent.Genes.ToArray();
-            var index = RandomFn.Rand.Next(childGenes.Length);
-            var randomSample = RandomFn.RandomSampleArray(geneSet, 2);
+            var index = Rand.Random.Next(childGenes.Length);
+            var randomSample = Rand.RandomSampleArray(geneSet, 2);
             var newGene = randomSample[0];
             var alternate = randomSample[1];
             childGenes[index] = newGene.Equals(childGenes[index]) ? alternate : newGene;
@@ -86,7 +86,7 @@ namespace GeneticAlgorithms.TravelingSalesmanProblem
             GetFitnessDelegate getFitness, CrossoverFun crossover, MutateChromosomeDelegate mutate,
             GenerateParentDelegate generateParent)
         {
-            var donorIndex = RandomFn.Rand.Next(0, parents.Count);
+            var donorIndex = Rand.Random.Next(0, parents.Count);
             if (donorIndex == index)
                 donorIndex = (donorIndex + 1) % parents.Count;
             var childGenes = crossover(parentGenes, parents[donorIndex].Genes);
@@ -143,7 +143,7 @@ namespace GeneticAlgorithms.TravelingSalesmanProblem
             Chromosome<TGene, TFitness> FnNewChild(Chromosome<TGene, TFitness> parent, int index,
                 List<Chromosome<TGene, TFitness>> parents) => 
                 crossover != null 
-                    ? usedStrategies[RandomFn.Rand.Next(usedStrategies.Count)](parent, index, parents) 
+                    ? usedStrategies[Rand.Random.Next(usedStrategies.Count)](parent, index, parents) 
                     : FnMutate(parent);
 
             foreach (var improvement in GetImprovement(FnNewChild, FnGenerateParent, maxAge, poolSize))
@@ -200,7 +200,7 @@ namespace GeneticAlgorithms.TravelingSalesmanProblem
                     var difference = historicalFitnesses.Count - index;
                     var proportionSimilar = (double) difference / historicalFitnesses.Count;
                     var exp = Math.Exp(-proportionSimilar);
-                    if (RandomFn.Rand.NextDouble() < exp)
+                    if (Rand.Random.NextDouble() < exp)
                     {
                         parents[pIndex] = child;
                         continue;

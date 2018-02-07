@@ -21,9 +21,9 @@ using System.Linq;
 
 namespace GeneticAlgorithms.Utilities
 {
-    public static class RandomFn
+    public static class Rand
     {
-        public static Random Rand { get; } = new Random();
+        public static Random Random { get; } = new Random();
 
         public static List<TGene> RandomSampleList<TGene>(TGene[] geneSet, int length)
         {
@@ -31,7 +31,7 @@ namespace GeneticAlgorithms.Utilities
             while (genes.Count < length)
             {
                 var sampleSize = Math.Min(geneSet.Length, length - genes.Count);
-                var array = geneSet.OrderBy(x => Rand.Next()).Take(sampleSize);
+                var array = geneSet.OrderBy(x => Random.Next()).Take(sampleSize);
                 genes.AddRange(array);
             }
 
@@ -44,7 +44,7 @@ namespace GeneticAlgorithms.Utilities
             while (genes.Count < length)
             {
                 var sampleSize = Math.Min(geneSet.Length, length - genes.Count);
-                var array = geneSet.OrderBy(x => Rand.Next()).Take(sampleSize);
+                var array = geneSet.OrderBy(x => Random.Next()).Take(sampleSize);
                 genes.AddRange(array);
             }
 
@@ -57,7 +57,7 @@ namespace GeneticAlgorithms.Utilities
             while (result.Length < length)
             {
                 var sampleSize = Math.Min(input.Length, length - result.Length);
-                var array = input.OrderBy(x => Rand.Next()).Take(sampleSize);
+                var array = input.OrderBy(x => Random.Next()).Take(sampleSize);
                 result += new string(array.ToArray());
             }
 

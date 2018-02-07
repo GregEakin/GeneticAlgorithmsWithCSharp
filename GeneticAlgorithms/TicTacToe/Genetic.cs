@@ -54,7 +54,7 @@ namespace GeneticAlgorithms.TicTacToe
         private Chromosome<TGene, TFitness> GenerateParent(int length, TGene[] geneSet,
             GetFitnessDelegate getGetFitness)
         {
-            var genes = RandomFn.RandomSampleList(geneSet, length);
+            var genes = Rand.RandomSampleList(geneSet, length);
             var fitness = getGetFitness(genes);
             var chromosome =
                 new Chromosome<TGene, TFitness>(genes, fitness, Chromosome<TGene, TFitness>.Strategies.Create);
@@ -65,8 +65,8 @@ namespace GeneticAlgorithms.TicTacToe
             GetFitnessDelegate getFitness)
         {
             var childGenes = parent.Genes.ToList();
-            var index = RandomFn.Rand.Next(childGenes.Count);
-            var randomSample = RandomFn.RandomSampleList(geneSet, 2);
+            var index = Rand.Random.Next(childGenes.Count);
+            var randomSample = Rand.RandomSampleList(geneSet, 2);
             var newGene = randomSample[0];
             var alternate = randomSample[1];
             childGenes[index] = newGene.Equals(childGenes[index]) ? alternate : newGene;
@@ -88,7 +88,7 @@ namespace GeneticAlgorithms.TicTacToe
             GetFitnessDelegate getFitness, CrossoverFun crossover, MutateChromosomeDelegate mutate,
             GenerateParentDelegate generateParent)
         {
-            var donorIndex = RandomFn.Rand.Next(0, parents.Count);
+            var donorIndex = Rand.Random.Next(0, parents.Count);
             if (donorIndex == index)
                 donorIndex = (donorIndex + 1) % parents.Count;
             var childGenes = crossover(parentGenes, parents[donorIndex].Genes);
@@ -146,7 +146,7 @@ namespace GeneticAlgorithms.TicTacToe
             Chromosome<TGene, TFitness> FnNewChild(Chromosome<TGene, TFitness> parent, int index,
                 List<Chromosome<TGene, TFitness>> parents) => 
                 crossover != null 
-                    ? usedStrategies[RandomFn.Rand.Next(usedStrategies.Count)](parent, index, parents) 
+                    ? usedStrategies[Rand.Random.Next(usedStrategies.Count)](parent, index, parents) 
                     : FnMutate(parent);
 
             try
@@ -222,7 +222,7 @@ namespace GeneticAlgorithms.TicTacToe
                     var difference = historicalFitnesses.Count - index;
                     var proportionSimilar = (double) difference / historicalFitnesses.Count;
                     var exp = Math.Exp(-proportionSimilar);
-                    if (RandomFn.Rand.NextDouble() < exp)
+                    if (Rand.Random.NextDouble() < exp)
                     {
                         parents[pIndex] = child;
                         continue;

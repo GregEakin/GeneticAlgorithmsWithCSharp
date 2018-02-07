@@ -39,7 +39,7 @@ namespace GeneticAlgorithms.Cards
 
         private Chromosome<TGene, TFitness> GenerateParent(int length, TGene[] geneSet, FitnessDelegate fitnessDelegate)
         {
-            var genes = RandomFn.RandomSampleArray(geneSet, length);
+            var genes = Rand.RandomSampleArray(geneSet, length);
             var fitness = fitnessDelegate(genes);
             return new Chromosome<TGene, TFitness>(genes, fitness);
         }
@@ -48,8 +48,8 @@ namespace GeneticAlgorithms.Cards
             FitnessDelegate getFitness)
         {
             var childGenes = parent.Genes.ToArray();
-            var index = RandomFn.Rand.Next(childGenes.Length);
-            var randomSample = RandomFn.RandomSampleArray(geneSet, 2);
+            var index = Rand.Random.Next(childGenes.Length);
+            var randomSample = Rand.RandomSampleArray(geneSet, 2);
             var newGene = randomSample[0];
             var alternate = randomSample[1];
             childGenes[index] = newGene.Equals(childGenes[index]) ? alternate : newGene;

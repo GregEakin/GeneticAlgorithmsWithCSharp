@@ -344,7 +344,7 @@ namespace GeneticAlgorithms.TicTacToe
             }
 
             List<Rule> FnCreate() =>
-                RandomFn.RandomSampleList(geneset.ToArray(), _random.Next(minGenes, maxGenes));
+                Rand.RandomSampleList(geneset.ToArray(), _random.Next(minGenes, maxGenes));
 
             var optimalFitness = new Fitness(620, 120, 0, 11);
 
@@ -393,7 +393,7 @@ namespace GeneticAlgorithms.TicTacToe
             }
 
             List<Rule> FnCreate() =>
-                RandomFn.RandomSampleList(geneset, _random.Next(minGenes, maxGenes));
+                Rand.RandomSampleList(geneset, _random.Next(minGenes, maxGenes));
 
             int FnSortKey(List<Rule> genes, int wins, int ties, int losses) => -1000 * losses - ties + 1 / genes.Count;
 

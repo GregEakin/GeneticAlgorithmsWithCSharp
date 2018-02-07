@@ -33,7 +33,7 @@ namespace GeneticAlgorithms.SortedNumbers
 
         public Chromosome<TGene, TFitness> GenerateParent(int length, TGene[] geneSet, GetFitnessFun getFitness)
         {
-            var genes = RandomFn.RandomSampleArray(geneSet, length);
+            var genes = Rand.RandomSampleArray(geneSet, length);
             var fit = getFitness(genes);
             return new Chromosome<TGene, TFitness>(genes, fit);
         }
@@ -42,8 +42,8 @@ namespace GeneticAlgorithms.SortedNumbers
             GetFitnessFun getFitness)
         {
             var childGenes = parent.Genes.ToArray();
-            var index = RandomFn.Rand.Next(parent.Genes.Length);
-            var randomSample = RandomFn.RandomSampleArray(geneSet, 2);
+            var index = Rand.Random.Next(parent.Genes.Length);
+            var randomSample = Rand.RandomSampleArray(geneSet, 2);
             var newGene = randomSample[0];
             var alternate = randomSample[1];
             childGenes[index] = newGene.Equals(childGenes[index]) ? alternate : newGene;

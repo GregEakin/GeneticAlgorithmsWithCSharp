@@ -100,7 +100,7 @@ namespace GeneticAlgorithms.Queens
         public void RandomSampelTest1()
         {
             var geneSet = "ABCabc".ToCharArray();
-            var gene = RandomFn.RandomSampleArray(geneSet, geneSet.Length);
+            var gene = Rand.RandomSampleArray(geneSet, geneSet.Length);
             Assert.IsInstanceOfType(gene, typeof(char[]));
             Assert.AreEqual(geneSet.Length, gene.Length);
             Assert.IsTrue(geneSet.All(c => gene.Contains(c)));
@@ -110,7 +110,7 @@ namespace GeneticAlgorithms.Queens
         public void RandomSampelTest2()
         {
             var geneSet = "ABCabc".ToCharArray();
-            var gene = RandomFn.RandomSampleArray(geneSet, 2 * geneSet.Length);
+            var gene = Rand.RandomSampleArray(geneSet, 2 * geneSet.Length);
             Assert.IsInstanceOfType(gene, typeof(char[]));
             CollectionAssert.AreEquivalent("AABBCCaabbcc".ToCharArray(), gene);
         }
@@ -121,7 +121,7 @@ namespace GeneticAlgorithms.Queens
             var geneSet = new[] {1, 2, 3};
             int[] gene;
             do
-                gene = RandomFn.RandomSampleArray(geneSet, geneSet.Length);
+                gene = Rand.RandomSampleArray(geneSet, geneSet.Length);
             while (gene.SequenceEqual(geneSet));
 
             CollectionAssert.AreEqual(new[] {1, 2, 3}, geneSet);

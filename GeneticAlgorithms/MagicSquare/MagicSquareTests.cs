@@ -79,7 +79,7 @@ namespace GeneticAlgorithms.MagicSquare
 
         private static void Mutate(List<int> genes, int[] allPositions)
         {
-            var randomSample = RandomFn.RandomSampleArray(allPositions, 2);
+            var randomSample = Rand.RandomSampleArray(allPositions, 2);
             var indexA = randomSample[0];
             var indexB = randomSample[1];
             var temp = genes[indexA];
