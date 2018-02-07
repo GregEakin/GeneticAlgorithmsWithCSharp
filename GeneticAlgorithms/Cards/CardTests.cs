@@ -45,7 +45,7 @@ namespace GeneticAlgorithms.Cards
                 candidate.Fitness, watch.ElapsedMilliseconds);
         }
 
-        public static void Mutate(int[] genes, int[] geneSet, Genetic<int, Fitness> genetic)
+        public static void Mutate(int[] genes, int[] geneSet)
         {
             if (genes.Length == new HashSet<int>(genes).Count)
             {
@@ -92,16 +92,15 @@ namespace GeneticAlgorithms.Cards
         [TestMethod]
         public void CardTest()
         {
-            var genetic = new Genetic<int, Fitness>();
             var geneSet = Enumerable.Range(1, 10).ToArray();
             var watch = Stopwatch.StartNew();
 
             void FnDisplay(Chromosome<int, Fitness> candidate) => Display(candidate, watch);
             Fitness FnGetFitness(int[] genes) => GetFitness(genes, genes.Length);
-            void FnMutate(int[] genes) => Mutate(genes, geneSet, genetic);
+            void FnMutate(int[] genes) => Mutate(genes, geneSet);
 
             var optimalFitness = new Fitness(36, 360, 0);
-            var best = genetic.GetBest(FnGetFitness, 10, optimalFitness, geneSet, FnDisplay, FnMutate);
+            var best = Genetic<int, Fitness>.GetBest(FnGetFitness, 10, optimalFitness, geneSet, FnDisplay, FnMutate);
             Assert.IsTrue(optimalFitness.CompareTo(best.Fitness) <= 0);
         }
 

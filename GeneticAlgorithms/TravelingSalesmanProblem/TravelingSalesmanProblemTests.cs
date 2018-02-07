@@ -277,7 +277,6 @@ namespace GeneticAlgorithms.TravelingSalesmanProblem
         {
             var geneSet = idToLocationLookup.Keys.ToArray();
             var watch = Stopwatch.StartNew();
-            var genetic = new Genetic<int, Fitness>();
 
             int[] FnCreate() => Rand.RandomSampleArray(geneSet, geneSet.Length);
 
@@ -290,7 +289,7 @@ namespace GeneticAlgorithms.TravelingSalesmanProblem
             int[] FnCrossover(int[] parent, int[] donor) => Crossover(parent, donor, FnGetFitness);
 
             var optimalFitness = FnGetFitness(optimalSequence);
-            var best = genetic.GetBest(FnGetFitness, 0, optimalFitness, null, FnDisplay, FnMutate, FnCreate, 50, 25,
+            var best = Genetic<int, Fitness>.GetBest(FnGetFitness, 0, optimalFitness, null, FnDisplay, FnMutate, FnCreate, 50, 25,
                 FnCrossover);
             Assert.IsTrue(optimalFitness.CompareTo(best.Fitness) <= 0);
         }

@@ -277,7 +277,6 @@ namespace GeneticAlgorithms.LogicCircuits
 
         private void FindCircuit(Tuple<bool[], bool>[] rules, int expectedLength)
         {
-            var genetic = new Genetic<Node, int>();
             var watch = Stopwatch.StartNew();
 
             void FnDisplay(Chromosome<Node, int> candidate, int? length = null)
@@ -301,7 +300,7 @@ namespace GeneticAlgorithms.LogicCircuits
             Chromosome<Node, int> FnOptimizationFunction(int variableLength)
             {
                 maxLength = variableLength;
-                return genetic.GetBest(FnGetFitness, 0, rules.Length, null, FnDisplay, FnMutate, FnCreate, 0, 3,
+                return Genetic<Node, int>.GetBest(FnGetFitness, 0, rules.Length, null, FnDisplay, FnMutate, FnCreate, 0, 3,
                     null, 30);
             }
 
@@ -316,7 +315,7 @@ namespace GeneticAlgorithms.LogicCircuits
             int FnGetNextFeatureValue(Chromosome<Node, int> currentBest) =>
                 NodesToCircuit(currentBest.Genes).Item2.Count;
 
-            var best = genetic.HillClimbing(FnOptimizationFunction, FnIsImprovement, FnIsOptimal, FnGetNextFeatureValue,
+            var best = Genetic<Node, int>.HillClimbing(FnOptimizationFunction, FnIsImprovement, FnIsOptimal, FnGetNextFeatureValue,
                 FnDisplay, maxLength);
             Assert.AreEqual(rules.Length, best.Fitness);
             var circuit = NodesToCircuit(best.Genes).Item2;

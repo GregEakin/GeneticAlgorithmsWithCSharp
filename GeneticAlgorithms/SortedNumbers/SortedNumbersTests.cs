@@ -59,13 +59,12 @@ namespace GeneticAlgorithms.SortedNumbers
         {
             var geneSet = Enumerable.Range(0, 100).ToArray();
             var watch = Stopwatch.StartNew();
-            var genetic = new Genetic<int, Fitness>();
 
             void FnDisplay(Chromosome<int, Fitness> candidate) => Display(candidate, watch);
             Fitness FnGetFitness(int[] genes) => GetFitness(genes);
 
             var optimalFitness = new Fitness(totalNumbers, 0);
-            var best = genetic.GetBest(FnGetFitness, totalNumbers, optimalFitness, geneSet, FnDisplay);
+            var best = Genetic<int, Fitness>.GetBest(FnGetFitness, totalNumbers, optimalFitness, geneSet, FnDisplay);
             Assert.IsTrue(optimalFitness.CompareTo(best.Fitness) <= 0);
         }
 

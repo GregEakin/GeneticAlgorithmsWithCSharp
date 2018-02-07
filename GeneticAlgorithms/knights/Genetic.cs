@@ -24,7 +24,7 @@ using System.Linq;
 
 namespace GeneticAlgorithms.Knights
 {
-    public class Genetic<TGene, TFitness>
+    public static class Genetic<TGene, TFitness>
         where TFitness : IComparable<TFitness>
     {
         public delegate TFitness FitnessDelegate(TGene[] gene);
@@ -39,7 +39,7 @@ namespace GeneticAlgorithms.Knights
 
         public delegate TGene[] CreateDelegate();
 
-        private Chromosome<TGene, TFitness> GenerateParent(int length, TGene[] geneSet, FitnessDelegate getFitness)
+        private static Chromosome<TGene, TFitness> GenerateParent(int length, TGene[] geneSet, FitnessDelegate getFitness)
         {
             var genes = Rand.RandomSampleArray(geneSet, length);
             var fitness = getFitness(genes);
@@ -47,7 +47,7 @@ namespace GeneticAlgorithms.Knights
             return chromosome;
         }
 
-        private Chromosome<TGene, TFitness> Mutate(Chromosome<TGene, TFitness> parent, TGene[] geneSet,
+        private static Chromosome<TGene, TFitness> Mutate(Chromosome<TGene, TFitness> parent, TGene[] geneSet,
             FitnessDelegate getFitness)
         {
             var childGenes = parent.Genes.ToArray();
@@ -69,7 +69,7 @@ namespace GeneticAlgorithms.Knights
             return new Chromosome<TGene, TFitness>(childGenes, fitness);
         }
 
-        internal Chromosome<TGene, TFitness> GetBest(FitnessDelegate getFitness, int targetLen, TFitness optimalFitness,
+        internal static Chromosome<TGene, TFitness> GetBest(FitnessDelegate getFitness, int targetLen, TFitness optimalFitness,
             TGene[] geneSet, DisplayDelegate display, MutateGeneDelegate customMutate = null, CreateDelegate customCreate = null)
         {
             Chromosome<TGene, TFitness> FnMutate(Chromosome<TGene, TFitness> parent) => customMutate == null
@@ -95,7 +95,7 @@ namespace GeneticAlgorithms.Knights
             throw new UnauthorizedAccessException();
         }
 
-        public IEnumerable<Chromosome<TGene, TFitness>> GetImprovement(MutateChromosomeDelegate newChild,
+        public static IEnumerable<Chromosome<TGene, TFitness>> GetImprovement(MutateChromosomeDelegate newChild,
             GenerateParentDelegate generateParent)
         {
             var bestParent = generateParent();

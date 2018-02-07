@@ -304,7 +304,6 @@ namespace GeneticAlgorithms.LawnmowerProblem
             int expectedNumberOfInstructions, int maxMutationRounds, CreateFieldDelegate fnCreateField,
             int expectedNumberOfSteps)
         {
-            var genetic = new Genetic<INode, Fitness>();
             var mowerStartLocation = new Location(width / 2, height / 2);
             var mowerStartDirection = Directions.South;
 
@@ -334,7 +333,7 @@ namespace GeneticAlgorithms.LawnmowerProblem
 
             var optimalFitness = new Fitness(width * height, expectedNumberOfInstructions, expectedNumberOfSteps);
 
-            var best = genetic.GetBest(FnGetFitness, 0, optimalFitness, null, FnDisplay, FnMutate, FnCreate, 0, 10,
+            var best = Genetic<INode, Fitness>.GetBest(FnGetFitness, 0, optimalFitness, null, FnDisplay, FnMutate, FnCreate, 0, 10,
                 Crossover, 10);
 
             Assert.IsTrue(optimalFitness.CompareTo(best.Fitness) <= 0);

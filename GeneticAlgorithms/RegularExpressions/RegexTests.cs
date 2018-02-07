@@ -520,7 +520,6 @@ namespace GeneticAlgorithms.RegularExpressions
         private Chromosome<string, Fitness> FindRegex(string[] wanted, string[] unwanted, int expectedLength,
             FnMutateDelegate[] customOperators = null)
         {
-            var genetic = new Genetic<string, Fitness>();
             var watch = Stopwatch.StartNew();
 
             // var set = new HashSet<char>(wanted.SelectMany(mo => mo.ToCharArray()));
@@ -552,7 +551,7 @@ namespace GeneticAlgorithms.RegularExpressions
 
             var optimalFitness = new Fitness(wanted.Length, wanted.Length, 0, expectedLength);
 
-            var best = genetic.GetBest(FnGetFitness, textGenes.Max(i => i.Length), optimalFitness, fullGeneSet,
+            var best = Genetic<string, Fitness>.GetBest(FnGetFitness, textGenes.Max(i => i.Length), optimalFitness, fullGeneSet,
                 FnDisplay, FnMutate, null, 0, 10);
 
             Assert.IsTrue(optimalFitness.CompareTo(best.Fitness) <= 0);

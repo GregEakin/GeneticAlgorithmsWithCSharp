@@ -24,7 +24,7 @@ using System.Linq;
 
 namespace GeneticAlgorithms.MagicSquare
 {
-    public class Genetic<TGene, TFitness>
+    public static class Genetic<TGene, TFitness>
         where TFitness : IComparable<TFitness>
     {
         public class ReverseComparer<T> : IComparer<T>
@@ -47,7 +47,7 @@ namespace GeneticAlgorithms.MagicSquare
 
         public delegate List<TGene> CreateDelegate();
 
-        private Chromosome<TGene, TFitness> GenerateParent(int length, TGene[] geneSet, FitnessDelegate getFitness)
+        private static Chromosome<TGene, TFitness> GenerateParent(int length, TGene[] geneSet, FitnessDelegate getFitness)
         {
             var genes = Rand.RandomSampleList(geneSet, length);
             var fitness = getFitness(genes);
@@ -55,7 +55,7 @@ namespace GeneticAlgorithms.MagicSquare
             return chromosome;
         }
 
-        private Chromosome<TGene, TFitness> Mutate(Chromosome<TGene, TFitness> parent, TGene[] geneSet,
+        private static Chromosome<TGene, TFitness> Mutate(Chromosome<TGene, TFitness> parent, TGene[] geneSet,
             FitnessDelegate getFitness)
         {
             var childGenes = parent.Genes.ToList();
@@ -77,7 +77,7 @@ namespace GeneticAlgorithms.MagicSquare
             return new Chromosome<TGene, TFitness>(childGenes, fitness);
         }
 
-        public Chromosome<TGene, TFitness> GetBest(FitnessDelegate getFitness, int targetLen, TFitness optimalFitness,
+        public static Chromosome<TGene, TFitness> GetBest(FitnessDelegate getFitness, int targetLen, TFitness optimalFitness,
             TGene[] geneSet, DisplayDelegate display, MutateGeneDelegate customMutate = null, CreateDelegate customCreate = null,
             int maxAge = 0)
         {
@@ -104,7 +104,7 @@ namespace GeneticAlgorithms.MagicSquare
             throw new UnauthorizedAccessException();
         }
 
-        public IEnumerable<Chromosome<TGene, TFitness>> GetImprovement(MutateChromosomeDelegate newChild,
+        public static IEnumerable<Chromosome<TGene, TFitness>> GetImprovement(MutateChromosomeDelegate newChild,
             GenerateParentDelegate generateParent, int maxAge = 0)
         {
             var bestParent = generateParent();

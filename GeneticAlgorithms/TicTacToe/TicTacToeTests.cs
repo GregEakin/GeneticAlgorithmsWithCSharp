@@ -307,8 +307,6 @@ namespace GeneticAlgorithms.TicTacToe
         [TestMethod]
         public void PerfectKnowledgeTest()
         {
-            var genetic = new Genetic<Rule, Fitness>();
-
             var minGenes = 10;
             var maxGenes = 20;
             var geneset = CreateGeneSet();
@@ -346,7 +344,7 @@ namespace GeneticAlgorithms.TicTacToe
 
             var optimalFitness = new Fitness(620, 120, 0, 11);
 
-            var best = genetic.GetBest(FnGetFitness, minGenes, optimalFitness, null, FnDisplay, FnMutate, FnCreate,
+            var best = Genetic<Rule, Fitness>.GetBest(FnGetFitness, minGenes, optimalFitness, null, FnDisplay, FnMutate, FnCreate,
                 500, 20, FnCrossover);
             Assert.IsTrue(optimalFitness.CompareTo(best.Fitness) <= 0);
         }
@@ -354,8 +352,6 @@ namespace GeneticAlgorithms.TicTacToe
         [TestMethod]
         public void TornamentTest()
         {
-            var genetic = new Genetic<Rule, Fitness>();
-
             var minGenes = 10;
             var maxGenes = 20;
             var geneset = CreateGeneSet();
@@ -395,7 +391,7 @@ namespace GeneticAlgorithms.TicTacToe
 
             int FnSortKey(List<Rule> genes, int wins, int ties, int losses) => -1000 * losses - ties + 1 / genes.Count;
 
-            var unused = genetic.Tournament(FnCreate, FnCrossover, PlayOneOnOne, FnDisplay, FnSortKey, 13);
+            var unused = Genetic<Rule, Fitness>.Tournament(FnCreate, FnCrossover, PlayOneOnOne, FnDisplay, FnSortKey, 13);
         }
 
         static Rule HaveThreeInRow => new RowContentFilter(ContentType.Mine, 3);

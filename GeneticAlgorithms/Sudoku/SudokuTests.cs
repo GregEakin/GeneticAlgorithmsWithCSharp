@@ -119,7 +119,6 @@ namespace GeneticAlgorithms.Sudoku
         [TestMethod]
         public void SudokuTest()
         {
-            var genetic = new Genetic<int, int>();
             var geneSet = Enumerable.Range(1, 9).ToArray();
             var watch = Stopwatch.StartNew();
             var optimalValue = 100;
@@ -138,7 +137,7 @@ namespace GeneticAlgorithms.Sudoku
             void FnMutate(List<int> genes) => 
                 Mutate(genes, validationRules);
 
-            var best = genetic.GetBest(FnGetFitness, 0, optimalValue, null, FnDisplay, FnMutate, FnCreate, 50);
+            var best = Genetic<int, int>.GetBest(FnGetFitness, 0, optimalValue, null, FnDisplay, FnMutate, FnCreate, 50);
 
             Assert.AreEqual(optimalValue, best.Fitness);
         }

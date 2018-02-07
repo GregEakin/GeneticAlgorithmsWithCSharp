@@ -152,7 +152,6 @@ namespace GeneticAlgorithms.ApproximatingPi
             if (bitValues == null)
                 bitValues = new List<int> {512, 256, 128, 64, 32, 16, 8, 4, 2, 1};
 
-            var genetic = new Genetic<bool, double>();
             var geneSet = new[] {false, true};
             var watch = Stopwatch.StartNew();
 
@@ -168,7 +167,8 @@ namespace GeneticAlgorithms.ApproximatingPi
                 Mutate(genes, bitValues.Count);
 
             var length = 2 * bitValues.Count;
-            var best = genetic.GetBest(FnGetFitness, length, optimalFitness, geneSet, FnDispaly, FnMutate, null, 250,
+            var best = Genetic<bool, double>.GetBest(FnGetFitness, length, optimalFitness, geneSet, FnDispaly, FnMutate,
+                null, 250,
                 1, null, maxSeconds);
 
             return optimalFitness <= best.Fitness;
@@ -177,7 +177,6 @@ namespace GeneticAlgorithms.ApproximatingPi
         [TestMethod]
         public void OptimizeTest()
         {
-            var genetic = new Genetic<int, double>();
             var geneSet = Enumerable.Range(1, 512).ToArray();
             var length = 10;
             var maxSeconds = 2;
@@ -208,7 +207,8 @@ namespace GeneticAlgorithms.ApproximatingPi
             Console.WriteLine("initial: {0} {1}", initial, FnGetFitness(initial));
 
             var optimalFitness = 10 * maxSeconds;
-            var unused = genetic.GetBest(FnGetFitness, length, optimalFitness, geneSet, FnDisplay, null, null, 0, 1,
+            var unused = Genetic<int, double>.GetBest(FnGetFitness, length, optimalFitness, geneSet, FnDisplay, null,
+                null, 0, 1,
                 null, 600);
         }
 

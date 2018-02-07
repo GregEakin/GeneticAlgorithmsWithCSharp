@@ -237,7 +237,6 @@ namespace GeneticAlgorithms.LinearEquation
         public void SolveUnknown(int numUnknowns, Fraction[] geneSet, Equation[] equations,
             Func<IReadOnlyList<Fraction>, IReadOnlyList<Fraction>> fnGenesToImputs)
         {
-            var genetic = new Genetic<Fraction, Fitness>();
             var watch = Stopwatch.StartNew();
             var maxAge = 50;
             var window = new Window(Math.Max(1, geneSet.Length / (2 * maxAge)),
@@ -251,7 +250,7 @@ namespace GeneticAlgorithms.LinearEquation
             void FnMutate(List<Fraction> genes) => Mutate(genes, sortedGeneSet, window, geneIndexes);
 
             var optimalFitness = new Fitness(new Fraction(0));
-            var best = genetic.GetBest(FnGetFitness, numUnknowns, optimalFitness, geneSet, FnDispaly, FnMutate,
+            var best = Genetic<Fraction, Fitness>.GetBest(FnGetFitness, numUnknowns, optimalFitness, geneSet, FnDispaly, FnMutate,
                 null, maxAge);
             Assert.IsTrue(optimalFitness.CompareTo(best.Fitness) <= 0);
             Assert.AreEqual(0.0, (float) best.Fitness.TotalDifference, 0.0001);

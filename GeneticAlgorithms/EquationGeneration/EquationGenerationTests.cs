@@ -201,8 +201,6 @@ namespace GeneticAlgorithms.EquationGeneration
         private static void Solve(string[] operations, Dictionary<string, OperationDelegate> prioritizedOperations,
             List<string> optimalLengthSolution)
         {
-            var genetic = new Genetic<string, int>();
-
             var numbers = new List<string> {"1", "2", "3", "4", "5", "6", "7"};
             var expectedTotal = Evaluate(optimalLengthSolution, prioritizedOperations);
             var minNumbers = (1 + optimalLengthSolution.Count) / 2;
@@ -225,7 +223,7 @@ namespace GeneticAlgorithms.EquationGeneration
                 Mutate(child, numbers, operations, minNumbers, maxNumbers, FnGetFitness);
 
             var optimalFitness = FnGetFitness(optimalLengthSolution);
-            var best = genetic.GetBest(FnGetFitness, 0, optimalFitness, null, FnDisplay, FnMutate, FnCreate, 50);
+            var best = Genetic<string, int>.GetBest(FnGetFitness, 0, optimalFitness, null, FnDisplay, FnMutate, FnCreate, 50);
             Assert.IsTrue(optimalFitness.CompareTo(best.Fitness) <= 0);
         }
 

@@ -24,21 +24,21 @@ using System.Linq;
 
 namespace GeneticAlgorithms.SortedNumbers
 {
-    public class Genetic<TGene, TFitness>
+    public static class Genetic<TGene, TFitness>
         where TFitness : IComparable<TFitness>
     {
         public delegate TFitness GetFitnessFun(TGene[] gene);
 
         public delegate void DisplayFun(Chromosome<TGene, TFitness> child);
 
-        public Chromosome<TGene, TFitness> GenerateParent(int length, TGene[] geneSet, GetFitnessFun getFitness)
+        public static Chromosome<TGene, TFitness> GenerateParent(int length, TGene[] geneSet, GetFitnessFun getFitness)
         {
             var genes = Rand.RandomSampleArray(geneSet, length);
             var fit = getFitness(genes);
             return new Chromosome<TGene, TFitness>(genes, fit);
         }
 
-        public Chromosome<TGene, TFitness> Mutate(Chromosome<TGene, TFitness> parent, TGene[] geneSet,
+        public static Chromosome<TGene, TFitness> Mutate(Chromosome<TGene, TFitness> parent, TGene[] geneSet,
             GetFitnessFun getFitness)
         {
             var childGenes = parent.Genes.ToArray();
@@ -51,7 +51,7 @@ namespace GeneticAlgorithms.SortedNumbers
             return new Chromosome<TGene, TFitness>(childGenes, fitness);
         }
 
-        public Chromosome<TGene, TFitness> GetBest(GetFitnessFun getFitness, int targetLen,
+        public static Chromosome<TGene, TFitness> GetBest(GetFitnessFun getFitness, int targetLen,
             TFitness optimalFitness, TGene[] geneSet, DisplayFun display)
         {
             Chromosome<TGene, TFitness> FnMutate(Chromosome<TGene, TFitness> parent) =>
@@ -69,7 +69,7 @@ namespace GeneticAlgorithms.SortedNumbers
             throw new Exception();
         }
 
-        private IEnumerable<Chromosome<TGene, TFitness>> GetImprovment(
+        private static IEnumerable<Chromosome<TGene, TFitness>> GetImprovment(
             Func<Chromosome<TGene, TFitness>, Chromosome<TGene, TFitness>> newChild,
             Func<Chromosome<TGene, TFitness>> generateParent)
         {

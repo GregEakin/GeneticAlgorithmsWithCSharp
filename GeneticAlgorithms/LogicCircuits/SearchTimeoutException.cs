@@ -21,11 +21,11 @@ using System;
 
 namespace GeneticAlgorithms.LogicCircuits
 {
-    public partial class Genetic<TGene, TFitness>
+    public static partial class Genetic<TGene, TFitness>
         where TFitness : IComparable<TFitness>
     {
         [Serializable]
-        public class SearchTimeoutException : Exception
+        private class SearchTimeoutException : Exception
         {
             public Chromosome<TGene, TFitness> Improvement { get; }
 

@@ -193,7 +193,6 @@ namespace GeneticAlgorithms.Knapsack
         private static void FillKnapsack(Resource[] items, double maxWeight,
             double maxVolume, Fitness optimalFitness)
         {
-            var genetic = new Genetic<ItemQuantity, Fitness>();
             var watch = Stopwatch.StartNew();
             var window = new Window(1, Math.Max(1, items.Length / 3), items.Length / 2);
             var sortedItems = items.OrderBy(i => i.Value).ToArray();
@@ -203,7 +202,7 @@ namespace GeneticAlgorithms.Knapsack
             List<ItemQuantity> FnCreate() => Create(items, maxWeight, maxVolume);
             void FnMutate(List<ItemQuantity> genes) => Mutate(genes, sortedItems, maxWeight, maxVolume, window);
 
-            var best = genetic.GetBest(FnGetFitness, 0, optimalFitness, null, FnDisplay, FnMutate, FnCreate, 50);
+            var best = Genetic<ItemQuantity, Fitness>.GetBest(FnGetFitness, 0, optimalFitness, null, FnDisplay, FnMutate, FnCreate, 50);
             Assert.IsTrue(optimalFitness.CompareTo(best.Fitness) <= 0);
         }
     }

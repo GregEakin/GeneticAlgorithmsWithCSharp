@@ -132,10 +132,9 @@ namespace GeneticAlgorithms.Queens
         public void GenerateParentTest()
         {
             int FitnessFun(int[] guess) => 86;
-            var genetic = new Genetic<int, int>();
 
             var geneSet = new[] {1, 3, 5, 7, 9};
-            var parent = genetic.GenerateParent(10, geneSet, FitnessFun);
+            var parent = Genetic<int, int>.GenerateParent(10, geneSet, FitnessFun);
             Assert.IsInstanceOfType(parent, typeof(Chromosome<int, int>));
             Assert.AreEqual(86, parent.Fitness);
             Assert.IsTrue(geneSet.All(c => parent.Genes.Contains(c)));
@@ -145,11 +144,10 @@ namespace GeneticAlgorithms.Queens
         public void MutateTest()
         {
             int FitnessFun(int[] guess) => 86;
-            var genetic = new Genetic<int, int>();
             var geneSet = new[] {0, 1, 2, 3, 4, 5, 6, 7};
             var genes = new[] {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
             var parent = new Chromosome<int, int>(genes, 0);
-            var child = genetic.Mutate(parent, geneSet, FitnessFun);
+            var child = Genetic<int, int>.Mutate(parent, geneSet, FitnessFun);
             Assert.IsTrue(parent.Genes.All(x => x == 0));
             Assert.IsFalse(child.Genes.All(x => x == 0));
         }
@@ -170,13 +168,12 @@ namespace GeneticAlgorithms.Queens
         {
             var geneSet = Enumerable.Range(0, size).ToArray();
             var watch = Stopwatch.StartNew();
-            var genetic = new Genetic<int, Fitness>();
 
             void DisplayFun(Chromosome<int, Fitness> candidate) => Display(candidate, watch, geneSet.Length);
             Fitness FitnessFun(int[] genes) => Fitness(genes, size);
 
             var optimalFitness = new Fitness(0);
-            var best = genetic.GetBest(FitnessFun, 2 * size, optimalFitness, geneSet, DisplayFun);
+            var best = Genetic<int, Fitness>.GetBest(FitnessFun, 2 * size, optimalFitness, geneSet, DisplayFun);
             Assert.IsTrue(optimalFitness.CompareTo(best.Fitness) <= 0);
         }
 

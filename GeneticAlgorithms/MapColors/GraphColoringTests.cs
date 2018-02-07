@@ -155,7 +155,6 @@ namespace GeneticAlgorithms.MapColors
 
         private static void Color(string file, string[] colors)
         {
-            var genetic = new Genetic<char, int>();
             var data = LoadData(file);
             var rules = data.Item1;
             var nodes = data.Item2;
@@ -170,7 +169,7 @@ namespace GeneticAlgorithms.MapColors
 
             int FnGetFitness(char[] genes) => GetFitness(genes, rules, nodeIndexLookup);
 
-            var best = genetic.GetBest(FnGetFitness, nodes.Count, optimalValue, geneSet, FnDisplay);
+            var best = Genetic<char, int>.GetBest(FnGetFitness, nodes.Count, optimalValue, geneSet, FnDisplay);
             Assert.IsTrue(optimalValue.CompareTo(best.Fitness) <= 0);
 
             var keys = nodes.OrderBy(c => c).ToArray();

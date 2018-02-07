@@ -25,7 +25,7 @@ using System.Linq;
 
 namespace GeneticAlgorithms.ApproximatingPi
 {
-    public partial class Genetic<TGene, TFitness>
+    public static partial class Genetic<TGene, TFitness>
         where TFitness : IComparable<TFitness>
     {
         private class ReverseComparer<T> : IComparer<T>
@@ -50,7 +50,7 @@ namespace GeneticAlgorithms.ApproximatingPi
 
         public delegate List<TGene> CrossoverFun(List<TGene> genes1, List<TGene> genes2);
 
-        private Chromosome<TGene, TFitness> GenerateParent(int length, TGene[] geneSet,
+        private static Chromosome<TGene, TFitness> GenerateParent(int length, TGene[] geneSet,
             GetFitnessDelegate getGetFitness)
         {
             var genes = Rand.RandomSampleList(geneSet, length);
@@ -60,7 +60,7 @@ namespace GeneticAlgorithms.ApproximatingPi
             return chromosome;
         }
 
-        private Chromosome<TGene, TFitness> Mutate(Chromosome<TGene, TFitness> parent, TGene[] geneSet,
+        private static Chromosome<TGene, TFitness> Mutate(Chromosome<TGene, TFitness> parent, TGene[] geneSet,
             GetFitnessDelegate getFitness)
         {
             var childGenes = parent.Genes.ToList();
@@ -73,7 +73,7 @@ namespace GeneticAlgorithms.ApproximatingPi
             return new Chromosome<TGene, TFitness>(childGenes, fitness, Chromosome<TGene, TFitness>.Strategies.Mutate);
         }
 
-        private Chromosome<TGene, TFitness> MutateCustom(Chromosome<TGene, TFitness> parent,
+        private static Chromosome<TGene, TFitness> MutateCustom(Chromosome<TGene, TFitness> parent,
             MutateGeneDelegate customMutate, GetFitnessDelegate getFitness)
         {
             var childGenes = parent.Genes.ToList();
@@ -82,7 +82,7 @@ namespace GeneticAlgorithms.ApproximatingPi
             return new Chromosome<TGene, TFitness>(childGenes, fitness, Chromosome<TGene, TFitness>.Strategies.Mutate);
         }
 
-        private Chromosome<TGene, TFitness> Crossover(List<TGene> parentGenes, int index,
+        private static Chromosome<TGene, TFitness> Crossover(List<TGene> parentGenes, int index,
             List<Chromosome<TGene, TFitness>> parents,
             GetFitnessDelegate getFitness, CrossoverFun crossover, MutateChromosomeDelegate mutate,
             GenerateParentDelegate generateParent)
@@ -103,7 +103,7 @@ namespace GeneticAlgorithms.ApproximatingPi
                 Chromosome<TGene, TFitness>.Strategies.Crossover);
         }
 
-        public Chromosome<TGene, TFitness> GetBest(GetFitnessDelegate getFitness, int targetLen,
+        public static Chromosome<TGene, TFitness> GetBest(GetFitnessDelegate getFitness, int targetLen,
             TFitness optimalFitness, TGene[] geneSet, DisplayDelegate display, MutateGeneDelegate customMutate = null,
             CreateDelegate customCreate = null, int maxAge = 0, int poolSize = 1, CrossoverFun crossover = null,
             int maxSeconds = 0)
@@ -168,7 +168,7 @@ namespace GeneticAlgorithms.ApproximatingPi
             throw new UnauthorizedAccessException();
         }
 
-        private IEnumerable<Chromosome<TGene, TFitness>> GetImprovement(
+        private static IEnumerable<Chromosome<TGene, TFitness>> GetImprovement(
             Func<Chromosome<TGene, TFitness>, int, List<Chromosome<TGene, TFitness>>, Chromosome<TGene, TFitness>>
                 newChild, GenerateParentDelegate generateParent, int maxAge, int poolSize, int maxSeconds)
         {

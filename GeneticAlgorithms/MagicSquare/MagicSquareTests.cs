@@ -118,7 +118,6 @@ namespace GeneticAlgorithms.MagicSquare
         private static void Generate(int diagonalSize, int maxAge)
         {
             var watch = Stopwatch.StartNew();
-            var genetic = new Genetic<int, Fitness>();
 
             var nSquared = diagonalSize * diagonalSize;
             var geneSet = Enumerable.Range(1, nSquared).ToArray();
@@ -131,7 +130,7 @@ namespace GeneticAlgorithms.MagicSquare
             List<int> FnCreate() => geneSet.OrderBy(i => Rand.Random.Next(geneSet.Length)).ToList();
 
             var optimalValue = new Fitness(0);
-            var best = genetic.GetBest(FnGetFitness, nSquared, optimalValue, geneSet, FnDisplay, FnMutate,
+            var best = Genetic<int, Fitness>.GetBest(FnGetFitness, nSquared, optimalValue, geneSet, FnDisplay, FnMutate,
                 FnCreate, maxAge);
             Assert.IsTrue(optimalValue.CompareTo(best.Fitness) <= 0);
         }
