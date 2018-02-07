@@ -57,11 +57,11 @@ namespace GeneticAlgorithms.Knapsack
             if (value != 0)
                 return value;
 
-            var weight = TotalWeight.CompareTo(that.TotalWeight);
+            var weight = -TotalWeight.CompareTo(that.TotalWeight);
             if (weight != 0)
                 return weight;
 
-            var volume = TotalVolume.CompareTo(that.TotalVolume);
+            var volume = -TotalVolume.CompareTo(that.TotalVolume);
             return volume;
         }
 

@@ -172,7 +172,7 @@ namespace GeneticAlgorithms.ApproximatingPi
             var best = genetic.GetBest(FnGetFitness, length, optimalFitness, geneSet, FnDispaly, FnMutate, null, 250,
                 1, null, maxSeconds);
 
-            return best.Fitness >= optimalFitness;
+            return optimalFitness <= best.Fitness;
         }
 
         [TestMethod]

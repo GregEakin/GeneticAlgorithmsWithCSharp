@@ -31,7 +31,7 @@ namespace GeneticAlgorithms.Knapsack
     {
         private static readonly Random Random = new Random();
 
-        public static Fitness GetFitness(IEnumerable<ItemQuantity> genes)
+        private static Fitness GetFitness(IEnumerable<ItemQuantity> genes)
         {
             var totalWeight = 0.0;
             var totalVolume = 0.0;
@@ -47,7 +47,7 @@ namespace GeneticAlgorithms.Knapsack
             return new Fitness(totalWeight, totalVolume, totalValue);
         }
 
-        public static void Display(Chromosome<ItemQuantity, Fitness> candidate, Stopwatch watch)
+        private static void Display(Chromosome<ItemQuantity, Fitness> candidate, Stopwatch watch)
         {
             if (candidate.Genes.Count > 0)
             {
@@ -60,14 +60,14 @@ namespace GeneticAlgorithms.Knapsack
                 Console.WriteLine("Empty");
         }
 
-        public static int MaxQuantity(Resource item, double maxWeight, double maxVolume)
+        private static int MaxQuantity(Resource item, double maxWeight, double maxVolume)
         {
             var weight = item.Weight > 0 ? (int) (maxWeight / item.Weight) : int.MaxValue;
             var volume = item.Volume > 0 ? (int) (maxVolume / item.Volume) : int.MaxValue;
             return Math.Min(weight, volume);
         }
 
-        public static List<ItemQuantity> Create(Resource[] items, double maxWeight, double maxVolume)
+        private static List<ItemQuantity> Create(Resource[] items, double maxWeight, double maxVolume)
         {
             var genes = new List<ItemQuantity>();
             var remainingWeight = maxWeight;
@@ -84,7 +84,7 @@ namespace GeneticAlgorithms.Knapsack
             return genes;
         }
 
-        public static ItemQuantity Add(ItemQuantity[] genes, Resource[] items, double maxWeight, double maxVolume)
+        private static ItemQuantity Add(ItemQuantity[] genes, Resource[] items, double maxWeight, double maxVolume)
         {
             var usedItems = genes.Select(iq => iq.Item).ToList();
             var item = items[Random.Next(items.Length)];
