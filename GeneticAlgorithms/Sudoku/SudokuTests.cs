@@ -18,20 +18,18 @@
  */
 
 using GeneticAlgorithms.MagicSquare;
+using GeneticAlgorithms.Utilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using GeneticAlgorithms.Utilities;
 
 namespace GeneticAlgorithms.Sudoku
 {
     [TestClass]
     public class SudokuTests
     {
-        private static readonly Random Random = new Random();
-
         public static int GetFitness(List<int> genes, Rule[] validationRules)
         {
 //            firstFailingRule = next(rule for rule in validationRules 
@@ -65,7 +63,7 @@ namespace GeneticAlgorithms.Sudoku
                 var row = IndexRow(selectedRule.OtherIndex);
                 var start = row * 9;
                 var indexA = selectedRule.OtherIndex;
-                var indexB = Random.Next(start, genes.Count);
+                var indexB = Rand.Random.Next(start, genes.Count);
 
                 Console.WriteLine("Swap {0} - {1}", indexA, indexB);
                 if (genes[indexA] == genes[indexB])
@@ -81,7 +79,7 @@ namespace GeneticAlgorithms.Sudoku
         {
             while (first < last)
             {
-                var index = Random.Next(first, last);
+                var index = Rand.Random.Next(first, last);
                 var temp = genes[index];
                 genes[index] = genes[first];
                 genes[first] = temp;

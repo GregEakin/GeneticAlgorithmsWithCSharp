@@ -17,9 +17,8 @@
  * permissions and limitations under the License.
  */
 
-using System;
-using System.Linq;
 using GeneticAlgorithms.Utilities;
+using System;
 
 namespace GeneticAlgorithms.Password
 {

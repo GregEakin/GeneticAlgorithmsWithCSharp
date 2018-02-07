@@ -29,8 +29,6 @@ namespace GeneticAlgorithms.TicTacToe
     [TestClass]
     public class TicTacToeTests
     {
-        private readonly Random _random = new Random();
-
         private readonly int[] _squareIndexes = {1, 2, 3, 4, 5, 6, 7, 8, 9};
 
         private Fitness GetFitness(List<Rule> genes)
@@ -198,8 +196,8 @@ namespace GeneticAlgorithms.TicTacToe
 
         public bool MutateAdd(List<Rule> genes, Rule[] geneSet)
         {
-            var index = _random.Next(genes.Count);
-            genes.Insert(index, geneSet[_random.Next(geneSet.Length)]);
+            var index = Rand.Random.Next(genes.Count);
+            genes.Insert(index, geneSet[Rand.Random.Next(geneSet.Length)]);
             return true;
         }
 
@@ -207,9 +205,9 @@ namespace GeneticAlgorithms.TicTacToe
         {
             if (!genes.Any())
                 return false;
-            genes.RemoveAt(_random.Next(genes.Count));
-            if (genes.Any() && _random.Next(2) == 1)
-                genes.RemoveAt(_random.Next(genes.Count));
+            genes.RemoveAt(Rand.Random.Next(genes.Count));
+            if (genes.Any() && Rand.Random.Next(2) == 1)
+                genes.RemoveAt(Rand.Random.Next(genes.Count));
             return true;
         }
 
@@ -217,8 +215,8 @@ namespace GeneticAlgorithms.TicTacToe
         {
             if (!genes.Any())
                 return false;
-            var index = _random.Next(genes.Count);
-            genes[index] = geneSet[_random.Next(geneSet.Length)];
+            var index = Rand.Random.Next(genes.Count);
+            genes[index] = geneSet[Rand.Random.Next(geneSet.Length)];
             return false;
         }
 
@@ -226,7 +224,7 @@ namespace GeneticAlgorithms.TicTacToe
         {
             if (genes.Count < 2)
                 return false;
-            var index = _random.Next(genes.Count - 1);
+            var index = Rand.Random.Next(genes.Count - 1);
             var temp = genes[index + 1];
             genes[index + 1] = genes[index];
             genes[index] = temp;
@@ -237,11 +235,11 @@ namespace GeneticAlgorithms.TicTacToe
         {
             if (genes.Count < 3)
                 return false;
-            var skip = _random.Next(genes.Count - 1);
-            var length = _random.Next(1, 3);
+            var skip = Rand.Random.Next(genes.Count - 1);
+            var length = Rand.Random.Next(1, 3);
             var toMove = genes.Skip(skip).Take(length).ToArray();
             genes.RemoveRange(skip, length);
-            var index = _random.Next(genes.Count);
+            var index = Rand.Random.Next(genes.Count);
             genes.InsertRange(index, toMove);
             return true;
         }
@@ -251,15 +249,15 @@ namespace GeneticAlgorithms.TicTacToe
             List<int> mutationRoundCounts)
         {
             var initialFitness = fnGetFitness(genes);
-            var count = _random.Next(mutationRoundCounts.Count);
+            var count = Rand.Random.Next(mutationRoundCounts.Count);
             for (var i = 1; i < count + 2; i++)
             {
                 var copy = mutationOperators.ToList();
-                var func = copy[_random.Next(copy.Count)];
+                var func = copy[Rand.Random.Next(copy.Count)];
                 while (!func(genes))
                 {
                     copy.Remove(func);
-                    func = copy[_random.Next(copy.Count)];
+                    func = copy[Rand.Random.Next(copy.Count)];
                 }
 
                 if (fnGetFitness(genes).CompareTo(initialFitness) > 0)
@@ -344,7 +342,7 @@ namespace GeneticAlgorithms.TicTacToe
             }
 
             List<Rule> FnCreate() =>
-                Rand.RandomSampleList(geneset.ToArray(), _random.Next(minGenes, maxGenes));
+                Rand.RandomSampleList(geneset.ToArray(), Rand.Random.Next(minGenes, maxGenes));
 
             var optimalFitness = new Fitness(620, 120, 0, 11);
 
@@ -393,7 +391,7 @@ namespace GeneticAlgorithms.TicTacToe
             }
 
             List<Rule> FnCreate() =>
-                Rand.RandomSampleList(geneset, _random.Next(minGenes, maxGenes));
+                Rand.RandomSampleList(geneset, Rand.Random.Next(minGenes, maxGenes));
 
             int FnSortKey(List<Rule> genes, int wins, int ties, int losses) => -1000 * losses - ties + 1 / genes.Count;
 

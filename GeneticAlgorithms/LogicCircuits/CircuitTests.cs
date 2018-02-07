@@ -17,6 +17,7 @@
  * permissions and limitations under the License.
  */
 
+using GeneticAlgorithms.Utilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
@@ -28,8 +29,6 @@ namespace GeneticAlgorithms.LogicCircuits
     [TestClass]
     public class CircuitTests
     {
-        private static readonly Random Random = new Random();
-
         public delegate Node FnCreateGene(int index);
 
         public delegate int FnGetFitnessDelegate(List<Node> genes);
@@ -89,19 +88,19 @@ namespace GeneticAlgorithms.LogicCircuits
         {
             var gateType = index < sources.Length
                 ? sources[index]
-                : gates[Random.Next(gates.Length)];
+                : gates[Rand.Random.Next(gates.Length)];
 
             int? indexA = null;
             int? indexB = null;
             if (gateType.Item2.InputCount > 0)
-                indexA = Random.Next(index);
+                indexA = Rand.Random.Next(index);
             if (gateType.Item2.InputCount > 1)
             {
                 indexB = index > 1 && index >= sources.Length
-                    ? Random.Next(index)
+                    ? Rand.Random.Next(index)
                     : 0;
                 if (indexB == indexA)
-                    indexB = Random.Next(index);
+                    indexB = Rand.Random.Next(index);
             }
 
             return new Node(gateType.Item1, indexA, indexB);
@@ -110,14 +109,14 @@ namespace GeneticAlgorithms.LogicCircuits
         private static void Mutate(List<Node> childGenes, FnCreateGene fnCreateGene, FnGetFitnessDelegate fnGetFitness,
             int sourceCount)
         {
-            var count = Random.Next(1, 6);
+            var count = Rand.Random.Next(1, 6);
             var initialFitness = fnGetFitness(childGenes);
             while (count-- > 0)
             {
                 var indexesUsed = NodesToCircuit(childGenes).Item2.Skip(sourceCount).ToArray();
                 if (!indexesUsed.Any())
                     return;
-                var index = indexesUsed[Random.Next(indexesUsed.Length)];
+                var index = indexesUsed[Rand.Random.Next(indexesUsed.Length)];
                 childGenes[index] = fnCreateGene(index);
                 if (fnGetFitness(childGenes).CompareTo(initialFitness) > 0)
                     return;

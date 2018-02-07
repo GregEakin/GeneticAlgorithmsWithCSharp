@@ -17,21 +17,20 @@
  * permissions and limitations under the License.
  */
 
+using GeneticAlgorithms.LogicCircuits;
+using GeneticAlgorithms.Utilities;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text.RegularExpressions;
-using GeneticAlgorithms.LogicCircuits;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace GeneticAlgorithms.RegularExpressions
 {
     [TestClass]
     public class RegexTests
     {
-        private static readonly Random Random = new Random();
-
         private static readonly string[] RepeatMetas = {"?", "*", "+", "{2}", "{2,}"};
 
         private static readonly string[] StartMetas = {"|", "(", "["};
@@ -208,8 +207,8 @@ namespace GeneticAlgorithms.RegularExpressions
 
         private bool MutateAdd(List<string> genes, string[] geneSet)
         {
-            var index = genes.Count > 0 ? Random.Next(genes.Count) : 0;
-            genes.Insert(index, geneSet[Random.Next(geneSet.Length)]);
+            var index = genes.Count > 0 ? Rand.Random.Next(genes.Count) : 0;
+            genes.Insert(index, geneSet[Rand.Random.Next(geneSet.Length)]);
             return true;
         }
 
@@ -227,9 +226,9 @@ namespace GeneticAlgorithms.RegularExpressions
         {
             if (genes.Count < 1)
                 return false;
-            genes.RemoveAt(Random.Next(genes.Count));
-            if (genes.Count > 1 && Random.Next(2) == 1)
-                genes.RemoveAt(Random.Next(genes.Count));
+            genes.RemoveAt(Rand.Random.Next(genes.Count));
+            if (genes.Count > 1 && Rand.Random.Next(2) == 1)
+                genes.RemoveAt(Rand.Random.Next(genes.Count));
             return true;
         }
 
@@ -246,8 +245,8 @@ namespace GeneticAlgorithms.RegularExpressions
         {
             if (genes.Count < 1)
                 return false;
-            var index = Random.Next(genes.Count);
-            genes[index] = geneSet[Random.Next(geneSet.Length)];
+            var index = Rand.Random.Next(genes.Count);
+            genes[index] = geneSet[Rand.Random.Next(geneSet.Length)];
             return true;
         }
 
@@ -265,9 +264,9 @@ namespace GeneticAlgorithms.RegularExpressions
         {
             if (genes.Count < 2)
                 return false;
-            var indexA = Random.Next(genes.Count);
+            var indexA = Rand.Random.Next(genes.Count);
             int indexB;
-            do indexB = Random.Next(genes.Count); while (indexA == indexB);
+            do indexB = Rand.Random.Next(genes.Count); while (indexA == indexB);
             var temp = genes[indexA];
             genes[indexA] = genes[indexB];
             genes[indexB] = temp;
@@ -287,11 +286,11 @@ namespace GeneticAlgorithms.RegularExpressions
         {
             if (genes.Count < 3)
                 return false;
-            var length = Random.Next(1, 3);
-            var start = Random.Next(genes.Count - length + 1);
+            var length = Rand.Random.Next(1, 3);
+            var start = Rand.Random.Next(genes.Count - length + 1);
             var toMove = genes.Skip(start).Take(length).ToArray();
             genes.RemoveRange(start, length);
-            var index = Random.Next(genes.Count);
+            var index = Rand.Random.Next(genes.Count);
             genes.InsertRange(index, toMove);
             return true;
         }
@@ -325,7 +324,7 @@ namespace GeneticAlgorithms.RegularExpressions
 
             if (shorter.Count == 0)
                 return false;
-            var index = ors[Random.Next(ors.Count)];
+            var index = ors[Rand.Random.Next(ors.Count)];
             var distinct = genes.Skip(index - 1).Take(3).Where((x, j) => j % 2 == 0).SelectMany(s => s.ToCharArray())
                 .Select(c => c.ToString()).Distinct();
 
@@ -371,7 +370,7 @@ namespace GeneticAlgorithms.RegularExpressions
             var min2 = lookup.Values.Where(i => i.Count > 1).ToList();
             if (min2.Count <= 0)
                 return false;
-            var choice = min2[Random.Next(min2.Count)];
+            var choice = min2[Rand.Random.Next(min2.Count)];
             var characterSet = new List<string> {"|", genes[choice[0] + 1][0].ToString(), "["};
             foreach (var i in choice)
                 characterSet.Add(genes[i + 1][1].ToString());
@@ -398,9 +397,9 @@ namespace GeneticAlgorithms.RegularExpressions
 
         private bool MutateAddWanted(List<string> genes, string[] wanted)
         {
-            var index = genes.Count > 0 ? Random.Next(genes.Count) : 0;
+            var index = genes.Count > 0 ? Rand.Random.Next(genes.Count) : 0;
             genes.Insert(index, "|");
-            genes.Insert(index + 1, wanted[Random.Next(wanted.Length)]);
+            genes.Insert(index + 1, wanted[Rand.Random.Next(wanted.Length)]);
             return true;
         }
 
@@ -413,15 +412,15 @@ namespace GeneticAlgorithms.RegularExpressions
             List<int> mutationRoundCounts)
         {
             var initialFitness = fnGetFitness(genes);
-            var count = mutationRoundCounts[Random.Next(mutationRoundCounts.Count)];
+            var count = mutationRoundCounts[Rand.Random.Next(mutationRoundCounts.Count)];
             for (var i = 1; i < count + 3; i++)
             {
                 var copy = mutationOperators.ToList();
-                var func = copy[Random.Next(copy.Count)];
+                var func = copy[Rand.Random.Next(copy.Count)];
                 while (!func(genes))
                 {
                     copy.Remove(func);
-                    func = copy[Random.Next(copy.Count)];
+                    func = copy[Rand.Random.Next(copy.Count)];
                 }
 
                 if (fnGetFitness(genes).CompareTo(initialFitness) <= 0)

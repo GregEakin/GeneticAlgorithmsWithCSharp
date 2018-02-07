@@ -18,6 +18,7 @@
  */
 
 using GeneticAlgorithms.ApproximatingPi;
+using GeneticAlgorithms.Utilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
@@ -29,8 +30,6 @@ namespace GeneticAlgorithms.EquationGeneration
     [TestClass]
     public class EquationGenerationTests
     {
-        private static readonly Random Random = new Random();
-
         private delegate int FnEvaluateDelegate(List<string> genes);
 
         private delegate int FnFitnessDelegate(List<string> genes);
@@ -109,13 +108,13 @@ namespace GeneticAlgorithms.EquationGeneration
 
         private static List<string> Create(List<string> numbers, string[] operators, int minNumbers, int maxNumbers)
         {
-            var genes = numbers.OrderBy(n => Random.Next()).Take(1).ToList();
-            var count = Random.Next(minNumbers, 1 + maxNumbers);
+            var genes = numbers.OrderBy(n => Rand.Random.Next()).Take(1).ToList();
+            var count = Rand.Random.Next(minNumbers, 1 + maxNumbers);
             while (count > 1)
             {
                 count--;
-                genes.Add(operators.OrderBy(n => Random.Next()).First());
-                genes.Add(numbers.OrderBy(n => Random.Next()).First());
+                genes.Add(operators.OrderBy(n => Rand.Random.Next()).First());
+                genes.Add(numbers.OrderBy(n => Rand.Random.Next()).First());
             }
 
             return genes;
@@ -124,7 +123,7 @@ namespace GeneticAlgorithms.EquationGeneration
         private static void Mutate(List<string> genes, List<string> numbers, string[] operations, int minNumbers,
             int maxNumbers, FnFitnessDelegate fnGetFitness)
         {
-            var count = Random.Next(1, 10);
+            var count = Rand.Random.Next(1, 10);
             var initialFitness = fnGetFitness(genes);
             while (count > 0)
             {
@@ -133,27 +132,27 @@ namespace GeneticAlgorithms.EquationGeneration
                     return;
 
                 var numberCount = (1 + genes.Count) / 2;
-                var adding = numberCount < maxNumbers && Random.Next(0, 100) == 0;
+                var adding = numberCount < maxNumbers && Rand.Random.Next(0, 100) == 0;
                 if (adding)
                 {
-                    genes.Add(operations[Random.Next(operations.Length)]);
-                    genes.Add(numbers[Random.Next(numbers.Count)]);
+                    genes.Add(operations[Rand.Random.Next(operations.Length)]);
+                    genes.Add(numbers[Rand.Random.Next(numbers.Count)]);
                     continue;
                 }
 
-                var removing = numberCount > minNumbers && Random.Next(0, 20) == 0;
+                var removing = numberCount > minNumbers && Rand.Random.Next(0, 20) == 0;
                 if (removing)
                 {
-                    var index = Random.Next(0, genes.Count - 1);
+                    var index = Rand.Random.Next(0, genes.Count - 1);
                     genes.RemoveAt(index);
                     genes.RemoveAt(index);
                     continue;
                 }
 
-                var index2 = Random.Next(0, genes.Count);
+                var index2 = Rand.Random.Next(0, genes.Count);
                 genes[index2] = (index2 & 1) == 1
-                    ? operations[Random.Next(operations.Length)]
-                    : numbers[Random.Next(numbers.Count)];
+                    ? operations[Rand.Random.Next(operations.Length)]
+                    : numbers[Rand.Random.Next(numbers.Count)];
             }
         }
 

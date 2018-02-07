@@ -20,6 +20,7 @@
 using System;
 using System.Diagnostics;
 using System.Linq;
+using GeneticAlgorithms.Utilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace GeneticAlgorithms.Password
@@ -28,8 +29,6 @@ namespace GeneticAlgorithms.Password
     public class GuessPassordTests
     {
         private static readonly char[] GeneSet = " abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!.,".ToCharArray();
-
-        private readonly Random _random = new Random();
 
         private static int GetFitness(string guess, string target)
         {
@@ -73,7 +72,7 @@ namespace GeneticAlgorithms.Password
         {
             const int length = 150;
             var target = string.Join("",
-                Enumerable.Range(0, length).Select(x => GeneSet[_random.Next(GeneSet.Length)]));
+                Enumerable.Range(0, length).Select(x => GeneSet[Rand.Random.Next(GeneSet.Length)]));
             GuessPassword(target);
         }
 

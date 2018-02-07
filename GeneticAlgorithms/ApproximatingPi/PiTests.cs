@@ -23,14 +23,13 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using GeneticAlgorithms.Utilities;
 
 namespace GeneticAlgorithms.ApproximatingPi
 {
     [TestClass]
     public class PiTests
     {
-        private static readonly Random Random = new Random();
-
         private static double GetFitness(List<bool> genes, List<int> bitValues)
         {
             var denominator = GetDenominator(genes, bitValues);
@@ -129,8 +128,8 @@ namespace GeneticAlgorithms.ApproximatingPi
 
         private static void Mutate(List<bool> genes, int numBits)
         {
-            var numeratorIndex = Random.Next(0, numBits);
-            var denominatorIndex = Random.Next(numBits, genes.Count);
+            var numeratorIndex = Rand.Random.Next(0, numBits);
+            var denominatorIndex = Rand.Random.Next(numBits, genes.Count);
             genes[numeratorIndex] = !genes[numeratorIndex];
             genes[denominatorIndex] = !genes[denominatorIndex];
         }

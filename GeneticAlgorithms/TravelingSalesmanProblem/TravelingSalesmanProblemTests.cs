@@ -17,13 +17,13 @@
  * permissions and limitations under the License.
  */
 
+using GeneticAlgorithms.Utilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using GeneticAlgorithms.Utilities;
 
 namespace GeneticAlgorithms.TravelingSalesmanProblem
 {
@@ -168,8 +168,7 @@ namespace GeneticAlgorithms.TravelingSalesmanProblem
             }
 
             var initialFitness = fnGetFitness(parentGenes);
-            var random = Rand.Random;
-            var count = random.Next(2, 20);
+            var count = Rand.Random.Next(2, 20);
             var runIndexes = Enumerable.Range(0, runs.Count).ToArray();
             while (count-- > 0)
             {
@@ -177,7 +176,7 @@ namespace GeneticAlgorithms.TravelingSalesmanProblem
                 {
                     if (runs[i].Count == 1)
                         continue;
-                    if (random.Next(runs.Count) == 0)
+                    if (Rand.Random.Next(runs.Count) == 0)
                         runs[i].Reverse();
                 }
 

@@ -17,10 +17,10 @@
  * permissions and limitations under the License.
  */
 
+using GeneticAlgorithms.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using GeneticAlgorithms.Utilities;
 
 namespace GeneticAlgorithms.TravelingSalesmanProblem
 {

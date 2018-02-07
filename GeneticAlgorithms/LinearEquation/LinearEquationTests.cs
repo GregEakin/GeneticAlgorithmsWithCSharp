@@ -18,6 +18,7 @@
  */
 
 using GeneticAlgorithms.MagicSquare;
+using GeneticAlgorithms.Utilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
@@ -30,8 +31,6 @@ namespace GeneticAlgorithms.LinearEquation
     public class LinearEquationTests
     {
         public delegate Fraction Equation(IReadOnlyList<Fraction> genes);
-
-        private static readonly Random Random = new Random();
 
         public static Fitness GetFitness(List<Fraction> genes, Equation[] equations)
         {
@@ -76,7 +75,7 @@ namespace GeneticAlgorithms.LinearEquation
                 .Distinct().OrderBy(g => g);
 
             IReadOnlyList<Fraction> FnGenesToInputs(IReadOnlyList<Fraction> genes1) => genes1;
-            var genes = geneSet.OrderBy(g => Random.Next()).Take(4).ToList();
+            var genes = geneSet.OrderBy(g => Rand.Random.Next()).Take(4).ToList();
             var fitness = new Fitness(new Fraction(42));
             var chromosome = new Chromosome<Fraction, Fitness>(genes, fitness);
             var watch = Stopwatch.StartNew();
@@ -96,16 +95,16 @@ namespace GeneticAlgorithms.LinearEquation
 
         public static void Mutate(List<Fraction> genes, List<Fraction> sortedGeneSet, Window window, int[] geneIndexes)
         {
-            var indexes = Random.Next(10) == 0
-                ? geneIndexes.OrderBy(g => Random.Next()).Take(1 + Random.Next(geneIndexes.Length - 1)).ToArray()
-                : new[] {geneIndexes[Random.Next(geneIndexes.Length)]};
+            var indexes = Rand.Random.Next(10) == 0
+                ? geneIndexes.OrderBy(g => Rand.Random.Next()).Take(1 + Rand.Random.Next(geneIndexes.Length - 1)).ToArray()
+                : new[] {geneIndexes[Rand.Random.Next(geneIndexes.Length)]};
             window.Slide();
             foreach (var index in indexes)
             {
                 var geneSetIndex = sortedGeneSet.IndexOf(genes[index]);
                 var start = Math.Max(0, geneSetIndex - window.Size);
                 var stop = Math.Min(sortedGeneSet.Count - 1, geneSetIndex + window.Size);
-                var genesetIndex2 = Random.Next(start, stop);
+                var genesetIndex2 = Rand.Random.Next(start, stop);
                 genes[index] = sortedGeneSet[genesetIndex2];
             }
         }
@@ -123,7 +122,7 @@ namespace GeneticAlgorithms.LinearEquation
 
             IReadOnlyList<Fraction> FnGenesToInputs(IReadOnlyList<Fraction> genes1) => genes1;
 
-            var genes = geneSet.OrderBy(g => Random.Next()).Take(4).ToList();
+            var genes = geneSet.OrderBy(g => Rand.Random.Next()).Take(4).ToList();
             Display(new Chromosome<Fraction, Fitness>(genes, fitness), watch, FnGenesToInputs);
 
             var sortedGeneSet = genes.OrderBy(g => g).ToList();

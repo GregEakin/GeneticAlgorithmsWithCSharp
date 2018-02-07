@@ -18,6 +18,7 @@
  */
 
 using GeneticAlgorithms.MagicSquare;
+using GeneticAlgorithms.Utilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
@@ -29,8 +30,6 @@ namespace GeneticAlgorithms.Knapsack
     [TestClass]
     public class KnapsackTests
     {
-        private static readonly Random Random = new Random();
-
         private static Fitness GetFitness(IEnumerable<ItemQuantity> genes)
         {
             var totalWeight = 0.0;
@@ -72,7 +71,7 @@ namespace GeneticAlgorithms.Knapsack
             var genes = new List<ItemQuantity>();
             var remainingWeight = maxWeight;
             var remainingVolume = maxVolume;
-            foreach (var unused in Enumerable.Range(1, Random.Next(items.Length)))
+            foreach (var unused in Enumerable.Range(1, Rand.Random.Next(items.Length)))
             {
                 var newGene = Add(genes.ToArray(), items, remainingWeight, remainingVolume);
                 if (newGene == null) continue;
@@ -87,9 +86,9 @@ namespace GeneticAlgorithms.Knapsack
         private static ItemQuantity Add(ItemQuantity[] genes, Resource[] items, double maxWeight, double maxVolume)
         {
             var usedItems = genes.Select(iq => iq.Item).ToList();
-            var item = items[Random.Next(items.Length)];
+            var item = items[Rand.Random.Next(items.Length)];
             while (usedItems.Contains(item))
-                item = items[Random.Next(items.Length)];
+                item = items[Rand.Random.Next(items.Length)];
 
             var maxQuantity = MaxQuantity(item, maxWeight, maxVolume);
             return maxQuantity > 0 ? new ItemQuantity(item, maxQuantity) : null;
@@ -103,10 +102,10 @@ namespace GeneticAlgorithms.Knapsack
             var remainingWeight = maxWeight - fitness.TotalWeight;
             var remainingVolume = maxVolume - fitness.TotalVolume;
 
-            var removing = genes.Count > 1 && Random.Next(10) == 0;
+            var removing = genes.Count > 1 && Rand.Random.Next(10) == 0;
             if (removing)
             {
-                var index1 = Random.Next(genes.Count);
+                var index1 = Rand.Random.Next(genes.Count);
                 var iq1 = genes[index1];
                 var item1 = iq1.Item;
                 remainingWeight += item1.Weight * iq1.Quantity;
@@ -115,7 +114,7 @@ namespace GeneticAlgorithms.Knapsack
             }
 
             var adding = (remainingWeight > 0 || remainingVolume > 0) &&
-                         (genes.Count == 0 || (genes.Count < items.Length && Random.Next(100) == 0));
+                         (genes.Count == 0 || (genes.Count < items.Length && Rand.Random.Next(100) == 0));
             if (adding)
             {
                 var newGene = Add(genes.ToArray(), items, remainingWeight, remainingVolume);
@@ -126,25 +125,25 @@ namespace GeneticAlgorithms.Knapsack
                 }
             }
 
-            var index = Random.Next(genes.Count);
+            var index = Rand.Random.Next(genes.Count);
             var iq = genes[index];
             var item = iq.Item;
             remainingWeight += item.Weight * iq.Quantity;
             remainingVolume += item.Volume * iq.Quantity;
 
-            var changeItem = genes.Count < items.Length && Random.Next(4) == 0;
+            var changeItem = genes.Count < items.Length && Rand.Random.Next(4) == 0;
             if (changeItem)
             {
                 var itemIndex = Array.IndexOf(items, iq.Item);
                 var start = Math.Max(1, itemIndex - window.Size);
                 var stop = Math.Min(items.Length - 1, itemIndex + window.Size);
-                item = items[Random.Next(start, stop)];
+                item = items[Rand.Random.Next(start, stop)];
             }
 
             var maxQuantity = MaxQuantity(item, remainingWeight, remainingVolume);
             if (maxQuantity > 0)
             {
-                var newGene = new ItemQuantity(item, window.Size > 1 ? maxQuantity : Random.Next(1, maxQuantity));
+                var newGene = new ItemQuantity(item, window.Size > 1 ? maxQuantity : Rand.Random.Next(1, maxQuantity));
                 genes[index] = newGene;
             }
             else

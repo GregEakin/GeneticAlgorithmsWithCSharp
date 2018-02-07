@@ -17,20 +17,18 @@
  * permissions and limitations under the License.
  */
 
+using GeneticAlgorithms.Utilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using GeneticAlgorithms.Utilities;
 
 namespace GeneticAlgorithms.MagicSquare
 {
     [TestClass]
     public class MagicSquareTests
     {
-        private static readonly Random Random = new Random();
-
         public static Fitness GetFitness(List<int> genes, int diagonalSize, int expectedSum)
         {
             var sums = Sums(genes, diagonalSize);
@@ -130,7 +128,7 @@ namespace GeneticAlgorithms.MagicSquare
             Fitness FnGetFitness(List<int> genes) => GetFitness(genes, diagonalSize, expectedSum);
             void FnDisplay(Chromosome<int, Fitness> candidate) => Display(candidate, watch, diagonalSize);
             void FnMutate(List<int> genes) => Mutate(genes, geneIndexes);
-            List<int> FnCreate() => geneSet.OrderBy(i => Random.Next(geneSet.Length)).ToList();
+            List<int> FnCreate() => geneSet.OrderBy(i => Rand.Random.Next(geneSet.Length)).ToList();
 
             var optimalValue = new Fitness(0);
             var best = genetic.GetBest(FnGetFitness, nSquared, optimalValue, geneSet, FnDisplay, FnMutate,

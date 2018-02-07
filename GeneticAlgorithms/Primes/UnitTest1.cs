@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using GeneticAlgorithms.Utilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace GeneticAlgorithms.primes
@@ -11,7 +12,6 @@ namespace GeneticAlgorithms.primes
         [TestMethod]
         public void Test2()
         {
-            var rnd = new Random();
             var teams = new List<HockeyTeam>
             {
                 new HockeyTeam("Detroit Red Wings", 1926),
@@ -22,7 +22,7 @@ namespace GeneticAlgorithms.primes
             };
 
             int[] years = {1920, 1930, 1980, 2000};
-            var foundedBeforeYear = years[rnd.Next(0, years.Length)];
+            var foundedBeforeYear = years[Rand.Random.Next(0, years.Length)];
             Console.WriteLine("Teams founded before {0}:", foundedBeforeYear);
             foreach (var team in teams.FindAll(team => team.Founded <= foundedBeforeYear).OrderBy(team => team.Name))
                 Console.WriteLine("    {0}: {1}", team.Name, team.Founded);

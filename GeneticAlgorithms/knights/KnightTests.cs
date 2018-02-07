@@ -17,19 +17,18 @@
  * permissions and limitations under the License.
  */
 
+using GeneticAlgorithms.Utilities;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace GeneticAlgorithms.Knights
 {
     [TestClass]
     public class KnightTests
     {
-        private static readonly Random Random = new Random();
-
         public delegate Position RandomPosition();
 
         public static int Fitness(Position[] genes, int width, int height)
@@ -54,7 +53,7 @@ namespace GeneticAlgorithms.Knights
         public static void Mutate(Position[] genes, int width, int height, Position[] allPositions,
             Position[] nonEdgePositions)
         {
-            var loops = Random.Next(10) == 0 ? 2 : 1;
+            var loops = Rand.Random.Next(10) == 0 ? 2 : 1;
             for (var count = 0; count < loops; count++)
             {
                 var positionToKnightIndexes =
@@ -86,10 +85,10 @@ namespace GeneticAlgorithms.Knights
                     : nonEdgePositions;
 
                 var geneIndex = knightIndexes.Count == 0
-                    ? Random.Next(genes.Length)
-                    : knightIndexes.ElementAt(Random.Next(knightIndexes.Count));
+                    ? Rand.Random.Next(genes.Length)
+                    : knightIndexes.ElementAt(Rand.Random.Next(knightIndexes.Count));
 
-                var position1 = potentialKnightPositions[Random.Next(potentialKnightPositions.Length)];
+                var position1 = potentialKnightPositions[Rand.Random.Next(potentialKnightPositions.Length)];
                 genes[geneIndex] = position1;
             }
         }
@@ -166,7 +165,7 @@ namespace GeneticAlgorithms.Knights
                     where 0 < p.X && p.X < width - 1 && 0 < p.Y && p.Y < height - 1
                     select p)).ToArray();
 
-            Position FnGetRandomPosition() => nonEdgePositions[Random.Next(nonEdgePositions.Length)];
+            Position FnGetRandomPosition() => nonEdgePositions[Rand.Random.Next(nonEdgePositions.Length)];
             void FnMutate(Position[] genes) => Mutate(genes, width, height, allPositions, nonEdgePositions);
             Position[] FnCreate() => Create(FnGetRandomPosition, expectedKnights);
 

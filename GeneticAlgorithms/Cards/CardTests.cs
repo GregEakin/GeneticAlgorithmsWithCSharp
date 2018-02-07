@@ -17,20 +17,18 @@
  * permissions and limitations under the License.
  */
 
+using GeneticAlgorithms.Utilities;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using GeneticAlgorithms.Utilities;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace GeneticAlgorithms.Cards
 {
     [TestClass]
     public class CardTests
     {
-        private static readonly Random Random = new Random();
-
         public static Fitness GetFitness(int[] genes, int size)
         {
             var group1Sum = genes.Take(5).Sum();
@@ -51,7 +49,7 @@ namespace GeneticAlgorithms.Cards
         {
             if (genes.Length == new HashSet<int>(genes).Count)
             {
-                var count = Random.Next(1, 4);
+                var count = Rand.Random.Next(1, 4);
                 while (count-- > 0)
                 {
                     var randomSample = Rand.RandomSampleArray(Enumerable.Range(0, genes.Length).ToArray(), 2);
@@ -64,8 +62,8 @@ namespace GeneticAlgorithms.Cards
             }
             else
             {
-                var indexA = Random.Next(genes.Length);
-                var indexB = Random.Next(geneSet.Length);
+                var indexA = Rand.Random.Next(genes.Length);
+                var indexB = Rand.Random.Next(geneSet.Length);
                 genes[indexA] = geneSet[indexB];
             }
         }
