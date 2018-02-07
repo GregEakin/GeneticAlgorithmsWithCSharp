@@ -1,5 +1,5 @@
 ﻿/* File: EquationGenerationTests.cs
- *     from chapter 10 of _Genetic Algorithms with Python_
+ *     from chapter 14 of _Genetic Algorithms with Python_
  *     writen by Clinton Sheppard
  *
  * Author: Greg Eakin <gregory.eakin@gmail.com>

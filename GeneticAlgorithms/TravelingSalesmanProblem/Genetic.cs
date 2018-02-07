@@ -151,18 +151,14 @@ namespace GeneticAlgorithms.TravelingSalesmanProblem
             var usedStrategies =
                 new List<Func<Chromosome<TGene, TFitness>, int, List<Chromosome<TGene, TFitness>>,
                     Chromosome<TGene, TFitness>>> {strategyLookup[Chromosome<TGene, TFitness>.Strategies.Mutate]};
+            if (crossover != null)
+                usedStrategies.Add(strategyLookup[Chromosome<TGene, TFitness>.Strategies.Crossover]);
 
             Chromosome<TGene, TFitness> FnNewChild(Chromosome<TGene, TFitness> parent, int index,
-                List<Chromosome<TGene, TFitness>> parents)
-            {
-                if (crossover != null)
-                {
-                    usedStrategies.Add(strategyLookup[Chromosome<TGene, TFitness>.Strategies.Crossover]);
-                    return usedStrategies[_random.Next(usedStrategies.Count)](parent, index, parents);
-                }
-
-                return FnMutate(parent);
-            }
+                List<Chromosome<TGene, TFitness>> parents) => 
+                crossover != null 
+                    ? usedStrategies[_random.Next(usedStrategies.Count)](parent, index, parents) 
+                    : FnMutate(parent);
 
             foreach (var improvement in GetImprovement(FnNewChild, FnGenerateParent, maxAge, poolSize))
             {

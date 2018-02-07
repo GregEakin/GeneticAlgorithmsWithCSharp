@@ -1,5 +1,23 @@
-﻿using System;
-using System.Linq;
+﻿/* File: Lawnmower.cs
+ *     from chapter 15 of _Genetic Algorithms with Python_
+ *     writen by Clinton Sheppard
+ *
+ * Author: Greg Eakin <gregory.eakin@gmail.com>
+ * Copyright (c) 2018 Greg Eakin
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+ * implied.  See the License for the specific language governing
+ * permissions and limitations under the License.
+ */
+
+using System;
 
 namespace GeneticAlgorithms.LawnmowerProblem
 {
@@ -32,29 +50,29 @@ namespace GeneticAlgorithms.LawnmowerProblem
         }
     }
 
-    public class Directions
+    public static class Directions
     {
-        public static Direction North = new Direction(0, 0, -1, '^');
-        public static Direction East = new Direction(1, 1, 0, '>');
-        public static Direction South = new Direction(2, 0, 1, 'v');
-        public static Direction West = new Direction(3, -1, 0, '<');
+        public static readonly Direction North = new Direction(0, 0, -1, '^');
+        public static readonly Direction East = new Direction(1, 1, 0, '>');
+        public static readonly Direction South = new Direction(2, 0, 1, 'v');
+        public static readonly Direction West = new Direction(3, -1, 0, '<');
 
-        public static Direction[] Dirs =
+        private static readonly Direction[] Dirs =
         {
-            North, South, East, West
+            North, East, South, West
         };
 
         public static Direction GetDirectionAfterTurnLeft90Degrees(Direction direction)
         {
             var newIndex = direction.Index > 0 ? direction.Index - 1 : Dirs.Length - 1;
-            var newDirection = Dirs.Single(d => d.Index == newIndex);
+            var newDirection = Dirs[newIndex];
             return newDirection;
         }
 
         public static Direction GetDirectionAfterTurnRight90Degrees(Direction direction)
         {
             var newIndex = direction.Index < Dirs.Length - 1 ? direction.Index + 1 : 0;
-            var newDirection = Dirs.Single(d => d.Index == newIndex);
+            var newDirection = Dirs[newIndex];
             return newDirection;
         }
     }
@@ -93,10 +111,9 @@ namespace GeneticAlgorithms.LawnmowerProblem
             var rightDirection = Directions.GetDirectionAfterTurnRight90Degrees(Direction);
             newLocation = rightDirection.MoveFrom(newLocation, right);
             var tuple = field.FixLocation(newLocation);
-            var valid = tuple.Item2;
-            if (!valid) return;
+            if (!tuple.Item2) return;
             Location = tuple.Item1;
-            StepCount += 1;
+            StepCount++;
             field[Location] = StepCount.ToString().PadLeft(2);
         }
     }
@@ -132,11 +149,16 @@ namespace GeneticAlgorithms.LawnmowerProblem
 
         public int CountMowed()
         {
+            //var sum = Enumerable.Range(0, Height)
+            //    .SelectMany(row => Enumerable.Range(0, Width), (row, colum) => new {row, colum})
+            //    .Count(t => _field[t.row, t.colum] != FieldContents.Grass);
+
             var sum = 0;
             for (var x = 0; x < Width; x++)
             for (var y = 0; y < Height; y++)
                 if (_field[x, y] != FieldContents.Grass)
                     sum++;
+
             return sum;
         }
 
@@ -159,13 +181,15 @@ namespace GeneticAlgorithms.LawnmowerProblem
 
     public class ValidatingField : Field
     {
-        public ValidatingField(int width, int height, string initialContent) : base(width, height, initialContent)
+        public ValidatingField(int width, int height, string initialContent)
+            : base(width, height, initialContent)
         {
         }
 
         public override Tuple<Location, bool> FixLocation(Location location)
         {
-            return 0 <= location.X && location.X < Width && 0 <= location.Y && location.Y < Height
+            return 0 <= location.X && location.X < Width &&
+                   0 <= location.Y && location.Y < Height
                 ? new Tuple<Location, bool>(location, true)
                 : new Tuple<Location, bool>(null, false);
         }
@@ -173,7 +197,8 @@ namespace GeneticAlgorithms.LawnmowerProblem
 
     public class ToroidField : Field
     {
-        public ToroidField(int width, int height, string initialContent) : base(width, height, initialContent)
+        public ToroidField(int width, int height, string initialContent)
+            : base(width, height, initialContent)
         {
         }
 

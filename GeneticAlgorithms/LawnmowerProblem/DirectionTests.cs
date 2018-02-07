@@ -1,4 +1,23 @@
-﻿using System.Collections.Generic;
+﻿/* File: DirectionTests.cs
+ *     from chapter 15 of _Genetic Algorithms with Python_
+ *     writen by Clinton Sheppard
+ *
+ * Author: Greg Eakin <gregory.eakin@gmail.com>
+ * Copyright (c) 2018 Greg Eakin
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+ * implied.  See the License for the specific language governing
+ * permissions and limitations under the License.
+ */
+
+using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace GeneticAlgorithms.LawnmowerProblem
@@ -200,16 +219,17 @@ namespace GeneticAlgorithms.LawnmowerProblem
         {
             var genes = new List<INode> {new Turn(), new Repeat(2, 3), new Mow(), new Mow(), new Turn()};
             var program = new Program(genes);
-            Assert.AreEqual("turn, repeat({mow, mow}, 3), turn", string.Join<INode>(", ", program.Main));
+            Assert.AreEqual("Turn, Repeat({Mow, Mow}, 3), Turn", string.Join(", ", program.Main));
+            Assert.AreEqual(0, program.Funcs.Count);
         }
 
         [TestMethod]
         public void CallTest()
         {
-            var genes = new List<INode> {new Turn(), new Call(1), new Turn(), new Func(), new Turn(), new Mow() };
+            var genes = new List<INode> {new Turn(), new Call(0), new Turn(), new Func(), new Turn(), new Mow() };
             var program = new Program(genes);
-            Assert.AreEqual("turn, call-1, turn", string.Join<INode>(", ", program.Main));
-            Assert.AreEqual("Func {turn, mow}: ", string.Join<INode>(",", program.Funcs));
+            Assert.AreEqual("Turn, Call-0, Turn", string.Join(", ", program.Main));
+            Assert.AreEqual("Func: {Turn, Mow}", string.Join("; ", program.Funcs));
         }
 
         [TestMethod]
@@ -217,8 +237,8 @@ namespace GeneticAlgorithms.LawnmowerProblem
         {
             var genes = new List<INode> { new Turn(), new Func(), new Turn(), new Func(), new Turn(), new Mow() };
             var program = new Program(genes);
-            Assert.AreEqual("turn, call-Func, turn", string.Join<INode>(", ", program.Main));
-            Assert.AreEqual("Func {turn, mow}: ", string.Join<INode>(",", program.Funcs));
+            Assert.AreEqual("Turn, Call-Func, Turn", string.Join(", ", program.Main));
+            Assert.AreEqual("Func: {Turn, Mow}", string.Join("; ", program.Funcs));
         }
 
         [TestMethod]
@@ -226,8 +246,8 @@ namespace GeneticAlgorithms.LawnmowerProblem
         {
             var genes = new List<INode> { new Turn(), new Turn(), new Func(), new Turn(), new Mow() };
             var program = new Program(genes);
-            Assert.AreEqual("turn, turn", string.Join<INode>(", ", program.Main));
-            Assert.AreEqual("Func {turn, mow}: ", string.Join<INode>(",", program.Funcs));
+            Assert.AreEqual("Turn, Turn", string.Join(", ", program.Main));
+            Assert.AreEqual("Func: {Turn, Mow}", string.Join("; ", program.Funcs));
         }
 
         [TestMethod]
@@ -235,8 +255,8 @@ namespace GeneticAlgorithms.LawnmowerProblem
         {
             var genes = new List<INode> { new Call(0), new Turn(), new Func(true), new Turn(), new Mow() };
             var program = new Program(genes);
-            Assert.AreEqual("call-0, turn", string.Join<INode>(", ", program.Main));
-            Assert.AreEqual("Func {turn, mow}: 0", string.Join<INode>(",", program.Funcs));
+            Assert.AreEqual("Call-0, Turn", string.Join(", ", program.Main));
+            Assert.AreEqual("Func 0: {Turn, Mow}", string.Join("; ", program.Funcs));
         }
 
         [TestMethod]
@@ -244,8 +264,8 @@ namespace GeneticAlgorithms.LawnmowerProblem
         {
             var genes = new List<INode> { new Call(0), new Call(1), new Func(true), new Turn(), new Mow(), new Func(true), new Mow(), new Turn() };
             var program = new Program(genes);
-            Assert.AreEqual("call-0, call-1", string.Join<INode>(", ", program.Main));
-            Assert.AreEqual("Func {mow, turn}: 0, Func {turn, mow}: 1", string.Join<INode>(", ", program.Funcs));
+            Assert.AreEqual("Call-0, Call-1", string.Join(", ", program.Main));
+            Assert.AreEqual("Func 0: {Mow, Turn}; Func 1: {Turn, Mow}", string.Join("; ", program.Funcs));
         }
 
         [TestMethod]
@@ -253,8 +273,8 @@ namespace GeneticAlgorithms.LawnmowerProblem
         {
             var genes = new List<INode> { new Func(), new Func(true), new Turn(), new Mow(), new Func(true), new Mow(), new Turn() };
             var program = new Program(genes);
-            Assert.AreEqual("call-Func", string.Join<INode>(", ", program.Main));
-            Assert.AreEqual("Func {mow, turn}: 0, Func {turn, mow}: 1", string.Join<INode>(", ", program.Funcs));
+            Assert.AreEqual("Call-Func", string.Join(", ", program.Main));
+            Assert.AreEqual("Func 0: {Mow, Turn}; Func 1: {Turn, Mow}", string.Join("; ", program.Funcs));
         }
     }
 
@@ -358,6 +378,14 @@ namespace GeneticAlgorithms.LawnmowerProblem
             var tuple = field.FixLocation(new Location(-1, 4));
             Assert.AreEqual(new Location(1, 1), tuple.Item1);
             Assert.IsTrue(tuple.Item2);
+        }
+
+        [TestMethod]
+        public void ModTest()
+        {
+            Assert.AreEqual(7, ToroidField.Mod(-3, 10));
+            Assert.AreEqual(5, ToroidField.Mod(5, 10));
+            Assert.AreEqual(8, ToroidField.Mod(18, 10));
         }
     }
 }

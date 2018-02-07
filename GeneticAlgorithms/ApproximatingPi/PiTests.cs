@@ -189,7 +189,7 @@ namespace GeneticAlgorithms.ApproximatingPi
                 var count = 0.0;
                 var stdout = Console.Out;
                 Console.SetOut(TextWriter.Null);
-                while (watch.Elapsed.Seconds < maxSeconds)
+                while (watch.ElapsedMilliseconds < maxSeconds * 1000)
                 {
                     var found = ApproximatePi(genes, maxSeconds);
                     if (found) count += 1.0;

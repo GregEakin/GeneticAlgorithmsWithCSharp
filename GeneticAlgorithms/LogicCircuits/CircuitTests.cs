@@ -95,7 +95,7 @@ namespace GeneticAlgorithms.LogicCircuits
             while (count-- > 0)
             {
                 var indexesUsed = NodesToCircuit(childGenes).Item2.Skip(sourceCount).ToArray();
-                if (indexesUsed.Length == 0)
+                if (indexesUsed.Any())
                     return childGenes;
                 var index = indexesUsed[Random.Next(indexesUsed.Length)];
                 childGenes[index] = fnCreateGene(index);

@@ -154,7 +154,7 @@ namespace GeneticAlgorithms.TicTacToe
         {
             var watch = Stopwatch.StartNew();
             var bestParent = generateParentFun();
-            if (maxSeconds > 0 && watch.Elapsed.Seconds > maxSeconds)
+            if (maxSeconds > 0 && watch.ElapsedMilliseconds > maxSeconds * 1000)
                 throw new SearchTimeoutException(bestParent);
             //yield return bestParent;
 
@@ -163,7 +163,7 @@ namespace GeneticAlgorithms.TicTacToe
             for (var i = 0; i < poolSize - 1; i++)
             {
                 var parent = generateParentFun();
-                if (maxSeconds > 0 && watch.Elapsed.Seconds > maxSeconds)
+                if (maxSeconds > 0 && watch.ElapsedMilliseconds > maxSeconds * 1000)
                     throw new SearchTimeoutException(parent);
                 //yield return parent;
 
@@ -181,7 +181,7 @@ namespace GeneticAlgorithms.TicTacToe
             var pIndex = 1;
             while (true)
             {
-                if (maxSeconds > 0 && watch.Elapsed.Seconds > maxSeconds)
+                if (maxSeconds > 0 && watch.ElapsedMilliseconds > maxSeconds * 1000)
                     throw new SearchTimeoutException(bestParent);
                 //yield return bestParent;
 

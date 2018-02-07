@@ -117,7 +117,7 @@ namespace GeneticAlgorithms.ApproximatingPi
                 Chromosome<TGene, TFitness>.Strategies.Crossover);
         }
 
-        internal Chromosome<TGene, TFitness> GetBest(GetFitnessDelegate getFitness, int targetLen,
+        public Chromosome<TGene, TFitness> GetBest(GetFitnessDelegate getFitness, int targetLen,
             TFitness optimalFitness, TGene[] geneSet, DisplayDelegate display, MutateGeneDelegate customMutate = null,
             CreateDelegate customCreate = null, int maxAge = 0, int poolSize = 1, CrossoverFun crossover = null,
             int maxSeconds = 0)
@@ -153,17 +153,14 @@ namespace GeneticAlgorithms.ApproximatingPi
                 new List<Func<Chromosome<TGene, TFitness>, int, List<Chromosome<TGene, TFitness>>,
                     Chromosome<TGene, TFitness>>> {strategyLookup[Chromosome<TGene, TFitness>.Strategies.Mutate]};
 
-            Chromosome<TGene, TFitness> FnNewChild(Chromosome<TGene, TFitness> parent, int index,
-                List<Chromosome<TGene, TFitness>> parents)
-            {
-                if (crossover != null)
-                {
-                    usedStrategies.Add(strategyLookup[Chromosome<TGene, TFitness>.Strategies.Crossover]);
-                    return usedStrategies[_random.Next(usedStrategies.Count)](parent, index, parents);
-                }
+            if (crossover != null)
+                usedStrategies.Add(strategyLookup[Chromosome<TGene, TFitness>.Strategies.Crossover]);
 
-                return FnMutate(parent);
-            }
+            Chromosome<TGene, TFitness> FnNewChild(Chromosome<TGene, TFitness> parent, int index,
+                List<Chromosome<TGene, TFitness>> parents) => 
+                crossover != null 
+                    ? usedStrategies[_random.Next(usedStrategies.Count)](parent, index, parents) 
+                    : FnMutate(parent);
 
             try
             {
@@ -191,16 +188,16 @@ namespace GeneticAlgorithms.ApproximatingPi
         {
             var watch = Stopwatch.StartNew();
             var bestParent = generateParent();
-            if (maxSeconds > 0 && maxSeconds < watch.Elapsed.Seconds)
+            if (maxSeconds > 0 && watch.ElapsedMilliseconds > maxSeconds * 1000)
                 throw new SearchTimeoutException(bestParent);
 
             yield return bestParent;
             var parents = new List<Chromosome<TGene, TFitness>> {bestParent};
             var historicalFitnesses = new List<TFitness> {bestParent.Fitness};
-            for (var i = 0; i < poolSize - 1; i++)
+            while(parents.Count < poolSize)
             {
                 var parent = generateParent();
-                if (maxSeconds > 0 && maxSeconds < watch.Elapsed.Seconds)
+                if (maxSeconds > 0 && watch.ElapsedMilliseconds > maxSeconds * 1000)
                     throw new SearchTimeoutException(parent);
 
                 if (parent.Fitness.CompareTo(bestParent.Fitness) > 0)
@@ -217,7 +214,7 @@ namespace GeneticAlgorithms.ApproximatingPi
             var pIndex = 1;
             while (true)
             {
-                if (maxSeconds > 0 && maxSeconds < watch.Elapsed.Seconds)
+                if (maxSeconds > 0 && watch.ElapsedMilliseconds > maxSeconds * 1000)
                     throw new SearchTimeoutException(bestParent);
 
                 pIndex = pIndex > 0 ? pIndex - 1 : lastParentIndex;

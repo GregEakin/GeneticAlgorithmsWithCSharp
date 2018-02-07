@@ -1,6 +1,26 @@
-﻿using System;
+﻿/* File: Mow.cs
+ *     from chapter 15 of _Genetic Algorithms with Python_
+ *     writen by Clinton Sheppard
+ *
+ * Author: Greg Eakin <gregory.eakin@gmail.com>
+ * Copyright (c) 2018 Greg Eakin
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+ * implied.  See the License for the specific language governing
+ * permissions and limitations under the License.
+ */
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace GeneticAlgorithms.LawnmowerProblem
 {
@@ -18,7 +38,7 @@ namespace GeneticAlgorithms.LawnmowerProblem
 
         public override string ToString()
         {
-            return "mow";
+            return nameof(Mow);
         }
     }
 
@@ -31,7 +51,7 @@ namespace GeneticAlgorithms.LawnmowerProblem
 
         public override string ToString()
         {
-            return "turn";
+            return nameof(Turn);
         }
     }
 
@@ -53,7 +73,7 @@ namespace GeneticAlgorithms.LawnmowerProblem
 
         public override string ToString()
         {
-            return $"jump({Forward},{Right})";
+            return $"{nameof(Jump)}({Forward},{Right})";
         }
     }
 
@@ -61,9 +81,9 @@ namespace GeneticAlgorithms.LawnmowerProblem
     {
         public int OpCount { get; }
         public int Times { get; }
-        public INode[] Ops { get; set; }
+        public List<INode> Ops { get; set; }
 
-        public Repeat(int opCount, int times, INode[] ops)
+        public Repeat(int opCount, int times, List<INode> ops)
         {
             OpCount = opCount;
             Times = times;
@@ -71,7 +91,7 @@ namespace GeneticAlgorithms.LawnmowerProblem
         }
 
         public Repeat(int opCount, int times)
-            : this(opCount, times, new INode[0])
+            : this(opCount, times, new List<INode>())
         {
         }
 
@@ -84,27 +104,27 @@ namespace GeneticAlgorithms.LawnmowerProblem
 
         public override string ToString()
         {
-            var x = Ops.Length > 0
-                ? $"{{{string.Join<INode>(", ", Ops)}}}"
+            var x = Ops.Any()
+                ? $"{{{string.Join(", ", Ops)}}}"
                 : OpCount.ToString();
-            return $"repeat({x}, {Times})";
+            return $"{nameof(Repeat)}({x}, {Times})";
         }
     }
 
     public class Func : INode
     {
-        public INode[] Ops { get; set; }
+        public List<INode> Ops { get; set; }
         public bool ExpectCall { get; }
         public int? Id { get; set; }
 
-        public Func(INode[] ops, bool expectCall)
+        public Func(List<INode> ops, bool expectCall)
         {
             Ops = ops;
             ExpectCall = expectCall;
         }
 
         public Func(bool expectCall = false)
-            : this(new INode[0], expectCall)
+            : this(new List<INode>(), expectCall)
         {
         }
 
@@ -116,115 +136,108 @@ namespace GeneticAlgorithms.LawnmowerProblem
 
         public override string ToString()
         {
-            return $"Func {{{string.Join<INode>(", ", Ops)}}}: {Id}";
+            var x = Id != null ? $" {Id}" : "";
+            return $"{nameof(Func)}{x}: {{{string.Join(", ", Ops)}}}";
         }
     }
 
     public class Call : INode
     {
         public int? FuncId { get; }
-        public INode[] Funcs { get; set; }
+        public List<INode> Funcs { get; set; }
 
-        public Call(int? funcId, INode[] funcs)
+        public Call(int? funcId, List<INode> funcs = null)
         {
             FuncId = funcId;
             Funcs = funcs;
         }
 
-        public Call(int? funcId)
-            : this(funcId, null)
-        {
-        }
-
         public void Execute(Mower mower, Field field)
         {
             var funcId = FuncId ?? 0;
-            if (Funcs.Length > funcId)
+            if (Funcs.Count > funcId)
                 Funcs[funcId].Execute(mower, field);
         }
 
         public override string ToString()
         {
-            return $"call-{FuncId?.ToString() ?? "Func"}";
+            return $"{nameof(Call)}-{FuncId?.ToString() ?? "Func"}";
         }
     }
 
     public class Program
     {
-        public INode[] Main { get; }
-        public Func[] Funcs { get; }
+        public List<INode> Main { get; }
+        public List<INode> Funcs { get; } = new List<INode>();
 
         public Program(List<INode> genes)
         {
-            var temp = new List<INode>(genes);
-            var funcs = new List<Func>();
-
-            for (var index = temp.Count - 1; index >= 0; index--)
+            Main = genes.ToList();
+            for (var index = Main.Count - 1; index >= 0; index--)
             {
-                switch (temp[index])
+                switch (Main[index])
                 {
                     case Repeat repeat:
                         var start1 = index + 1;
-                        var end1 = Math.Min(index + repeat.OpCount + 1, temp.Count);
-                        repeat.Ops = temp.Skip(start1).Take(end1 - start1).ToArray();
-                        temp.RemoveRange(start1, end1 - start1);
+                        var end1 = Math.Min(index + repeat.OpCount + 1, Main.Count);
+                        repeat.Ops = Main.Skip(start1).Take(end1 - start1).ToList();
+                        Main.RemoveRange(start1, end1 - start1);
                         continue;
 
                     case Call call:
-                        call.Funcs = funcs.Cast<INode>().ToArray();
+                        call.Funcs = Funcs;
                         break;
 
                     case Func func:
-                        if (funcs.Count > 0 && !func.ExpectCall)
+                        if (Funcs.Count > 0 && !func.ExpectCall)
                         {
-                            temp[index] = new Call(null, funcs.Cast<INode>().ToArray());
+                            Main[index] = new Call(null, Funcs);
                             continue;
                         }
 
                         var start2 = index + 1;
-                        var end2 = temp.Count;
+                        var end2 = Main.Count;
                         var func2 = new Func();
                         if (func.ExpectCall)
-                            func2.Id = funcs.Count;
-                        func2.Ops = temp.Skip(start2).Take(end2 - start2)
-                            .Where(t => !(t is Repeat) || ((Repeat) t).Ops.Length > 0).ToArray();
-                        funcs.Add(func2);
-                        temp.RemoveRange(index, end2 - index);
+                            func2.Id = Funcs.Count;
+                        func2.Ops = Main.Skip(start2).Take(end2 - start2)
+                            .Where(t => !(t is Repeat) || ((Repeat) t).Ops.Any()).ToList();
+                        Funcs.Add(func2);
+                        Main.RemoveRange(index, end2 - index);
                         break;
                 }
             }
 
-            foreach (var func in funcs)
+            foreach (var func in Funcs.Cast<Func>())
+                for (var index = func.Ops.Count - 1; index >= 0; index--)
+                {
+                    if (!(func.Ops[index] is Call call))
+                        continue;
+
+                    var funcId = call.FuncId;
+                    if (funcId == null)
+                        continue;
+
+                    if (funcId < Funcs.Count && !((Func) Funcs[(int) funcId]).Ops.Any())
+                        continue;
+
+                    func.Ops.RemoveAt(index);
+                }
+
+            for (var index = Main.Count - 1; index >= 0; index--)
             {
-                for (var index = func.Ops.Length - 1; index >= 0; index--)
-                {
-                    if (!(func.Ops[index] is Call call))
-                        continue;
-                    var funcId = call.FuncId;
-                    if (funcId == null)
-                        continue;
-                    if (funcId >= funcs.Count || funcs[(int) funcId].Ops.Length == 0)
-                    {
-                        var funcOps = new List<INode>(func.Ops);
-                        funcOps.RemoveAt(index);
-                        func.Ops = funcOps.ToArray();
-                    }
-                }
+                if (!(Main[index] is Call call))
+                    continue;
 
-                for (var index = func.Ops.Length - 1; index >= 0; index--)
-                {
-                    if (!(func.Ops[index] is Call call))
-                        continue;
-                    var funcId = call.FuncId;
-                    if (funcId == null)
-                        continue;
-                    if (funcId >= funcs.Count || funcs[(int) funcId].Ops.Length == 0)
-                        temp.RemoveAt(index);
-                }
+                var funcId = call.FuncId;
+                if (funcId == null)
+                    continue;
+
+                if (funcId < Funcs.Count && ((Func) Funcs[(int) funcId]).Ops.Any())
+                    continue;
+
+                Main.RemoveAt(index);
             }
-
-            Main = temp.ToArray();
-            Funcs = funcs.ToArray();
         }
 
         public void Evaluate(Mower mower, Field field)
@@ -236,13 +249,14 @@ namespace GeneticAlgorithms.LawnmowerProblem
         public void Print()
         {
             if (Funcs != null)
-                foreach (var func in Funcs)
+                foreach (var func in Funcs.Cast<Func>())
                 {
-                    if (func.Id != null && func.Ops.Length == 0)
+                    if (func.Id != null && !func.Ops.Any())
                         continue;
                     Console.WriteLine(func);
                 }
-            Console.WriteLine(string.Join<INode>(", ", Main));
+
+            Console.WriteLine("Program: {0}", string.Join(", ", Main));
         }
     }
 }
