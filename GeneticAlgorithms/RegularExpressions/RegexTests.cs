@@ -1,4 +1,23 @@
-﻿using System;
+﻿/* File: RegexTests.cs
+ *     from chapter 17 of _Genetic Algorithms with Python_
+ *     writen by Clinton Sheppard
+ *
+ * Author: Greg Eakin <gregory.eakin@gmail.com>
+ * Copyright (c) 2018 Greg Eakin
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+ * implied.  See the License for the specific language governing
+ * permissions and limitations under the License.
+ */
+
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -44,10 +63,10 @@ namespace GeneticAlgorithms.RegularExpressions
         {
             var pattern = "1[[2".ToCharArray().Select(c => c.ToString()).ToList();
             var repaired = RepairRegex(pattern);
-            Assert.AreEqual("1[]2", repaired);
+            Assert.AreEqual("1[2]", repaired);
         }
 
-        public string RepairRegex(List<string> genes)
+        private string RepairRegex(List<string> genes)
         {
             var result = new List<string>();
             var finals = new List<string>();
@@ -61,7 +80,7 @@ namespace GeneticAlgorithms.RegularExpressions
             return string.Join("", result);
         }
 
-        public RepairFunc RepairIgnoreRepeatMetas(string token, List<string> result, List<string> finals)
+        private RepairFunc RepairIgnoreRepeatMetas(string token, List<string> result, List<string> finals)
         {
             if (RepeatMetas.Contains(token) || EndMetas.Contains(token))
                 return RepairIgnoreRepeatMetas;
@@ -77,7 +96,7 @@ namespace GeneticAlgorithms.RegularExpressions
             return RepairIgnoreRepeatMetasFollowingRepeatOrStartMetas;
         }
 
-        public RepairFunc RepairIgnoreRepeatMetasFollowingRepeatOrStartMetas(string token, List<string> result,
+        private RepairFunc RepairIgnoreRepeatMetasFollowingRepeatOrStartMetas(string token, List<string> result,
             List<string> finals)
         {
             var last = result[result.Count - 1];
@@ -121,7 +140,7 @@ namespace GeneticAlgorithms.RegularExpressions
             return RepairIgnoreRepeatMetasFollowingRepeatOrStartMetas;
         }
 
-        public RepairFunc RepairInCharacterSet(string token, List<string> result, List<string> finals)
+        private RepairFunc RepairInCharacterSet(string token, List<string> result, List<string> finals)
         {
             switch (token)
             {
@@ -144,7 +163,7 @@ namespace GeneticAlgorithms.RegularExpressions
             return RepairInCharacterSet;
         }
 
-        public Fitness GetFitness(List<string> genes, List<string> wanted, List<string> unwanted)
+        private Fitness GetFitness(List<string> genes, List<string> wanted, List<string> unwanted)
         {
             var pattern = RepairRegex(genes);
             var length = pattern.Length;
@@ -181,13 +200,13 @@ namespace GeneticAlgorithms.RegularExpressions
             Assert.AreEqual(7, fitness.Length);
         }
 
-        public void Display(Chromosome<string, Fitness> candidate, Stopwatch watch)
+        private void Display(Chromosome<string, Fitness> candidate, Stopwatch watch)
         {
             Console.WriteLine("{0}\t{1}\t{2} ms", RepairRegex(candidate.Genes), candidate.Fitness,
                 watch.ElapsedMilliseconds);
         }
 
-        public bool MutateAdd(List<string> genes, string[] geneSet)
+        private bool MutateAdd(List<string> genes, string[] geneSet)
         {
             var index = genes.Count > 0 ? Random.Next(genes.Count) : 0;
             genes.Insert(index, geneSet[Random.Next(geneSet.Length)]);
@@ -204,7 +223,7 @@ namespace GeneticAlgorithms.RegularExpressions
             Assert.AreNotEqual("1*0?10*", string.Join(string.Empty, genes.Select(p => p)));
         }
 
-        public bool MutateRemove(List<string> genes)
+        private bool MutateRemove(List<string> genes)
         {
             if (genes.Count < 1)
                 return false;
@@ -223,7 +242,7 @@ namespace GeneticAlgorithms.RegularExpressions
             Assert.AreNotEqual("1*0?10*", string.Join(string.Empty, genes.Select(p => p)));
         }
 
-        public bool MutateReplace(List<string> genes, string[] geneSet)
+        private bool MutateReplace(List<string> genes, string[] geneSet)
         {
             if (genes.Count < 1)
                 return false;
@@ -242,7 +261,7 @@ namespace GeneticAlgorithms.RegularExpressions
             Assert.AreNotEqual("1*0?10*", string.Join(string.Empty, genes.Select(p => p)));
         }
 
-        public bool MutateSwap(List<string> genes)
+        private bool MutateSwap(List<string> genes)
         {
             if (genes.Count < 2)
                 return false;
@@ -264,7 +283,7 @@ namespace GeneticAlgorithms.RegularExpressions
             Assert.AreNotEqual("1*0?10*", string.Join(string.Empty, genes.Select(p => p)));
         }
 
-        public bool MutateMove(List<string> genes)
+        private bool MutateMove(List<string> genes)
         {
             if (genes.Count < 3)
                 return false;
@@ -286,7 +305,7 @@ namespace GeneticAlgorithms.RegularExpressions
             Assert.AreNotEqual("1*0?10*", string.Join(string.Empty, genes.Select(p => p)));
         }
 
-        public bool MutateToCharacterSet(List<string> genes)
+        private bool MutateToCharacterSet(List<string> genes)
         {
             if (genes.Count < 3)
                 return false;
@@ -307,7 +326,8 @@ namespace GeneticAlgorithms.RegularExpressions
             if (shorter.Count == 0)
                 return false;
             var index = ors[Random.Next(ors.Count)];
-            var distinct = genes.Skip(index - 1).Take(3).Where((x, j) => j % 2 == 0).SelectMany(s => s.ToCharArray()).Select(c => c.ToString()).Distinct();
+            var distinct = genes.Skip(index - 1).Take(3).Where((x, j) => j % 2 == 0).SelectMany(s => s.ToCharArray())
+                .Select(c => c.ToString()).Distinct();
 
             //var distinct = new HashSet<char>(genes.SelectMany(mo => mo.Substring(index-1, index+2).ToCharArray()));
 
@@ -327,7 +347,7 @@ namespace GeneticAlgorithms.RegularExpressions
             CollectionAssert.AreEqual(new[] {"[", "0", "1", "]"}, genes);
         }
 
-        public bool MutateToCharacterSetLeft(List<string> genes, string[] wanted)
+        private bool MutateToCharacterSetLeft(List<string> genes, string[] wanted)
         {
             if (genes.Count < 4)
                 return false;
@@ -359,7 +379,7 @@ namespace GeneticAlgorithms.RegularExpressions
             choice.Reverse();
             foreach (var i in choice)
                 if (i + 1 >= 0)
-                    genes.RemoveAt(i+1);
+                    genes.RemoveAt(i + 1);
             genes.AddRange(characterSet);
             return true;
         }
@@ -367,15 +387,16 @@ namespace GeneticAlgorithms.RegularExpressions
         [TestMethod]
         public void MutateToCharacterSetLeftTest()
         {
-            var genes = new List<string>{"MA", "|", "MI", "|", "MS", "|","MD" };
+            var genes = new List<string> {"MA", "|", "MI", "|", "MS", "|", "MD"};
             var wanted = new[] {"MA", "MI", "MN"};
             var mutated = MutateToCharacterSetLeft(genes, wanted);
             Console.WriteLine(string.Join(", ", genes));
             Assert.IsTrue(mutated);
-            CollectionAssert.AreEqual(new List<string>{"|", "|", "MS", "|", "MD", "|", "M", "[", "A", "I", "]" }, genes);
+            CollectionAssert.AreEqual(new List<string> {"|", "|", "MS", "|", "MD", "|", "M", "[", "A", "I", "]"},
+                genes);
         }
 
-        public bool MutateAddWanted(List<string> genes, string[] wanted)
+        private bool MutateAddWanted(List<string> genes, string[] wanted)
         {
             var index = genes.Count > 0 ? Random.Next(genes.Count) : 0;
             genes.Insert(index, "|");
@@ -387,7 +408,8 @@ namespace GeneticAlgorithms.RegularExpressions
 
         public delegate bool FnMutateDelegate(List<string> genes);
 
-        public void Mutate(List<string> genes, FnGetFitnessDelegate fnGetFitness, List<FnMutateDelegate> mutationOperators,
+        private void Mutate(List<string> genes, FnGetFitnessDelegate fnGetFitness,
+            List<FnMutateDelegate> mutationOperators,
             List<int> mutationRoundCounts)
         {
             var initialFitness = fnGetFitness(genes);
@@ -496,7 +518,7 @@ namespace GeneticAlgorithms.RegularExpressions
             FindRegex(wanted, unwanted, 120, customOperators);
         }
 
-        public Chromosome<string, Fitness> FindRegex(string[] wanted, string[] unwanted, int expectedLength,
+        private Chromosome<string, Fitness> FindRegex(string[] wanted, string[] unwanted, int expectedLength,
             FnMutateDelegate[] customOperators = null)
         {
             var genetic = new Genetic<string, Fitness>();
@@ -507,9 +529,11 @@ namespace GeneticAlgorithms.RegularExpressions
             var textGenes = wanted.ToList().Concat(set).ToArray();
             var fullGeneSet = AllMetas.Concat(textGenes).ToArray();
 
-            void FnDisplay(Chromosome<string, Fitness> candidate, int? length) => Display(candidate, watch);
+            void FnDisplay(Chromosome<string, Fitness> candidate, int? length) =>
+                Display(candidate, watch);
 
-            Fitness FnFitness(List<string> genes) => GetFitness(genes, wanted.ToList(), unwanted.ToList());
+            Fitness FnGetFitness(List<string> genes) =>
+                GetFitness(genes, wanted.ToList(), unwanted.ToList());
 
             var mutationRoundCounts = new List<int> {1};
 
@@ -525,22 +549,22 @@ namespace GeneticAlgorithms.RegularExpressions
             if (customOperators != null)
                 mutationOperators.AddRange(customOperators);
 
-            void FnMutate(List<string> genes) => Mutate(genes, FnFitness, mutationOperators, mutationRoundCounts);
+            void FnMutate(List<string> genes) => Mutate(genes, FnGetFitness, mutationOperators, mutationRoundCounts);
 
             var optimalFitness = new Fitness(wanted.Length, wanted.Length, 0, expectedLength);
 
-                var best = genetic.GetBest(FnFitness, textGenes.Max(i => i.Length), optimalFitness, fullGeneSet,
+            var best = genetic.GetBest(FnGetFitness, textGenes.Max(i => i.Length), optimalFitness, fullGeneSet,
                 FnDisplay, FnMutate, null, 0, 10);
 
             Assert.IsTrue(optimalFitness.CompareTo(best.Fitness) <= 0);
 
-            if (_regexErrorsSeen.Count > 0)
-            {
-                Console.WriteLine();
-                Console.WriteLine("Errors:");
-                foreach (var error in _regexErrorsSeen)
-                    Console.WriteLine("  {0}", error.Message);
-            }
+            if (!_regexErrorsSeen.Any())
+                return best;
+
+            Console.WriteLine();
+            Console.WriteLine("Errors:");
+            foreach (var error in _regexErrorsSeen)
+                Console.WriteLine("  {0}", error.Message);
 
             return best;
         }
