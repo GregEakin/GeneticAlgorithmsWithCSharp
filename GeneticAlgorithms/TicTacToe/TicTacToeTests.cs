@@ -17,28 +17,32 @@
  * permissions and limitations under the License.
  */
 
+using GeneticAlgorithms.Utilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using GeneticAlgorithms.Utilities;
 
 namespace GeneticAlgorithms.TicTacToe
 {
     [TestClass]
     public class TicTacToeTests
     {
-        private readonly int[] _squareIndexes = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+        private static readonly int[] SquareIndexes = {1, 2, 3, 4, 5, 6, 7, 8, 9};
 
-        private Fitness GetFitness(List<Rule> genes)
+        public delegate bool FnMutateDelegate(List<Rule> genes);
+
+        public delegate Fitness FnGetFitness(List<Rule> genes);
+
+        private static Fitness GetFitness(List<Rule> genes)
         {
             var localCopy = genes.ToList();
             var fitness = GetFitnessForGames(localCopy);
             return new Fitness(fitness.Wins, fitness.Ties, fitness.Losses, genes.Count);
         }
 
-        private CompetitionResult PlayOneOnOne(List<Rule> xGenes, List<Rule> oGenes)
+        private static CompetitionResult PlayOneOnOne(List<Rule> xGenes, List<Rule> oGenes)
         {
             var board = Enumerable.Range(1, 9).ToDictionary(i => i, i => new Square(i));
             var empties = board.Values.Where(v => v.Content == ContentType.Empty).ToArray();
@@ -79,11 +83,11 @@ namespace GeneticAlgorithms.TicTacToe
             return CompetitionResult.Tie;
         }
 
-        public Fitness GetFitnessForGames(List<Rule> genes)
+        public static Fitness GetFitnessForGames(List<Rule> genes)
         {
             string GetBoardString(IReadOnlyDictionary<int, Square> b) =>
                 string.Join("",
-                    _squareIndexes.Select(i =>
+                    SquareIndexes.Select(i =>
                         b[i].Content == ContentType.Empty ? "." : b[i].Content == ContentType.Mine ? "x" : "o"));
 
             var board = Enumerable.Range(1, 9).ToDictionary(i => i, i => new Square(i));
@@ -194,14 +198,14 @@ namespace GeneticAlgorithms.TicTacToe
                 candidate.Fitness, watch.ElapsedMilliseconds);
         }
 
-        public bool MutateAdd(List<Rule> genes, Rule[] geneSet)
+        public static bool MutateAdd(List<Rule> genes, Rule[] geneSet)
         {
             var index = Rand.Random.Next(genes.Count);
             genes.Insert(index, geneSet[Rand.Random.Next(geneSet.Length)]);
             return true;
         }
 
-        public bool MutateRemove(List<Rule> genes)
+        public static bool MutateRemove(List<Rule> genes)
         {
             if (!genes.Any())
                 return false;
@@ -211,16 +215,16 @@ namespace GeneticAlgorithms.TicTacToe
             return true;
         }
 
-        public bool MutateReplace(List<Rule> genes, Rule[] geneSet)
+        public static bool MutateReplace(List<Rule> genes, Rule[] geneSet)
         {
             if (!genes.Any())
                 return false;
             var index = Rand.Random.Next(genes.Count);
             genes[index] = geneSet[Rand.Random.Next(geneSet.Length)];
-            return false;
+            return true;
         }
 
-        public bool MutateSwapAdjacent(List<Rule> genes)
+        public static bool MutateSwapAdjacent(List<Rule> genes)
         {
             if (genes.Count < 2)
                 return false;
@@ -231,7 +235,7 @@ namespace GeneticAlgorithms.TicTacToe
             return true;
         }
 
-        public bool MutateMove(List<Rule> genes)
+        public static bool MutateMove(List<Rule> genes)
         {
             if (genes.Count < 3)
                 return false;
@@ -240,12 +244,13 @@ namespace GeneticAlgorithms.TicTacToe
             var toMove = genes.Skip(skip).Take(length).ToArray();
             genes.RemoveRange(skip, length);
             var index = Rand.Random.Next(genes.Count);
+            if (index >= skip)
+                index++;
             genes.InsertRange(index, toMove);
             return true;
         }
 
-        private void Mutate(List<Rule> genes, Func<List<Rule>, Fitness> fnGetFitness,
-            FnMutateDelegate[] mutationOperators,
+        private static void Mutate(List<Rule> genes, FnGetFitness fnGetFitness, FnMutateDelegate[] mutationOperators,
             List<int> mutationRoundCounts)
         {
             var initialFitness = fnGetFitness(genes);
@@ -302,8 +307,6 @@ namespace GeneticAlgorithms.TicTacToe
             return genes;
         }
 
-        public delegate bool FnMutateDelegate(List<Rule> genes);
-
         [TestMethod]
         public void PerfectKnowledgeTest()
         {
@@ -344,7 +347,8 @@ namespace GeneticAlgorithms.TicTacToe
 
             var optimalFitness = new Fitness(620, 120, 0, 11);
 
-            var best = Genetic<Rule, Fitness>.GetBest(FnGetFitness, minGenes, optimalFitness, null, FnDisplay, FnMutate, FnCreate,
+            var best = Genetic<Rule, Fitness>.GetBest(FnGetFitness, minGenes, optimalFitness, null, FnDisplay, FnMutate,
+                FnCreate,
                 500, 20, FnCrossover);
             Assert.IsTrue(optimalFitness.CompareTo(best.Fitness) <= 0);
         }
@@ -391,7 +395,8 @@ namespace GeneticAlgorithms.TicTacToe
 
             int FnSortKey(List<Rule> genes, int wins, int ties, int losses) => -1000 * losses - ties + 1 / genes.Count;
 
-            var unused = Genetic<Rule, Fitness>.Tournament(FnCreate, FnCrossover, PlayOneOnOne, FnDisplay, FnSortKey, 13);
+            var unused =
+                Genetic<Rule, Fitness>.Tournament(FnCreate, FnCrossover, PlayOneOnOne, FnDisplay, FnSortKey, 13);
         }
 
         static Rule HaveThreeInRow => new RowContentFilter(ContentType.Mine, 3);

@@ -17,6 +17,7 @@
  * permissions and limitations under the License.
  */
 
+using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -52,13 +53,55 @@ namespace GeneticAlgorithms.TicTacToe
         [TestMethod]
         public void MutateAddTest()
         {
-            var ticTacToe = new TicTacToeTests();
             var genes = new List<Rule>();
             var geneSet = TicTacToeTests.CreateGeneSet();
-            Assert.IsTrue(ticTacToe.MutateAdd(genes, geneSet));
+            Assert.IsTrue(TicTacToeTests.MutateAdd(genes, geneSet));
             Assert.AreEqual(1, genes.Count);
-            Assert.IsTrue(ticTacToe.MutateAdd(genes, geneSet));
+            Assert.IsTrue(TicTacToeTests.MutateAdd(genes, geneSet));
             Assert.AreEqual(2, genes.Count);
+        }
+
+        [TestMethod]
+        public void MutateRemove()
+        {
+            var genes = new List<Rule> {new DiagonalContentFilter(null, null)};
+            Assert.IsTrue(TicTacToeTests.MutateRemove(genes));
+            Assert.IsFalse(genes.Any());
+        }
+
+        [TestMethod]
+        public void MutateReplace()
+        {
+            var genes = new List<Rule> {new DiagonalContentFilter(null, null)};
+            var geneSet = new Rule[] {new DiagonalOppositeFilter(null)};
+            Assert.IsTrue(TicTacToeTests.MutateReplace(genes, geneSet));
+            Assert.AreEqual(1, genes.Count);
+            Assert.IsInstanceOfType(genes[0], typeof(DiagonalOppositeFilter));
+        }
+
+        [TestMethod]
+        public void MutateSwapAdjacent()
+        {
+            var genes = new List<Rule> {new DiagonalContentFilter(null, null), new DiagonalOppositeFilter(null)};
+            Assert.IsTrue(TicTacToeTests.MutateSwapAdjacent(genes));
+            Assert.IsInstanceOfType(genes[0], typeof(DiagonalOppositeFilter));
+            Assert.IsInstanceOfType(genes[1], typeof(DiagonalContentFilter));
+        }
+
+        [TestMethod]
+        public void MutateMoveTest()
+        {
+            var save = new List<Rule>
+            {
+                new DiagonalContentFilter(null, null),
+                new DiagonalOppositeFilter(null),
+                new RowOppositeFilter(null)
+            };
+
+            var ticTacToe = new TicTacToeTests();
+            var genes = save.ToList();
+            Assert.IsTrue(TicTacToeTests.MutateMove(genes));
+            CollectionAssert.AreNotEqual(save, genes);
         }
 
         [TestMethod]
@@ -101,9 +144,8 @@ namespace GeneticAlgorithms.TicTacToe
                 new RuleMetadata((expectedContent, count) => new CenterFilter()),
             };
             var genes = geneSet.SelectMany(g => g.CreateRules()).ToList();
-            var ticTacToe = new TicTacToeTests();
-            var x = ticTacToe.GetFitnessForGames(genes);
-            Assert.AreEqual("100.0% Losses (65), 0.0% Ties (0), 0.0% Wins (0), 1 rules", x.ToString());
+            var fitness = TicTacToeTests.GetFitnessForGames(genes);
+            Assert.AreEqual("100.0% Losses (65), 0.0% Ties (0), 0.0% Wins (0), 1 rules", fitness.ToString());
         }
     }
 }
