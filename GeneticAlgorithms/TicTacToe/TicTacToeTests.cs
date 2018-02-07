@@ -1,4 +1,23 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿/* File: TicTacToeTests.cs
+ *     from chapter 18 of _Genetic Algorithms with Python_
+ *     writen by Clinton Sheppard
+ *
+ * Author: Greg Eakin <gregory.eakin@gmail.com>
+ * Copyright (c) 2018 Greg Eakin
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+ * implied.  See the License for the specific language governing
+ * permissions and limitations under the License.
+ */
+
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -11,24 +30,24 @@ namespace GeneticAlgorithms.TicTacToe
     {
         private readonly Random _random = new Random();
 
-        private readonly int[] _squareIndexes = { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+        private readonly int[] _squareIndexes = {1, 2, 3, 4, 5, 6, 7, 8, 9};
 
-        public Fitness GetFitness(Rule[] genes)
+        private Fitness GetFitness(List<Rule> genes)
         {
-            var localCopy = genes.ToArray();
+            var localCopy = genes.ToList();
             var fitness = GetFitnessForGames(localCopy);
-            return new Fitness(fitness.Wins, fitness.Ties, fitness.Losses, genes.Length);
+            return new Fitness(fitness.Wins, fitness.Ties, fitness.Losses, genes.Count);
         }
 
-        public CompetitionResult PlayOneOnOne(Rule[] xGenes, Rule[] oGenes)
+        private CompetitionResult PlayOneOnOne(List<Rule> xGenes, List<Rule> oGenes)
         {
             var board = Enumerable.Range(1, 9).ToDictionary(i => i, i => new Square(i));
             var empties = board.Values.Where(v => v.Content == ContentType.Empty).ToArray();
             var roundData = new[]
             {
-                new Tuple<Rule[], ContentType, CompetitionResult, CompetitionResult>(xGenes, ContentType.Mine,
+                new Tuple<List<Rule>, ContentType, CompetitionResult, CompetitionResult>(xGenes, ContentType.Mine,
                     CompetitionResult.Loss, CompetitionResult.Win),
-                new Tuple<Rule[], ContentType, CompetitionResult, CompetitionResult>(oGenes, ContentType.Opponent,
+                new Tuple<List<Rule>, ContentType, CompetitionResult, CompetitionResult>(oGenes, ContentType.Opponent,
                     CompetitionResult.Win, CompetitionResult.Loss),
             };
 
@@ -61,7 +80,7 @@ namespace GeneticAlgorithms.TicTacToe
             return CompetitionResult.Tie;
         }
 
-        public Fitness GetFitnessForGames(Rule[] genes)
+        public Fitness GetFitnessForGames(List<Rule> genes)
         {
             string GetBoardString(IReadOnlyDictionary<int, Square> b) =>
                 string.Join("",
@@ -142,10 +161,11 @@ namespace GeneticAlgorithms.TicTacToe
                 }
             }
 
-            return new Fitness(wins, ties, losses, genes.Length);
+            return new Fitness(wins, ties, losses, genes.Count);
         }
 
-        public static int[] GetMove(Rule[] ruleSet, Dictionary<int, Square> board, Square[] empties, int startingRuleIndex = 0)
+        public static int[] GetMove(List<Rule> ruleSet, Dictionary<int, Square> board, Square[] empties,
+            int startingRuleIndex = 0)
         {
             var ruleSetCopy = ruleSet.ToArray();
             for (var ruleIndex = startingRuleIndex; ruleIndex < ruleSetCopy.Length; ruleIndex++)
@@ -165,9 +185,10 @@ namespace GeneticAlgorithms.TicTacToe
 
         public static void Display(Chromosome<Rule, Fitness> candidate, Stopwatch watch)
         {
-            var localCopy = candidate.Genes.Reverse().Select(g => g.ToString());
-            Console.WriteLine("\t{0}\n{1}\n{2} ms", string.Join("\n\t", localCopy), candidate.Fitness,
-                watch.ElapsedMilliseconds);
+            var localCopy = candidate.Genes;
+            localCopy.Reverse();
+            Console.WriteLine("\t{0}\n{1}\n{2} ms", string.Join("\n\t", localCopy.Select(g => g.ToString())),
+                candidate.Fitness, watch.ElapsedMilliseconds);
         }
 
         public bool MutateAdd(List<Rule> genes, Rule[] geneSet)
@@ -220,11 +241,10 @@ namespace GeneticAlgorithms.TicTacToe
             return true;
         }
 
-        public Rule[] Mutate(Rule[] input, Func<Rule[], Fitness> fnGetFitness, FnMutateDelegate[] mutationOperators,
+        private void Mutate(List<Rule> genes, Func<List<Rule>, Fitness> fnGetFitness, FnMutateDelegate[] mutationOperators,
             List<int> mutationRoundCounts)
         {
-            var genes = input.ToList();
-            var initialFitness = fnGetFitness(genes.ToArray());
+            var initialFitness = fnGetFitness(genes);
             var count = _random.Next(mutationRoundCounts.Count);
             for (var i = 1; i < count + 2; i++)
             {
@@ -236,14 +256,12 @@ namespace GeneticAlgorithms.TicTacToe
                     func = copy[_random.Next(copy.Count)];
                 }
 
-                if (fnGetFitness(genes.ToArray()).CompareTo(initialFitness) > 0)
+                if (fnGetFitness(genes).CompareTo(initialFitness) > 0)
                 {
                     mutationRoundCounts.Add(i);
-                    return genes.ToArray();
+                    return;
                 }
             }
-
-            return genes.ToArray();
         }
 
         public static Rule[] CreateGeneSet()
@@ -292,9 +310,11 @@ namespace GeneticAlgorithms.TicTacToe
             var geneset = CreateGeneSet();
             var watch = Stopwatch.StartNew();
 
-            void FnDisplay(Chromosome<Rule, Fitness> candidate, int? length) => Display(candidate, watch);
+            void FnDisplay(Chromosome<Rule, Fitness> candidate, int? length) =>
+                Display(candidate, watch);
 
-            Fitness FnGetFitness(Rule[] genes) => GetFitness(genes);
+            Fitness FnGetFitness(List<Rule> genes) =>
+                GetFitness(genes);
 
             var mutationRoundCounts = new List<int> {1};
 
@@ -307,22 +327,22 @@ namespace GeneticAlgorithms.TicTacToe
                 MutateMove,
             };
 
-            Rule[] FnMutate(Rule[] genes) => Mutate(genes, FnGetFitness, mutationOperators, mutationRoundCounts);
+            void FnMutate(List<Rule> genes) =>
+                Mutate(genes, FnGetFitness, mutationOperators, mutationRoundCounts);
 
-            Rule[] FnCrossover(Rule[] parent, Rule[] doner)
+            List<Rule> FnCrossover(List<Rule> parent, List<Rule> doner)
             {
-                var child = new List<Rule>();
-                child.AddRange(parent.Take(parent.Length / 2));
-                child.AddRange(doner.Skip(doner.Length / 2));
-                var retval = FnMutate(child.ToArray());
-                return retval;
+                var child = parent.Take(parent.Count / 2).Concat(doner.Skip(doner.Count / 2)).ToList();
+                FnMutate(child);
+                return child;
             }
 
-            Rule[] FnCreate() => genetic.RandomSample(geneset, _random.Next(minGenes, maxGenes));
+            List<Rule> FnCreate() => 
+                genetic.RandomSample(geneset.ToArray(), _random.Next(minGenes, maxGenes));
 
             var optimalFitness = new Fitness(620, 120, 0, 11);
 
-            var best = genetic.BestFitness(FnGetFitness, minGenes, optimalFitness, null, FnDisplay, FnMutate, FnCreate,
+            var best = genetic.GetBest(FnGetFitness, minGenes, optimalFitness, null, FnDisplay, FnMutate, FnCreate,
                 500, 20, FnCrossover);
             Assert.IsTrue(optimalFitness.CompareTo(best.Fitness) <= 0);
         }
@@ -337,11 +357,11 @@ namespace GeneticAlgorithms.TicTacToe
             var geneset = CreateGeneSet();
             var watch = Stopwatch.StartNew();
 
-            void FnDisplay(Rule[] genes, int wins, int ties, int losses, int generation)
+            void FnDisplay(List<Rule> genes, int wins, int ties, int losses, int generation)
             {
                 Console.WriteLine("-- generation {0} --", generation);
                 Display(
-                    new Chromosome<Rule, Fitness>(genes, new Fitness(wins, ties, losses, genes.Length),
+                    new Chromosome<Rule, Fitness>(genes, new Fitness(wins, ties, losses, genes.Count),
                         Chromosome<Rule, Fitness>.Strategies.None), watch);
             }
 
@@ -356,21 +376,20 @@ namespace GeneticAlgorithms.TicTacToe
                 MutateMove,
             };
 
-            Rule[] FnMutate(Rule[] genes) =>
+            void FnMutate(List<Rule> genes) =>
                 Mutate(genes, x => new Fitness(0, 0, 0, 0), mutationOperators, mutationRoundCounts);
 
-            Rule[] FnCrossover(Rule[] parent, Rule[] doner)
+            List<Rule> FnCrossover(List<Rule> parent, List<Rule> doner)
             {
-                var child = new List<Rule>();
-                child.AddRange(parent.Take(parent.Length / 2));
-                child.AddRange(doner.Skip(doner.Length / 2));
-                var retval = FnMutate(child.ToArray());
-                return retval;
+                var child = parent.Take(parent.Count / 2).Concat(doner.Skip(doner.Count / 2)).ToList();
+                FnMutate(child);
+                return child;
             }
 
-            Rule[] FnCreate() => genetic.RandomSample(geneset, _random.Next(minGenes, maxGenes));
+            List<Rule> FnCreate() => 
+                genetic.RandomSample(geneset, _random.Next(minGenes, maxGenes));
 
-            int FnSortKey(Rule[] genes, int wins, int ties, int losses) => -1000 * losses - ties + 1 / genes.Length;
+            int FnSortKey(List<Rule> genes, int wins, int ties, int losses) => -1000 * losses - ties + 1 / genes.Count;
 
             var unused = genetic.Tournament(FnCreate, FnCrossover, PlayOneOnOne, FnDisplay, FnSortKey, 13);
         }

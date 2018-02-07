@@ -132,6 +132,7 @@
     <Compile Include="Primes\yield\EmptyList.cs" />
     <Compile Include="Primes\yield\LazyList.cs" />
     <Compile Include="Primes\yield\MyList.cs" />
+    <Compile Include="TicTacToe\Benchmark.cs" />
     <Compile Include="TicTacToe\Chromosome.cs" />
     <Compile Include="TicTacToe\CompetitionResult.cs" />
     <Compile Include="TicTacToe\ContentType.cs" />
