@@ -1,4 +1,23 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿/* File: CircuitTests.cs
+ *     from chapter 16 of _Genetic Algorithms with Python_
+ *     writen by Clinton Sheppard
+ *
+ * Author: Greg Eakin <gregory.eakin@gmail.com>
+ * Copyright (c) 2018 Greg Eakin
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+ * implied.  See the License for the specific language governing
+ * permissions and limitations under the License.
+ */
+
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -13,9 +32,9 @@ namespace GeneticAlgorithms.LogicCircuits
 
         public delegate Node FnCreateGene(int index);
 
-        public delegate int FnFitnessDelegate(Node[] genes);
+        public delegate int FnGetFitnessDelegate(List<Node> genes);
 
-        public static int Fitness(Node[] genes, Tuple<bool[], bool>[] rules, Dictionary<char, bool?> inputs)
+        private static int Fitness(List<Node> genes, Tuple<bool[], bool>[] rules, Dictionary<char, bool?> inputs)
         {
             var circuit = NodesToCircuit(genes).Item1;
             var sourceLabels = "ABCD";
@@ -37,7 +56,7 @@ namespace GeneticAlgorithms.LogicCircuits
         {
             var inputs = new Dictionary<char, bool?>();
 
-            var nodes = new[]
+            var nodes = new List<Node>
             {
                 new Node((a, b) => new Source('A', inputs)),
                 new Node((a, b) => new Source('B', inputs)),
@@ -55,15 +74,17 @@ namespace GeneticAlgorithms.LogicCircuits
             var fitness = Fitness(nodes, rules, inputs);
             Assert.AreEqual(4, fitness);
             Assert.AreEqual(2, inputs.Count);
+            Assert.AreEqual(rules[rules.Length - 1].Item1[0], inputs['A']);
+            Assert.AreEqual(rules[rules.Length - 1].Item1[1], inputs['B']);
         }
 
-        public static void Display(Chromosome<Node, int> candidate, Stopwatch watch)
+        private static void Display(Chromosome<Node, int> candidate, Stopwatch watch)
         {
             var circuit = NodesToCircuit(candidate.Genes).Item1;
             Console.WriteLine("{0}\t{1}\t{2} ms", circuit, candidate.Fitness, watch.ElapsedMilliseconds);
         }
 
-        public static Node CreateGene(int index, Tuple<Node.CrateGeneDelegate, ICircuit>[] gates,
+        private static Node CreateGene(int index, Tuple<Node.CrateGeneDelegate, ICircuit>[] gates,
             Tuple<Node.CrateGeneDelegate, ICircuit>[] sources)
         {
             var gateType = index < sources.Length
@@ -86,24 +107,21 @@ namespace GeneticAlgorithms.LogicCircuits
             return new Node(gateType.Item1, indexA, indexB);
         }
 
-        public static Node[] Mutate(Node[] input, FnCreateGene fnCreateGene, FnFitnessDelegate fnFitness,
+        private static void Mutate(List<Node> childGenes, FnCreateGene fnCreateGene, FnGetFitnessDelegate fnGetFitness,
             int sourceCount)
         {
-            var childGenes = input.ToArray();
             var count = Random.Next(1, 6);
-            var initialFitness = fnFitness(childGenes);
+            var initialFitness = fnGetFitness(childGenes);
             while (count-- > 0)
             {
                 var indexesUsed = NodesToCircuit(childGenes).Item2.Skip(sourceCount).ToArray();
-                if (indexesUsed.Any())
-                    return childGenes;
+                if (!indexesUsed.Any())
+                    return;
                 var index = indexesUsed[Random.Next(indexesUsed.Length)];
                 childGenes[index] = fnCreateGene(index);
-                if (fnFitness(childGenes).CompareTo(initialFitness) > 0)
-                    return childGenes;
+                if (fnGetFitness(childGenes).CompareTo(initialFitness) > 0)
+                    return;
             }
-
-            return childGenes;
         }
 
         [TestMethod]
@@ -125,9 +143,9 @@ namespace GeneticAlgorithms.LogicCircuits
                 new Tuple<Node.CrateGeneDelegate, ICircuit>((a, b) => new Or(a, b), new Or(null, null))
             };
 
-            var nodes = new Node[6];
-            for (var i = 0; i < nodes.Length; i++)
-                nodes[i] = CreateGene(i, gates, sources);
+            var nodes = new List<Node>(6);
+            for (var i = 0; i < 6; i++)
+                nodes.Add(CreateGene(i, gates, sources));
 
             var circuit = NodesToCircuit(nodes).Item1;
             Console.Write("{0} = {1}", circuit, circuit.Output);
@@ -138,7 +156,7 @@ namespace GeneticAlgorithms.LogicCircuits
         private List<Tuple<Node.CrateGeneDelegate, ICircuit>> _sources;
 
         [TestInitialize]
-        public void SetupClass()
+        public void SetupTest()
         {
             _inputs = new Dictionary<char, bool?>();
             _gates = new List<Tuple<Node.CrateGeneDelegate, ICircuit>>
@@ -204,26 +222,26 @@ namespace GeneticAlgorithms.LogicCircuits
             FindCircuit(rules, 12);
         }
 
-        public Tuple<bool[], bool>[] Get2BitAdderRulesForBit(int bit)
+        private Tuple<bool[], bool>[] Get2BitAdderRulesForBit(int bit)
         {
             var rules = new[]
             {
-                new Tuple<int[], int[]>(new[] {0, 0, 0, 0}, new[] {0, 0, 0}),  // 0 + 0 = 0
-                new Tuple<int[], int[]>(new[] {0, 0, 0, 1}, new[] {0, 0, 1}),  // 0 + 1 = 1
-                new Tuple<int[], int[]>(new[] {0, 0, 1, 0}, new[] {0, 1, 0}),  // 0 + 2 = 2
-                new Tuple<int[], int[]>(new[] {0, 0, 1, 1}, new[] {0, 1, 1}),  // 0 + 3 = 3
-                new Tuple<int[], int[]>(new[] {0, 1, 0, 0}, new[] {0, 0, 1}),  // 1 + 0 = 1
-                new Tuple<int[], int[]>(new[] {0, 1, 0, 1}, new[] {0, 1, 0}),  // 1 + 1 = 2
-                new Tuple<int[], int[]>(new[] {0, 1, 1, 0}, new[] {0, 1, 1}),  // 1 + 2 = 3
-                new Tuple<int[], int[]>(new[] {0, 1, 1, 1}, new[] {1, 0, 0}),  // 1 + 3 = 4
-                new Tuple<int[], int[]>(new[] {1, 0, 0, 0}, new[] {0, 1, 0}),  // 2 + 0 = 2
-                new Tuple<int[], int[]>(new[] {1, 0, 0, 1}, new[] {0, 1, 1}),  // 2 + 1 = 3
-                new Tuple<int[], int[]>(new[] {1, 0, 1, 0}, new[] {1, 0, 0}),  // 2 + 2 = 4
-                new Tuple<int[], int[]>(new[] {1, 0, 1, 1}, new[] {1, 0, 1}),  // 2 + 3 = 5
-                new Tuple<int[], int[]>(new[] {1, 1, 0, 0}, new[] {0, 1, 1}),  // 3 + 0 = 3
-                new Tuple<int[], int[]>(new[] {1, 1, 0, 1}, new[] {1, 0, 0}),  // 3 + 1 = 4
-                new Tuple<int[], int[]>(new[] {1, 1, 1, 0}, new[] {1, 0, 1}),  // 3 + 2 = 5
-                new Tuple<int[], int[]>(new[] {1, 1, 1, 1}, new[] {1, 1, 0}),  // 3 + 3 = 6
+                new Tuple<int[], int[]>(new[] {0, 0, 0, 0}, new[] {0, 0, 0}), // 0 + 0 = 0
+                new Tuple<int[], int[]>(new[] {0, 0, 0, 1}, new[] {0, 0, 1}), // 0 + 1 = 1
+                new Tuple<int[], int[]>(new[] {0, 0, 1, 0}, new[] {0, 1, 0}), // 0 + 2 = 2
+                new Tuple<int[], int[]>(new[] {0, 0, 1, 1}, new[] {0, 1, 1}), // 0 + 3 = 3
+                new Tuple<int[], int[]>(new[] {0, 1, 0, 0}, new[] {0, 0, 1}), // 1 + 0 = 1
+                new Tuple<int[], int[]>(new[] {0, 1, 0, 1}, new[] {0, 1, 0}), // 1 + 1 = 2
+                new Tuple<int[], int[]>(new[] {0, 1, 1, 0}, new[] {0, 1, 1}), // 1 + 2 = 3
+                new Tuple<int[], int[]>(new[] {0, 1, 1, 1}, new[] {1, 0, 0}), // 1 + 3 = 4
+                new Tuple<int[], int[]>(new[] {1, 0, 0, 0}, new[] {0, 1, 0}), // 2 + 0 = 2
+                new Tuple<int[], int[]>(new[] {1, 0, 0, 1}, new[] {0, 1, 1}), // 2 + 1 = 3
+                new Tuple<int[], int[]>(new[] {1, 0, 1, 0}, new[] {1, 0, 0}), // 2 + 2 = 4
+                new Tuple<int[], int[]>(new[] {1, 0, 1, 1}, new[] {1, 0, 1}), // 2 + 3 = 5
+                new Tuple<int[], int[]>(new[] {1, 1, 0, 0}, new[] {0, 1, 1}), // 3 + 0 = 3
+                new Tuple<int[], int[]>(new[] {1, 1, 0, 1}, new[] {1, 0, 0}), // 3 + 1 = 4
+                new Tuple<int[], int[]>(new[] {1, 1, 1, 0}, new[] {1, 0, 1}), // 3 + 2 = 5
+                new Tuple<int[], int[]>(new[] {1, 1, 1, 1}, new[] {1, 1, 0}), // 3 + 3 = 6
             };
 
             var bitNRules = rules.Select(rule =>
@@ -258,7 +276,7 @@ namespace GeneticAlgorithms.LogicCircuits
             FindCircuit(rules, 9);
         }
 
-        public void FindCircuit(Tuple<bool[], bool>[] rules, int expectedLength)
+        private void FindCircuit(Tuple<bool[], bool>[] rules, int expectedLength)
         {
             var genetic = new Genetic<Node, int>();
             var watch = Stopwatch.StartNew();
@@ -271,23 +289,20 @@ namespace GeneticAlgorithms.LogicCircuits
                     Display(candidate, watch);
             }
 
-            //void FnBlankDisplay(Chromosome<Node, int> candidate, int? length = null)
-            //{}
-
-            int FnGetFitness(Node[] genes) => Fitness(genes, rules, _inputs);
+            int FnGetFitness(List<Node> genes) => Fitness(genes, rules, _inputs);
 
             Node FnCreateGene(int index) => CreateGene(index, _gates.ToArray(), _sources.ToArray());
 
-            Node[] FnMutate(Node[] genes) => Mutate(genes, FnCreateGene, FnGetFitness, _sources.Count);
+            void FnMutate(List<Node> genes) => Mutate(genes, FnCreateGene, FnGetFitness, _sources.Count);
 
             var maxLength = 50;
 
-            Node[] FnCreate() => Enumerable.Range(0, maxLength).Select(FnCreateGene).ToArray();
+            List<Node> FnCreate() => Enumerable.Range(0, maxLength).Select(FnCreateGene).ToList();
 
             Chromosome<Node, int> FnOptimizationFunction(int variableLength)
             {
                 maxLength = variableLength;
-                return genetic.BestFitness(FnGetFitness, 0, rules.Length, null, FnDisplay, FnMutate, FnCreate, 0, 3,
+                return genetic.GetBest(FnGetFitness, 0, rules.Length, null, FnDisplay, FnMutate, FnCreate, 0, 3,
                     null, 30);
             }
 
@@ -309,11 +324,11 @@ namespace GeneticAlgorithms.LogicCircuits
             Assert.IsFalse(circuit.Count > expectedLength);
         }
 
-        public static Tuple<ICircuit, ISet<int>> NodesToCircuit(Node[] genes)
+        private static Tuple<ICircuit, ISet<int>> NodesToCircuit(List<Node> genes)
         {
             var circuit = new List<ICircuit>();
             var usedIndexes = new List<ISet<int>>();
-            for (var i = 0; i < genes.Length; i++)
+            for (var i = 0; i < genes.Count; i++)
             {
                 var node = genes[i];
                 var used = new HashSet<int> {i};

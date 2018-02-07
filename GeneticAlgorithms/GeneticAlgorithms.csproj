@@ -68,6 +68,7 @@
     <Compile Include="LawnmowerProblem\Location.cs" />
     <Compile Include="LawnmowerProblem\Mow.cs" />
     <Compile Include="LinearEquation\FitnessTests.cs" />
+    <Compile Include="LogicCircuits\Benchmark.cs" />
     <Compile Include="LogicCircuits\Chromosome.cs" />
     <Compile Include="LogicCircuits\Circuits.cs" />
     <Compile Include="LogicCircuits\CircuitTests.cs" />

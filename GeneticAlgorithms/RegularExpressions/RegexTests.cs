@@ -34,7 +34,7 @@ namespace GeneticAlgorithms.RegularExpressions
         [TestMethod]
         public void RepairRegex1Test()
         {
-            var pattern = "1*0?10*".ToCharArray().Select(c => c.ToString()).ToArray();
+            var pattern = "1*0?10*".ToCharArray().Select(c => c.ToString()).ToList();
             var repaired = RepairRegex(pattern);
             Assert.AreEqual("1*0?10*", repaired);
         }
@@ -42,12 +42,12 @@ namespace GeneticAlgorithms.RegularExpressions
         [TestMethod]
         public void RepairRegex2Test()
         {
-            var pattern = "1[[2".ToCharArray().Select(c => c.ToString()).ToArray();
+            var pattern = "1[[2".ToCharArray().Select(c => c.ToString()).ToList();
             var repaired = RepairRegex(pattern);
             Assert.AreEqual("1[]2", repaired);
         }
 
-        public string RepairRegex(string[] genes)
+        public string RepairRegex(List<string> genes)
         {
             var result = new List<string>();
             var finals = new List<string>();
@@ -144,7 +144,7 @@ namespace GeneticAlgorithms.RegularExpressions
             return RepairInCharacterSet;
         }
 
-        public Fitness GetFitness(string[] genes, List<string> wanted, List<string> unwanted)
+        public Fitness GetFitness(List<string> genes, List<string> wanted, List<string> unwanted)
         {
             var pattern = RepairRegex(genes);
             var length = pattern.Length;
@@ -171,7 +171,7 @@ namespace GeneticAlgorithms.RegularExpressions
         [TestMethod]
         public void FitnessTest()
         {
-            var pattern = "1*0?10*".ToCharArray().Select(c => $"{c}").ToArray();
+            var pattern = "1*0?10*".ToCharArray().Select(c => $"{c}").ToList();
             var wanted = new[] {"01", "11", "10"};
             var unwanted = new[] {"00", ""};
 
@@ -383,15 +383,14 @@ namespace GeneticAlgorithms.RegularExpressions
             return true;
         }
 
-        public delegate Fitness FnFitnessDelegate(string[] genes);
+        public delegate Fitness FnGetFitnessDelegate(List<string> genes);
 
         public delegate bool FnMutateDelegate(List<string> genes);
 
-        public string[] Mutate(string[] input, FnFitnessDelegate fnGetFitness, List<FnMutateDelegate> mutationOperators,
+        public void Mutate(List<string> genes, FnGetFitnessDelegate fnGetFitness, List<FnMutateDelegate> mutationOperators,
             List<int> mutationRoundCounts)
         {
-            var genes = input.ToList();
-            var initialFitness = fnGetFitness(genes.ToArray());
+            var initialFitness = fnGetFitness(genes);
             var count = mutationRoundCounts[Random.Next(mutationRoundCounts.Count)];
             for (var i = 1; i < count + 3; i++)
             {
@@ -403,14 +402,12 @@ namespace GeneticAlgorithms.RegularExpressions
                     func = copy[Random.Next(copy.Count)];
                 }
 
-                if (fnGetFitness(genes.ToArray()).CompareTo(initialFitness) <= 0)
+                if (fnGetFitness(genes).CompareTo(initialFitness) <= 0)
                     continue;
 
                 mutationRoundCounts.Add(i);
                 break;
             }
-
-            return genes.ToArray();
         }
 
         [TestMethod]
@@ -512,7 +509,7 @@ namespace GeneticAlgorithms.RegularExpressions
 
             void FnDisplay(Chromosome<string, Fitness> candidate, int? length) => Display(candidate, watch);
 
-            Fitness FnFitness(string[] genes) => GetFitness(genes, wanted.ToList(), unwanted.ToList());
+            Fitness FnFitness(List<string> genes) => GetFitness(genes, wanted.ToList(), unwanted.ToList());
 
             var mutationRoundCounts = new List<int> {1};
 
@@ -528,11 +525,11 @@ namespace GeneticAlgorithms.RegularExpressions
             if (customOperators != null)
                 mutationOperators.AddRange(customOperators);
 
-            string[] FnMutate(string[] genes) => Mutate(genes, FnFitness, mutationOperators, mutationRoundCounts);
+            void FnMutate(List<string> genes) => Mutate(genes, FnFitness, mutationOperators, mutationRoundCounts);
 
             var optimalFitness = new Fitness(wanted.Length, wanted.Length, 0, expectedLength);
 
-                var best = genetic.BestFitness(FnFitness, textGenes.Max(i => i.Length), optimalFitness, fullGeneSet,
+                var best = genetic.GetBest(FnFitness, textGenes.Max(i => i.Length), optimalFitness, fullGeneSet,
                 FnDisplay, FnMutate, null, 0, 10);
 
             Assert.IsTrue(optimalFitness.CompareTo(best.Fitness) <= 0);
