@@ -20,6 +20,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using GeneticAlgorithms.Utilities;
 
 namespace GeneticAlgorithms.Cards
 {
@@ -36,24 +37,9 @@ namespace GeneticAlgorithms.Cards
 
         public delegate Chromosome<TGene, TFitness> GenerateParentDelegate();
 
-        private readonly Random _random = new Random();
-
-        public TGene[] RandomSample(TGene[] geneSet, int length)
-        {
-            var genes = new List<TGene>(length);
-            while (genes.Count < length)
-            {
-                var sampleSize = Math.Min(geneSet.Length, length - genes.Count);
-                var array = geneSet.OrderBy(x => _random.Next()).Take(sampleSize);
-                genes.AddRange(array);
-            }
-
-            return genes.ToArray();
-        }
-
         private Chromosome<TGene, TFitness> GenerateParent(int length, TGene[] geneSet, FitnessDelegate fitnessDelegate)
         {
-            var genes = RandomSample(geneSet, length);
+            var genes = RandomFn.RandomSampleArray(geneSet, length);
             var fitness = fitnessDelegate(genes);
             return new Chromosome<TGene, TFitness>(genes, fitness);
         }
@@ -62,8 +48,8 @@ namespace GeneticAlgorithms.Cards
             FitnessDelegate getFitness)
         {
             var childGenes = parent.Genes.ToArray();
-            var index = _random.Next(childGenes.Length);
-            var randomSample = RandomSample(geneSet, 2);
+            var index = RandomFn.Rand.Next(childGenes.Length);
+            var randomSample = RandomFn.RandomSampleArray(geneSet, 2);
             var newGene = randomSample[0];
             var alternate = randomSample[1];
             childGenes[index] = newGene.Equals(childGenes[index]) ? alternate : newGene;

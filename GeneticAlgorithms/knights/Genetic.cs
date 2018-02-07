@@ -20,6 +20,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using GeneticAlgorithms.Utilities;
 
 namespace GeneticAlgorithms.Knights
 {
@@ -38,24 +39,9 @@ namespace GeneticAlgorithms.Knights
 
         public delegate TGene[] CreateDelegate();
 
-        private readonly Random _random = new Random();
-
-        public TGene[] RandomSample(TGene[] geneSet, int length)
+        private Chromosome<TGene, TFitness> GenerateParent(int length, TGene[] geneSet, FitnessDelegate getFitness)
         {
-            var genes = new List<TGene>(length);
-            while (genes.Count < length)
-            {
-                var sampleSize = Math.Min(geneSet.Length, length - genes.Count);
-                var array = geneSet.OrderBy(x => _random.Next()).Take(sampleSize);
-                genes.AddRange(array);
-            }
-
-            return genes.ToArray();
-        }
-
-        public Chromosome<TGene, TFitness> GenerateParent(int length, TGene[] geneSet, FitnessDelegate getFitness)
-        {
-            var genes = RandomSample(geneSet, length);
+            var genes = RandomFn.RandomSampleArray(geneSet, length);
             var fitness = getFitness(genes);
             var chromosome = new Chromosome<TGene, TFitness>(genes, fitness);
             return chromosome;
@@ -65,8 +51,8 @@ namespace GeneticAlgorithms.Knights
             FitnessDelegate getFitness)
         {
             var childGenes = parent.Genes.ToArray();
-            var index = _random.Next(childGenes.Length);
-            var randomSample = RandomSample(geneSet, 2);
+            var index = RandomFn.Rand.Next(childGenes.Length);
+            var randomSample = RandomFn.RandomSampleArray(geneSet, 2);
             var newGene = randomSample[0];
             var alternate = randomSample[1];
             childGenes[index] = newGene.Equals(childGenes[index]) ? alternate : newGene;

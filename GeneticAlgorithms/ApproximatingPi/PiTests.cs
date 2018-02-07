@@ -178,7 +178,7 @@ namespace GeneticAlgorithms.ApproximatingPi
         [TestMethod]
         public void OptimizeTest()
         {
-            var generic = new Genetic<int, double>();
+            var genetic = new Genetic<int, double>();
             var geneSet = Enumerable.Range(1, 512).ToArray();
             var length = 10;
             var maxSeconds = 2;
@@ -209,7 +209,7 @@ namespace GeneticAlgorithms.ApproximatingPi
             Console.WriteLine("initial: {0} {1}", initial, FnGetFitness(initial));
 
             var optimalFitness = 10 * maxSeconds;
-            var unused = generic.GetBest(FnGetFitness, length, optimalFitness, geneSet, FnDisplay, null, null, 0, 1,
+            var unused = genetic.GetBest(FnGetFitness, length, optimalFitness, geneSet, FnDisplay, null, null, 0, 1,
                 null, 600);
         }
 

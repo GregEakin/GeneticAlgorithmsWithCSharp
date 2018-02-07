@@ -19,6 +19,7 @@
 
 using System;
 using System.Linq;
+using GeneticAlgorithms.Utilities;
 
 namespace GeneticAlgorithms.Password
 {
@@ -28,28 +29,13 @@ namespace GeneticAlgorithms.Password
 
         public delegate void DisplayDelegate(Chromosome child);
 
-        private static readonly Random Random = new Random();
-
-        private static string RandomSample(char[] input, int length)
-        {
-            var result = string.Empty;
-            while (result.Length < length)
-            {
-                var sampleSize = Math.Min(input.Length, length - result.Length);
-                var array = input.OrderBy(x => Random.Next()).Take(sampleSize);
-                result += new string(array.ToArray());
-            }
-
-            return result;
-        }
-
         private static Chromosome GenerateParent(char[] geneSet, int length, GetFitnessDelegate getFitness)
         {
             var genes = string.Empty;
             while (genes.Length < length)
             {
                 var sampleSize = Math.Min(length - genes.Length, geneSet.Length);
-                genes += RandomSample(geneSet, sampleSize);
+                genes += RandomFn.RandomSampleString(geneSet, sampleSize);
             }
 
             var fitness = getFitness(genes);
@@ -58,9 +44,9 @@ namespace GeneticAlgorithms.Password
 
         private static Chromosome Mutate(char[] geneSet, Chromosome parent, GetFitnessDelegate getFitness)
         {
-            var index = Random.Next(parent.Genes.Length);
+            var index = RandomFn.Rand.Next(parent.Genes.Length);
             var childGenes = parent.Genes.ToCharArray();
-            var randomSample = RandomSample(geneSet, 2);
+            var randomSample = RandomFn.RandomSampleString(geneSet, 2);
             var newGene = randomSample[0];
             var alternate = randomSample[1];
             childGenes[index] = newGene == childGenes[index] ? alternate : newGene;

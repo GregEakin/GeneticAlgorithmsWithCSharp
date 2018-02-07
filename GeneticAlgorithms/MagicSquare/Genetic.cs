@@ -20,6 +20,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using GeneticAlgorithms.Utilities;
 
 namespace GeneticAlgorithms.MagicSquare
 {
@@ -46,23 +47,9 @@ namespace GeneticAlgorithms.MagicSquare
 
         public delegate List<TGene> CreateDelegate();
 
-        private readonly Random _random = new Random();
-
-        public List<TGene> RandomSample(TGene[] geneSet, int length)
-        {
-            var genes = new List<TGene>(length);
-            while (genes.Count < length)
-            {
-                var sampleSize = Math.Min(geneSet.Length, length - genes.Count);
-                var array = geneSet.OrderBy(x => _random.Next()).Take(sampleSize);
-                genes.AddRange(array);
-            }
-
-            return genes.ToList();
-        }
         private Chromosome<TGene, TFitness> GenerateParent(int length, TGene[] geneSet, FitnessDelegate getFitness)
         {
-            var genes = RandomSample(geneSet, length);
+            var genes = RandomFn.RandomSampleList(geneSet, length);
             var fitness = getFitness(genes);
             var chromosome = new Chromosome<TGene, TFitness>(genes, fitness);
             return chromosome;
@@ -72,8 +59,8 @@ namespace GeneticAlgorithms.MagicSquare
             FitnessDelegate getFitness)
         {
             var childGenes = parent.Genes.ToList();
-            var index = _random.Next(childGenes.Count);
-            var randomSample = RandomSample(geneSet, 2);
+            var index = RandomFn.Rand.Next(childGenes.Count);
+            var randomSample = RandomFn.RandomSampleList(geneSet, 2);
             var newGene = randomSample[0];
             var alternate = randomSample[1];
             childGenes[index] = newGene.Equals(childGenes[index]) ? alternate : newGene;
@@ -142,7 +129,7 @@ namespace GeneticAlgorithms.MagicSquare
                     var difference = historicalFitnesses.Count - index;
                     var proportionSimilar = (double)difference / historicalFitnesses.Count;
                     var exp = Math.Exp(-proportionSimilar);
-                    if (_random.NextDouble() < exp)
+                    if (RandomFn.Rand.NextDouble() < exp)
                     {
                         parent = child;
                         continue;

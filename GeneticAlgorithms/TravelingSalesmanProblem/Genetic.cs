@@ -20,6 +20,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using GeneticAlgorithms.Utilities;
 
 namespace GeneticAlgorithms.TravelingSalesmanProblem
 {
@@ -48,25 +49,10 @@ namespace GeneticAlgorithms.TravelingSalesmanProblem
 
         public delegate TGene[] CrossoverFun(TGene[] genes1, TGene[] genes2);
 
-        private readonly Random _random = new Random();
-
-        private TGene[] RandomSample(TGene[] geneSet, int length)
-        {
-            var genes = new List<TGene>(length);
-            while (genes.Count < length)
-            {
-                var sampleSize = Math.Min(geneSet.Length, length - genes.Count);
-                var array = geneSet.OrderBy(x => _random.Next()).Take(sampleSize);
-                genes.AddRange(array);
-            }
-
-            return genes.ToArray();
-        }
-
         private Chromosome<TGene, TFitness> GenerateParent(int length, TGene[] geneSet,
             GetFitnessDelegate getGetFitness)
         {
-            var genes = RandomSample(geneSet, length);
+            var genes = RandomFn.RandomSampleArray(geneSet, length);
             var fitness = getGetFitness(genes);
             var chromosome =
                 new Chromosome<TGene, TFitness>(genes, fitness, Chromosome<TGene, TFitness>.Strategies.Create);
@@ -77,8 +63,8 @@ namespace GeneticAlgorithms.TravelingSalesmanProblem
             GetFitnessDelegate getFitness)
         {
             var childGenes = parent.Genes.ToArray();
-            var index = _random.Next(childGenes.Length);
-            var randomSample = RandomSample(geneSet, 2);
+            var index = RandomFn.Rand.Next(childGenes.Length);
+            var randomSample = RandomFn.RandomSampleArray(geneSet, 2);
             var newGene = randomSample[0];
             var alternate = randomSample[1];
             childGenes[index] = newGene.Equals(childGenes[index]) ? alternate : newGene;
@@ -100,7 +86,7 @@ namespace GeneticAlgorithms.TravelingSalesmanProblem
             GetFitnessDelegate getFitness, CrossoverFun crossover, MutateChromosomeDelegate mutate,
             GenerateParentDelegate generateParent)
         {
-            var donorIndex = _random.Next(0, parents.Count);
+            var donorIndex = RandomFn.Rand.Next(0, parents.Count);
             if (donorIndex == index)
                 donorIndex = (donorIndex + 1) % parents.Count;
             var childGenes = crossover(parentGenes, parents[donorIndex].Genes);
@@ -157,7 +143,7 @@ namespace GeneticAlgorithms.TravelingSalesmanProblem
             Chromosome<TGene, TFitness> FnNewChild(Chromosome<TGene, TFitness> parent, int index,
                 List<Chromosome<TGene, TFitness>> parents) => 
                 crossover != null 
-                    ? usedStrategies[_random.Next(usedStrategies.Count)](parent, index, parents) 
+                    ? usedStrategies[RandomFn.Rand.Next(usedStrategies.Count)](parent, index, parents) 
                     : FnMutate(parent);
 
             foreach (var improvement in GetImprovement(FnNewChild, FnGenerateParent, maxAge, poolSize))
@@ -214,7 +200,7 @@ namespace GeneticAlgorithms.TravelingSalesmanProblem
                     var difference = historicalFitnesses.Count - index;
                     var proportionSimilar = (double) difference / historicalFitnesses.Count;
                     var exp = Math.Exp(-proportionSimilar);
-                    if (_random.NextDouble() < exp)
+                    if (RandomFn.Rand.NextDouble() < exp)
                     {
                         parents[pIndex] = child;
                         continue;

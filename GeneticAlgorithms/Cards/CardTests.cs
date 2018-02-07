@@ -21,6 +21,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using GeneticAlgorithms.Utilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace GeneticAlgorithms.Cards
@@ -53,7 +54,7 @@ namespace GeneticAlgorithms.Cards
                 var count = Random.Next(1, 4);
                 while (count-- > 0)
                 {
-                    var randomSample = genetic.RandomSample(Enumerable.Range(0, genes.Length).ToArray(), 2);
+                    var randomSample = RandomFn.RandomSampleArray(Enumerable.Range(0, genes.Length).ToArray(), 2);
                     var indexA = randomSample[0];
                     var indexB = randomSample[1];
                     var temp = genes[indexA];

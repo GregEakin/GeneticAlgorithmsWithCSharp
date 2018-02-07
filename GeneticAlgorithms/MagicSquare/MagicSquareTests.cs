@@ -22,6 +22,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using GeneticAlgorithms.Utilities;
 
 namespace GeneticAlgorithms.MagicSquare
 {
@@ -78,25 +79,12 @@ namespace GeneticAlgorithms.MagicSquare
 
         private static void Mutate(List<int> genes, int[] allPositions)
         {
-            var randomSample = RandomSample(allPositions, 2);
+            var randomSample = RandomFn.RandomSampleArray(allPositions, 2);
             var indexA = randomSample[0];
             var indexB = randomSample[1];
             var temp = genes[indexA];
             genes[indexA] = genes[indexB];
             genes[indexB] = temp;
-        }
-
-        private static int[] RandomSample(int[] geneSet, int length)
-        {
-            var genes = new List<int>(length);
-            do
-            {
-                var sampleSize = Math.Min(geneSet.Length, length - genes.Count);
-                var array = geneSet.OrderBy(x => Random.Next()).Take(sampleSize);
-                genes.AddRange(array);
-            } while (genes.Count < length);
-
-            return genes.ToArray();
         }
 
         [TestMethod]

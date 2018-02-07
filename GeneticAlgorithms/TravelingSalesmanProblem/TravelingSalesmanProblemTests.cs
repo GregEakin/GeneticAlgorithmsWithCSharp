@@ -23,27 +23,13 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using GeneticAlgorithms.Utilities;
 
 namespace GeneticAlgorithms.TravelingSalesmanProblem
 {
     [TestClass]
     public class TravelingSalesmanProblemTests
     {
-        private readonly Random _random = new Random();
-
-        private int[] RandomSample(int[] geneSet, int length)
-        {
-            var genes = new List<int>(length);
-            while (genes.Count < length)
-            {
-                var sampleSize = Math.Min(geneSet.Length, length - genes.Count);
-                var array = geneSet.OrderBy(x => _random.Next()).Take(sampleSize);
-                genes.AddRange(array);
-            }
-
-            return genes.ToArray();
-        }
-
         private static Fitness GetFitness(int[] genes, Dictionary<int, double[]> idToLocatonLookup)
         {
             var fitness = GetDistance(idToLocatonLookup[genes[0]], idToLocatonLookup[genes[genes.Length - 1]]);
@@ -111,11 +97,11 @@ namespace GeneticAlgorithms.TravelingSalesmanProblem
 
         private void Mutate(int[] genes, Func<int[], Fitness> fnGetFitness)
         {
-            var count = _random.Next(2, genes.Length);
+            var count = RandomFn.Rand.Next(2, genes.Length);
             var initialFitness = fnGetFitness(genes);
             while (count-- > 0)
             {
-                var sample = RandomSample(Enumerable.Range(0, genes.Length).ToArray(), 2);
+                var sample = RandomFn.RandomSampleArray(Enumerable.Range(0, genes.Length).ToArray(), 2);
                 var indexA = sample[0];
                 var indexB = sample[1];
                 var temp = genes[indexA];
@@ -182,7 +168,8 @@ namespace GeneticAlgorithms.TravelingSalesmanProblem
             }
 
             var initialFitness = fnGetFitness(parentGenes);
-            var count = _random.Next(2, 20);
+            var random = RandomFn.Rand;
+            var count = random.Next(2, 20);
             var runIndexes = Enumerable.Range(0, runs.Count).ToArray();
             while (count-- > 0)
             {
@@ -190,11 +177,11 @@ namespace GeneticAlgorithms.TravelingSalesmanProblem
                 {
                     if (runs[i].Count == 1)
                         continue;
-                    if (_random.Next(runs.Count) == 0)
+                    if (random.Next(runs.Count) == 0)
                         runs[i].Reverse();
                 }
 
-                var randomSample = RandomSample(runIndexes, 2);
+                var randomSample = RandomFn.RandomSampleArray(runIndexes, 2);
                 var indexA = randomSample[0];
                 var indexB = randomSample[1];
                 var temp = runs[indexA];
@@ -293,7 +280,7 @@ namespace GeneticAlgorithms.TravelingSalesmanProblem
             var watch = Stopwatch.StartNew();
             var genetic = new Genetic<int, Fitness>();
 
-            int[] FnCreate() => RandomSample(geneSet, geneSet.Length);
+            int[] FnCreate() => RandomFn.RandomSampleArray(geneSet, geneSet.Length);
 
             void FnDisplay(Chromosome<int, Fitness> candidate) => Display(candidate, watch);
 

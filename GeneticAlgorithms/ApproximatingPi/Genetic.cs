@@ -21,6 +21,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using GeneticAlgorithms.Utilities;
 
 namespace GeneticAlgorithms.ApproximatingPi
 {
@@ -49,25 +50,10 @@ namespace GeneticAlgorithms.ApproximatingPi
 
         public delegate List<TGene> CrossoverFun(List<TGene> genes1, List<TGene> genes2);
 
-        private readonly Random _random = new Random();
-
-        private List<TGene> RandomSample(TGene[] geneSet, int length)
-        {
-            var genes = new List<TGene>(length);
-            while (genes.Count < length)
-            {
-                var sampleSize = Math.Min(geneSet.Length, length - genes.Count);
-                var array = geneSet.OrderBy(x => _random.Next()).Take(sampleSize);
-                genes.AddRange(array);
-            }
-
-            return genes;
-        }
-
         private Chromosome<TGene, TFitness> GenerateParent(int length, TGene[] geneSet,
             GetFitnessDelegate getGetFitness)
         {
-            var genes = RandomSample(geneSet, length);
+            var genes = RandomFn.RandomSampleList(geneSet, length);
             var fitness = getGetFitness(genes);
             var chromosome =
                 new Chromosome<TGene, TFitness>(genes, fitness, Chromosome<TGene, TFitness>.Strategies.Create);
@@ -78,8 +64,8 @@ namespace GeneticAlgorithms.ApproximatingPi
             GetFitnessDelegate getFitness)
         {
             var childGenes = parent.Genes.ToList();
-            var index = _random.Next(childGenes.Count);
-            var randomSample = RandomSample(geneSet, 2);
+            var index = RandomFn.Rand.Next(childGenes.Count);
+            var randomSample = RandomFn.RandomSampleList(geneSet, 2);
             var newGene = randomSample[0];
             var alternate = randomSample[1];
             childGenes[index] = newGene.Equals(childGenes[index]) ? alternate : newGene;
@@ -101,7 +87,7 @@ namespace GeneticAlgorithms.ApproximatingPi
             GetFitnessDelegate getFitness, CrossoverFun crossover, MutateChromosomeDelegate mutate,
             GenerateParentDelegate generateParent)
         {
-            var donorIndex = _random.Next(0, parents.Count);
+            var donorIndex = RandomFn.Rand.Next(0, parents.Count);
             if (donorIndex == index)
                 donorIndex = (donorIndex + 1) % parents.Count;
             var childGenes = crossover(parentGenes, parents[donorIndex].Genes);
@@ -157,9 +143,9 @@ namespace GeneticAlgorithms.ApproximatingPi
                 usedStrategies.Add(strategyLookup[Chromosome<TGene, TFitness>.Strategies.Crossover]);
 
             Chromosome<TGene, TFitness> FnNewChild(Chromosome<TGene, TFitness> parent, int index,
-                List<Chromosome<TGene, TFitness>> parents) => 
-                crossover != null 
-                    ? usedStrategies[_random.Next(usedStrategies.Count)](parent, index, parents) 
+                List<Chromosome<TGene, TFitness>> parents) =>
+                crossover != null
+                    ? usedStrategies[RandomFn.Rand.Next(usedStrategies.Count)](parent, index, parents)
                     : FnMutate(parent);
 
             try
@@ -194,7 +180,7 @@ namespace GeneticAlgorithms.ApproximatingPi
             yield return bestParent;
             var parents = new List<Chromosome<TGene, TFitness>> {bestParent};
             var historicalFitnesses = new List<TFitness> {bestParent.Fitness};
-            while(parents.Count < poolSize)
+            while (parents.Count < poolSize)
             {
                 var parent = generateParent();
                 if (maxSeconds > 0 && watch.ElapsedMilliseconds > maxSeconds * 1000)
@@ -234,7 +220,7 @@ namespace GeneticAlgorithms.ApproximatingPi
                     var difference = historicalFitnesses.Count - index;
                     var proportionSimilar = (double) difference / historicalFitnesses.Count;
                     var exp = Math.Exp(-proportionSimilar);
-                    if (_random.NextDouble() < exp)
+                    if (RandomFn.Rand.NextDouble() < exp)
                     {
                         parents[pIndex] = child;
                         continue;

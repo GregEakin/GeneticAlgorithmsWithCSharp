@@ -22,6 +22,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using GeneticAlgorithms.Utilities;
 
 namespace GeneticAlgorithms.TicTacToe
 {
@@ -92,8 +93,10 @@ namespace GeneticAlgorithms.TicTacToe
             queue.Enqueue(board);
             foreach (var square in board.Values)
             {
-                var candiateCopy = new Dictionary<int, Square>(board);
-                candiateCopy[square.Index] = new Square(square.Index, ContentType.Opponent);
+                var candiateCopy = new Dictionary<int, Square>(board)
+                {
+                    [square.Index] = new Square(square.Index, ContentType.Opponent)
+                };
                 queue.Enqueue(candiateCopy);
             }
 
@@ -155,8 +158,10 @@ namespace GeneticAlgorithms.TicTacToe
                 // queue all possible OPPONENT responses
                 foreach (var square in empties)
                 {
-                    var candiateCopy = new Dictionary<int, Square>(board);
-                    candiateCopy[square.Index] = new Square(square.Index, ContentType.Opponent);
+                    var candiateCopy = new Dictionary<int, Square>(board)
+                    {
+                        [square.Index] = new Square(square.Index, ContentType.Opponent)
+                    };
                     queue.Enqueue(candiateCopy);
                 }
             }
@@ -241,7 +246,8 @@ namespace GeneticAlgorithms.TicTacToe
             return true;
         }
 
-        private void Mutate(List<Rule> genes, Func<List<Rule>, Fitness> fnGetFitness, FnMutateDelegate[] mutationOperators,
+        private void Mutate(List<Rule> genes, Func<List<Rule>, Fitness> fnGetFitness,
+            FnMutateDelegate[] mutationOperators,
             List<int> mutationRoundCounts)
         {
             var initialFitness = fnGetFitness(genes);
@@ -337,8 +343,8 @@ namespace GeneticAlgorithms.TicTacToe
                 return child;
             }
 
-            List<Rule> FnCreate() => 
-                genetic.RandomSample(geneset.ToArray(), _random.Next(minGenes, maxGenes));
+            List<Rule> FnCreate() =>
+                RandomFn.RandomSampleList(geneset.ToArray(), _random.Next(minGenes, maxGenes));
 
             var optimalFitness = new Fitness(620, 120, 0, 11);
 
@@ -386,8 +392,8 @@ namespace GeneticAlgorithms.TicTacToe
                 return child;
             }
 
-            List<Rule> FnCreate() => 
-                genetic.RandomSample(geneset, _random.Next(minGenes, maxGenes));
+            List<Rule> FnCreate() =>
+                RandomFn.RandomSampleList(geneset, _random.Next(minGenes, maxGenes));
 
             int FnSortKey(List<Rule> genes, int wins, int ties, int losses) => -1000 * losses - ties + 1 / genes.Count;
 

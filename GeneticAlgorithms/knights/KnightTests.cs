@@ -150,7 +150,7 @@ namespace GeneticAlgorithms.Knights
 
         public void FindKnightPositions(int width, int height, int expectedKnights)
         {
-            var generic = new Genetic<Position, int>();
+            var genetic = new Genetic<Position, int>();
             var watch = Stopwatch.StartNew();
 
             void FnDisplay(Chromosome<Position, int> candidate) => Display(candidate, watch, width, height);
@@ -171,7 +171,7 @@ namespace GeneticAlgorithms.Knights
             Position[] FnCreate() => Create(FnGetRandomPosition, expectedKnights);
 
             var optimalFitness = width * height;
-            var best = generic.GetBest(FnFitness, 0, optimalFitness, null, FnDisplay, FnMutate, FnCreate);
+            var best = genetic.GetBest(FnFitness, 0, optimalFitness, null, FnDisplay, FnMutate, FnCreate);
             Assert.IsTrue(optimalFitness <= best.Fitness);
         }
 
