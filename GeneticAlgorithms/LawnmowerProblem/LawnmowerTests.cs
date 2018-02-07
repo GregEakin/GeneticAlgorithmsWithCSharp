@@ -1,4 +1,23 @@
-﻿using GeneticAlgorithms.ApproximatingPi;
+﻿/* File: LawnmowerTests.cs
+ *     from chapter 15 of _Genetic Algorithms with Python_
+ *     writen by Clinton Sheppard
+ *
+ * Author: Greg Eakin <gregory.eakin@gmail.com>
+ * Copyright (c) 2018 Greg Eakin
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+ * implied.  See the License for the specific language governing
+ * permissions and limitations under the License.
+ */
+
+using GeneticAlgorithms.ApproximatingPi;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
@@ -14,17 +33,18 @@ namespace GeneticAlgorithms.LawnmowerProblem
 
         public delegate Tuple<Field, Mower, Program> FnEvaluateDelegate(List<INode> genes);
 
-        public delegate Fitness FnFitnessDelegate(List<INode> genes);
+        public delegate Fitness FnGetFitnessDelegate(List<INode> genes);
 
-        public delegate Field CreateFieldFun();
+        public delegate Field CreateFieldDelegate();
 
-        public static Fitness Fitness(List<INode> genes, FnEvaluateDelegate fnEvaluate)
+        private static Fitness GetFitness(List<INode> genes, FnEvaluateDelegate fnEvaluate)
         {
             var tuple = fnEvaluate(genes);
             return new Fitness(tuple.Item1.CountMowed(), genes.Count, tuple.Item2.StepCount);
         }
 
-        public static void Display(Chromosome<INode, Fitness> candidate, Stopwatch watch, FnEvaluateDelegate fnEvaluate)
+        private static void Display(Chromosome<INode, Fitness> candidate, Stopwatch watch,
+            FnEvaluateDelegate fnEvaluate)
         {
             var tuple = fnEvaluate(candidate.Genes);
             tuple.Item1.Display(tuple.Item2);
@@ -33,59 +53,59 @@ namespace GeneticAlgorithms.LawnmowerProblem
             Console.WriteLine();
         }
 
-        public static List<INode> Mutate(List<INode> genes, Func<INode>[] geneSet, int minGenes, int maxGenes,
-            FnFitnessDelegate fnFitness, int maxRounds)
+        private static void Mutate(List<INode> genes, Func<INode>[] geneSet, int minGenes, int maxGenes,
+            FnGetFitnessDelegate fnGetFitness, int maxRounds)
         {
             var count = Random.Next(1, maxRounds + 1);
-            var initialFitness = fnFitness(genes);
+            var initialFitness = fnGetFitness(genes);
             while (count-- > 0)
             {
-                var fitness = fnFitness(genes);
-                if (fitness.CompareTo(initialFitness) > 0)
-                    return genes;
+                if (fnGetFitness(genes).CompareTo(initialFitness) > 0)
+                    return;
 
-                var adding = genes.Count == 0 || genes.Count <= maxGenes && Random.Next(0, 6) == 0;
+                var adding = genes.Count == 0 || genes.Count <= maxGenes && Random.Next(0, 5) == 0;
                 if (adding)
                 {
-                    genes.Add(geneSet[Random.Next(geneSet.Length)]());
+                    var gene1 = geneSet[Random.Next(geneSet.Length)]();
+                    genes.Add(gene1);
                     continue;
                 }
 
-                var removing = genes.Count > minGenes && Random.Next(0, 51) == 0;
+                var removing = genes.Count > minGenes && Random.Next(0, 50) == 0;
                 if (removing)
                 {
-                    genes.RemoveAt(Random.Next(genes.Count));
+                    var index1 = Random.Next(genes.Count);
+                    genes.RemoveAt(index1);
                     continue;
                 }
 
                 var index = Random.Next(genes.Count);
-                genes[index] = geneSet[Random.Next(geneSet.Length)]();
+                var gene = geneSet[Random.Next(geneSet.Length)]();
+                genes[index] = gene;
             }
-
-            return genes;
         }
 
-        public static List<INode> Create(Func<INode>[] geneSet, int minGenes, int maxGenes)
+        private static List<INode> Create(Func<INode>[] geneSet, int minGenes, int maxGenes)
         {
             var numGenes = Random.Next(minGenes, maxGenes + 1);
             var genes = new List<INode>(numGenes);
             for (var i = 0; i < numGenes; i++)
-                genes[i] = geneSet[Random.Next(geneSet.Length)]();
+                genes.Add(geneSet[Random.Next(geneSet.Length)]());
             return genes;
         }
 
-        public static List<INode> Crossover(List<INode> mother, List<INode> father)
+        private static List<INode> Crossover(List<INode> mother, List<INode> father)
         {
             if (mother.Count <= 2)
-                return mother;
+                return mother.ToList();
             var length = Random.Next(1, mother.Count - 1);
             var start = Random.Next(0, mother.Count - length + 1);
             if (father.Count < start + length)
-                return mother;
+                return mother.ToList();
 
             var child = mother.Take(start)
                 .Concat(father.Skip(start).Take(length))
-                .Concat(mother.Skip(start + length).Take(mother.Count - start - length))
+                .Concat(mother.Skip(start + length))
                 .ToList();
             return child;
         }
@@ -108,11 +128,13 @@ namespace GeneticAlgorithms.LawnmowerProblem
                 return new Tuple<Field, Mower, Program>(field, mower, program);
             }
 
-            Fitness FnFitness(List<INode> genes) => Fitness(genes, FnEvaluate);
+            Fitness FnFitness(List<INode> genes) =>
+                GetFitness(genes, FnEvaluate);
 
-            var child = Mutate(parent, geneSet, 2, 5, FnFitness, 1);
-            Assert.IsTrue(child.Any(c => c.GetType() == typeof(Mow)));
-            FnEvaluate(child);
+            var copy = parent.ToList();
+            Mutate(parent, geneSet, 2, 5, FnFitness, 1);
+            CollectionAssert.AreNotEqual(copy, parent);
+            Assert.IsTrue(parent.Any(c => c.GetType() != typeof(Mow)));
         }
 
         [TestMethod]
@@ -145,7 +167,8 @@ namespace GeneticAlgorithms.LawnmowerProblem
             var maxMutationRounds = 3;
             var expectedNumberOfInstructions = 78;
 
-            Field FnCreateField() => new ToroidField(width, height, FieldContents.Grass);
+            Field FnCreateField() =>
+                new ToroidField(width, height, FieldContents.Grass);
 
             RunWith(geneSet, width, height, minGenes, maxGenes,
                 expectedNumberOfInstructions, maxMutationRounds,
@@ -168,7 +191,8 @@ namespace GeneticAlgorithms.LawnmowerProblem
             var maxMutationRounds = 1;
             var expectedNumberOfInstructions = 64;
 
-            Field FnCreateField() => new ToroidField(width, height, FieldContents.Grass);
+            Field FnCreateField() =>
+                new ToroidField(width, height, FieldContents.Grass);
 
             RunWith(geneSet, width, height, minGenes, maxGenes,
                 expectedNumberOfInstructions, maxMutationRounds,
@@ -191,7 +215,8 @@ namespace GeneticAlgorithms.LawnmowerProblem
             var maxMutationRounds = 3;
             var expectedNumberOfInstructions = 79;
 
-            Field FnCreateField() => new ValidatingField(width, height, FieldContents.Grass);
+            Field FnCreateField() =>
+                new ValidatingField(width, height, FieldContents.Grass);
 
             RunWith(geneSet, width, height, minGenes, maxGenes,
                 expectedNumberOfInstructions, maxMutationRounds,
@@ -215,7 +240,8 @@ namespace GeneticAlgorithms.LawnmowerProblem
             var expectedNumberOfInstructions = 9;
             var expectedNumberOfSteps = 88;
 
-            Field FnCreateField() => new ToroidField(width, height, FieldContents.Grass);
+            Field FnCreateField() =>
+                new ToroidField(width, height, FieldContents.Grass);
 
             RunWith(geneSet, width, height, minGenes, maxGenes,
                 expectedNumberOfInstructions, maxMutationRounds,
@@ -240,7 +266,8 @@ namespace GeneticAlgorithms.LawnmowerProblem
             var expectedNumberOfInstructions = 18;
             var expectedNumberOfSteps = 65;
 
-            Field FnCreateField() => new ToroidField(width, height, FieldContents.Grass);
+            Field FnCreateField() =>
+                new ToroidField(width, height, FieldContents.Grass);
 
             RunWith(geneSet, width, height, minGenes, maxGenes,
                 expectedNumberOfInstructions, maxMutationRounds,
@@ -266,7 +293,8 @@ namespace GeneticAlgorithms.LawnmowerProblem
             var expectedNumberOfInstructions = 18;
             var expectedNumberOfSteps = 65;
 
-            Field FnCreateField() => new ToroidField(width, height, FieldContents.Grass);
+            Field FnCreateField() =>
+                new ToroidField(width, height, FieldContents.Grass);
 
             RunWith(geneSet, width, height, minGenes, maxGenes,
                 expectedNumberOfInstructions, maxMutationRounds,
@@ -274,14 +302,15 @@ namespace GeneticAlgorithms.LawnmowerProblem
         }
 
         private void RunWith(Func<INode>[] geneSet, int width, int height, int minGenes, int maxGenes,
-            int expectedNumberOfInstructions, int maxMutationRounds, CreateFieldFun fnCreateField,
+            int expectedNumberOfInstructions, int maxMutationRounds, CreateFieldDelegate fnCreateField,
             int expectedNumberOfSteps)
         {
             var genetic = new Genetic<INode, Fitness>();
             var mowerStartLocation = new Location(width / 2, height / 2);
             var mowerStartDirection = Directions.South;
 
-            List<INode> FnCreate() => Create(geneSet, 1, height);
+            List<INode> FnCreate() =>
+                Create(geneSet, 1, height);
 
             Tuple<Field, Mower, Program> FnEvaluate(List<INode> instructions)
             {
@@ -293,21 +322,23 @@ namespace GeneticAlgorithms.LawnmowerProblem
                 return new Tuple<Field, Mower, Program>(field, mower, program);
             }
 
-            Fitness FnFitness(List<INode> genes) => Fitness(genes, FnEvaluate);
+            Fitness FnGetFitness(List<INode> genes) =>
+                GetFitness(genes, FnEvaluate);
 
             var watch = Stopwatch.StartNew();
 
-            void FnDisplay(Chromosome<INode, Fitness> candidate) => Display(candidate, watch, FnEvaluate);
+            void FnDisplay(Chromosome<INode, Fitness> candidate) =>
+                Display(candidate, watch, FnEvaluate);
 
             void FnMutate(List<INode> child) =>
-                Mutate(child, geneSet, minGenes, maxGenes, FnFitness, maxMutationRounds);
+                Mutate(child, geneSet, minGenes, maxGenes, FnGetFitness, maxMutationRounds);
 
             var optimalFitness = new Fitness(width * height, expectedNumberOfInstructions, expectedNumberOfSteps);
 
-            var best = genetic.GetBest(FnFitness, 0, optimalFitness, null, FnDisplay, FnMutate, FnCreate, 0, 10,
-                Crossover, 30);
+            var best = genetic.GetBest(FnGetFitness, 0, optimalFitness, null, FnDisplay, FnMutate, FnCreate, 0, 10,
+                Crossover, 10);
 
-            Assert.IsTrue(best.Fitness.CompareTo(optimalFitness) <= 0);
+            Assert.IsTrue(optimalFitness.CompareTo(best.Fitness) <= 0);
         }
     }
 }
