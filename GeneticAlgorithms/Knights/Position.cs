@@ -1,4 +1,4 @@
-﻿/* File: Benchmark.cs
+﻿/* File: Position.cs
  *     from chapter 6 of _Genetic Algorithms with Python_
  *     writen by Clinton Sheppard
  *
