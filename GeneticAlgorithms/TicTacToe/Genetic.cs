@@ -171,7 +171,6 @@ namespace GeneticAlgorithms.TicTacToe
                     display(improvement);
                     var f = strategyLookup[improvement.Strategy];
                     usedStrategies.Add(f);
-                    Console.WriteLine("## {0}", usedStrategies.Count);
                     if (optimalFitness.CompareTo(improvement.Fitness) <= 0)
                         return improvement;
                 }

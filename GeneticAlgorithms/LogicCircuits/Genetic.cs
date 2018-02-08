@@ -164,7 +164,6 @@ namespace GeneticAlgorithms.LogicCircuits
                     display(improvement);
                     var f = strategyLookup[improvement.Strategy];
                     usedStrategies.Add(f);
-                    Console.WriteLine("## {0}", usedStrategies.Count);
                     if (optimalFitness.CompareTo(improvement.Fitness) <= 0)
                         return improvement;
                 }
@@ -178,9 +177,8 @@ namespace GeneticAlgorithms.LogicCircuits
             throw new UnauthorizedAccessException();
         }
 
-        private static IEnumerable<Chromosome<TGene, TFitness>> GetImprovement(
-            StrategyDelegate
-                newChild, GenerateParentDelegate generateParent, int maxAge, int poolSize, int maxSeconds)
+        private static IEnumerable<Chromosome<TGene, TFitness>> GetImprovement(StrategyDelegate newChild,
+            GenerateParentDelegate generateParent, int maxAge, int poolSize, int maxSeconds)
         {
             var watch = Stopwatch.StartNew();
             var bestParent = generateParent();

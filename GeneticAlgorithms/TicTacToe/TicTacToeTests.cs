@@ -86,9 +86,8 @@ namespace GeneticAlgorithms.TicTacToe
         public static Fitness GetFitnessForGames(List<Rule> genes)
         {
             string GetBoardString(IReadOnlyDictionary<int, Square> b) =>
-                string.Join("",
-                    SquareIndexes.Select(i =>
-                        b[i].Content == ContentType.Empty ? "." : b[i].Content == ContentType.Mine ? "x" : "o"));
+                string.Join("", SquareIndexes.Select(i =>
+                    b[i].Content == ContentType.Empty ? "." : b[i].Content == ContentType.Mine ? "x" : "o"));
 
             var board = Enumerable.Range(1, 9).ToDictionary(i => i, i => new Square(i));
             var queue = new Queue<Dictionary<int, Square>>();
@@ -200,7 +199,7 @@ namespace GeneticAlgorithms.TicTacToe
 
         public static bool MutateAdd(List<Rule> genes, Rule[] geneSet)
         {
-            var index = Rand.Random.Next(genes.Count);
+            var index = Rand.Random.Next(genes.Count + 1);
             genes.Insert(index, geneSet[Rand.Random.Next(geneSet.Length)]);
             return true;
         }
@@ -254,7 +253,7 @@ namespace GeneticAlgorithms.TicTacToe
             List<int> mutationRoundCounts)
         {
             var initialFitness = fnGetFitness(genes);
-            var count = Rand.Random.Next(mutationRoundCounts.Count);
+            var count = mutationRoundCounts[Rand.Random.Next(mutationRoundCounts.Count)];
             for (var i = 1; i < count + 2; i++)
             {
                 var copy = mutationOperators.ToList();
@@ -348,8 +347,7 @@ namespace GeneticAlgorithms.TicTacToe
             var optimalFitness = new Fitness(620, 120, 0, 11);
 
             var best = Genetic<Rule, Fitness>.GetBest(FnGetFitness, minGenes, optimalFitness, null, FnDisplay, FnMutate,
-                FnCreate,
-                500, 20, FnCrossover);
+                FnCreate, 500, 20, FnCrossover, 60);
             Assert.IsTrue(optimalFitness.CompareTo(best.Fitness) <= 0);
         }
 
@@ -365,7 +363,8 @@ namespace GeneticAlgorithms.TicTacToe
             {
                 Console.WriteLine("-- generation {0} --", generation);
                 Display(
-                    new Chromosome<Rule, Fitness>(genes, new Fitness(wins, ties, losses, genes.Count), Strategies.None), watch);
+                    new Chromosome<Rule, Fitness>(genes, new Fitness(wins, ties, losses, genes.Count), Strategies.None),
+                    watch);
             }
 
             var mutationRoundCounts = new List<int> {1};
