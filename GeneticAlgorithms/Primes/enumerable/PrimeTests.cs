@@ -14,7 +14,7 @@ namespace GeneticAlgorithms.primes.enumerable
 
         public static IEnumerable<int> Primes1()
         {
-            var ints = Enumerable.Range(2, int.MaxValue - 10).ToArray();
+            var ints = Enumerable.Range(2, int.MaxValue - 10);
             return ints.Where(x => ints.TakeWhile(y => y < x).All(y => x % y != 0));
         }
 
@@ -24,10 +24,9 @@ namespace GeneticAlgorithms.primes.enumerable
             CollectionAssert.AreEqual(Primes, Primes1().Take(Primes.Length).ToList());
         }
 
-
         public static IEnumerable<int> Primes2()
         {
-            var ints = Enumerable.Range(2, int.MaxValue - 10).ToArray();
+            var ints = Enumerable.Range(2, int.MaxValue - 10);
             return ints.Where(x => ints.TakeWhile(y => y <= Math.Sqrt(x)).All(y => x % y != 0));
         }
 
@@ -40,7 +39,7 @@ namespace GeneticAlgorithms.primes.enumerable
 
         public static IEnumerable<int> Primes3()
         {
-            var ints = Enumerable.Range(2, int.MaxValue - 10).ToArray();
+            var ints = Enumerable.Range(2, int.MaxValue - 10);
             return ints.Where(x =>
             {
                 var sqrt = Math.Sqrt(x);
