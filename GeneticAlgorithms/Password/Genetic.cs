@@ -24,9 +24,9 @@ namespace GeneticAlgorithms.Password
 {
     public static class Genetic
     {
-        public delegate int GetFitnessDelegate(string guess);
-
         public delegate void DisplayDelegate(Chromosome child);
+
+        public delegate int GetFitnessDelegate(string guess);
 
         private static Chromosome GenerateParent(char[] geneSet, int length, GetFitnessDelegate getFitness)
         {

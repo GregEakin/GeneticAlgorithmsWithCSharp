@@ -25,8 +25,9 @@ namespace GeneticAlgorithms.TicTacToe
 {
     public abstract class Rule
     {
-        public delegate int[] ValueFromSquareDelegate(Square square);
         public delegate bool FunctionDelegate(Square square);
+
+        public delegate int[] ValueFromSquareDelegate(Square square);
 
         public string DescriptionPrefix { get; }
         public ContentType? ExpectedContent { get; }

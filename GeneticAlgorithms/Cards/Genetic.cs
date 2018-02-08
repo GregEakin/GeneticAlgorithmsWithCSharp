@@ -27,15 +27,15 @@ namespace GeneticAlgorithms.Cards
     public static class Genetic<TGene, TFitness>
         where TFitness : IComparable<TFitness>
     {
-        public delegate TFitness FitnessDelegate(TGene[] gene);
-
         public delegate void DisplayDelegate(Chromosome<TGene, TFitness> child);
 
         public delegate void MutateGeneDelegate(TGene[] genes);
 
-        public delegate Chromosome<TGene, TFitness> MutateDelegate(Chromosome<TGene, TFitness> parent);
+        public delegate TFitness FitnessDelegate(TGene[] gene);
 
         public delegate Chromosome<TGene, TFitness> GenerateParentDelegate();
+
+        public delegate Chromosome<TGene, TFitness> MutateDelegate(Chromosome<TGene, TFitness> parent);
 
         private static Chromosome<TGene, TFitness> GenerateParent(int length, TGene[] geneSet, FitnessDelegate fitnessDelegate)
         {

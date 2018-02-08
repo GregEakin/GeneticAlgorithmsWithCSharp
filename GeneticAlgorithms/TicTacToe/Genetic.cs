@@ -37,11 +37,11 @@ namespace GeneticAlgorithms.TicTacToe
             }
         }
 
+        public delegate void MutateGeneDelegate(List<TGene> genes);
+
         public delegate void DisplayDelegate(Chromosome<TGene, TFitness> child, int? length = null);
 
         public delegate void DisplayDelegate2(List<TGene> a, int b, int c, int d, int e);
-
-        public delegate void MutateGeneDelegate(List<TGene> genes);
 
         public delegate bool OptimalDelegate(Chromosome<TGene, TFitness> b);
 

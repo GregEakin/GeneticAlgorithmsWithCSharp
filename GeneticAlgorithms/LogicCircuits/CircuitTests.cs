@@ -29,9 +29,9 @@ namespace GeneticAlgorithms.LogicCircuits
     [TestClass]
     public class CircuitTests
     {
-        public delegate Node FnCreateGene(int index);
-
         public delegate int FnGetFitnessDelegate(List<Node> genes);
+
+        public delegate Node FnCreateGene(int index);
 
         private static int Fitness(List<Node> genes, Tuple<bool[], bool>[] rules, Dictionary<char, bool?> inputs)
         {

@@ -37,9 +37,21 @@ namespace GeneticAlgorithms.LogicCircuits
             }
         }
 
+        public delegate void MutateGeneDelegate(List<TGene> genes);
+
         public delegate void DisplayDelegate(Chromosome<TGene, TFitness> child, int? length = null);
 
-        public delegate void MutateGeneDelegate(List<TGene> genes);
+        public delegate bool ImprovementDelegate(Chromosome<TGene, TFitness> c, Chromosome<TGene, TFitness> d);
+
+        public delegate bool OptimalDelegate(Chromosome<TGene, TFitness> b);
+
+        public delegate int NextFeatureValueDelegate(Chromosome<TGene, TFitness> i);
+
+        public delegate List<TGene> CreateDelegate();
+
+        public delegate List<TGene> CrossoverDelegate(List<TGene> genes1, List<TGene> genes2);
+
+        public delegate TFitness GetFitnessDelegate(List<TGene> gene);
 
         public delegate Chromosome<TGene, TFitness> GenerateParentDelegate();
 
@@ -49,18 +61,6 @@ namespace GeneticAlgorithms.LogicCircuits
 
         public delegate Chromosome<TGene, TFitness> StrategyDelegate(Chromosome<TGene, TFitness> p, int i,
             List<Chromosome<TGene, TFitness>> o);
-
-        public delegate List<TGene> CreateDelegate();
-
-        public delegate List<TGene> CrossoverDelegate(List<TGene> genes1, List<TGene> genes2);
-
-        public delegate bool ImprovementDelegate(Chromosome<TGene, TFitness> c, Chromosome<TGene, TFitness> d);
-
-        public delegate bool OptimalDelegate(Chromosome<TGene, TFitness> b);
-
-        public delegate int NextFeatureValueDelegate(Chromosome<TGene, TFitness> i);
-
-        public delegate TFitness GetFitnessDelegate(List<TGene> gene);
 
         private static Chromosome<TGene, TFitness> GenerateParent(int length, TGene[] geneSet,
             GetFitnessDelegate getGetFitness)

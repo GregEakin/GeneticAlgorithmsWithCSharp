@@ -45,10 +45,10 @@ namespace GeneticAlgorithms.LogicCircuits
             : $"{nameof(Not)}({_input})";
     }
 
-    public delegate bool FnTest(bool indexA, bool indexB);
-
     public abstract class GateWith2Inputs : ICircuit
     {
+        public delegate bool FnTest(bool indexA, bool indexB);
+
         private readonly ICircuit _inputA;
         private readonly ICircuit _inputB;
         private readonly string _label;

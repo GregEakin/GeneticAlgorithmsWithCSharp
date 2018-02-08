@@ -41,11 +41,11 @@ namespace GeneticAlgorithms.RegularExpressions
 
         private static readonly List<ArgumentException> RegexErrorsSeen = new List<ArgumentException>();
 
-        public delegate RepairDelegate RepairDelegate(string token1, List<string> result1, List<string> finals1);
+        public delegate bool FnMutateDelegate(List<string> genes);
 
         public delegate Fitness FnGetFitnessDelegate(List<string> genes);
 
-        public delegate bool FnMutateDelegate(List<string> genes);
+        public delegate RepairDelegate RepairDelegate(string token1, List<string> result1, List<string> finals1);
 
         [TestMethod]
         public void AllMetaTest()

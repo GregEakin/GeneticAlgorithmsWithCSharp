@@ -30,14 +30,13 @@ namespace GeneticAlgorithms.LawnmowerProblem
     [TestClass]
     public class LawnmowerTests
     {
-        public delegate Tuple<Field, Mower, Program> FnEvaluateDelegate(List<INode> genes);
-
-        public delegate Fitness FnGetFitnessDelegate(List<INode> genes);
-
         public delegate Field FnCreateFieldDelegate();
 
         public delegate INode FnCreateGeneDelegate();
 
+        public delegate Fitness FnGetFitnessDelegate(List<INode> genes);
+
+        public delegate Tuple<Field, Mower, Program> FnEvaluateDelegate(List<INode> genes);
 
         private static Fitness GetFitness(List<INode> genes, FnEvaluateDelegate fnEvaluate)
         {

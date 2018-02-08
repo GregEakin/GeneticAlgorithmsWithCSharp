@@ -35,11 +35,11 @@ namespace GeneticAlgorithms.MagicSquare
             }
         }
 
-        public delegate TFitness FitnessDelegate(List<TGene> gene);
-
         public delegate void DisplayDelegate(Chromosome<TGene, TFitness> child);
 
         public delegate void MutateGeneDelegate(List<TGene> genes);
+
+        public delegate TFitness FitnessDelegate(List<TGene> gene);
 
         public delegate Chromosome<TGene, TFitness> MutateChromosomeDelegate(Chromosome<TGene, TFitness> parent);
 

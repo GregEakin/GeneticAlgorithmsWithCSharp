@@ -27,17 +27,17 @@ namespace GeneticAlgorithms.Knights
     public static class Genetic<TGene, TFitness>
         where TFitness : IComparable<TFitness>
     {
-        public delegate TFitness FitnessDelegate(TGene[] gene);
+        public delegate void MutateGeneDelegate(TGene[] genes);
 
         public delegate void DisplayDelegate(Chromosome<TGene, TFitness> child);
 
-        public delegate void MutateGeneDelegate(TGene[] genes);
+        public delegate TGene[] CreateDelegate();
 
-        public delegate Chromosome<TGene, TFitness> MutateChromosomeDelegate(Chromosome<TGene, TFitness> parent);
+        public delegate TFitness FitnessDelegate(TGene[] gene);
 
         public delegate Chromosome<TGene, TFitness> GenerateParentDelegate();
 
-        public delegate TGene[] CreateDelegate();
+        public delegate Chromosome<TGene, TFitness> MutateChromosomeDelegate(Chromosome<TGene, TFitness> parent);
 
         private static Chromosome<TGene, TFitness> GenerateParent(int length, TGene[] geneSet, FitnessDelegate getFitness)
         {

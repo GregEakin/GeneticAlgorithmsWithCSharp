@@ -36,23 +36,22 @@ namespace GeneticAlgorithms.ApproximatingPi
             }
         }
 
-        public delegate TFitness GetFitnessDelegate(List<TGene> gene);
+        public delegate void MutateGeneDelegate(List<TGene> genes);
 
         public delegate void DisplayDelegate(Chromosome<TGene, TFitness> child);
 
-        public delegate void MutateGeneDelegate(List<TGene> genes);
-
-        public delegate Chromosome<TGene, TFitness> MutateChromosomeDelegate(Chromosome<TGene, TFitness> parent);
-
-        public delegate Chromosome<TGene, TFitness> GenerateParentDelegate();
+        public delegate TFitness GetFitnessDelegate(List<TGene> gene);
 
         public delegate List<TGene> CreateDelegate();
 
         public delegate List<TGene> CrossoverDelegate(List<TGene> genes1, List<TGene> genes2);
 
+        public delegate Chromosome<TGene, TFitness> GenerateParentDelegate();
+
+        public delegate Chromosome<TGene, TFitness> MutateChromosomeDelegate(Chromosome<TGene, TFitness> parent);
+
         public delegate Chromosome<TGene, TFitness> MutateDelegate(Chromosome<TGene, TFitness> x1, int x2,
             List<Chromosome<TGene, TFitness>> x3);
-
 
         private static Chromosome<TGene, TFitness> GenerateParent(int length, TGene[] geneSet,
             GetFitnessDelegate getGetFitness)

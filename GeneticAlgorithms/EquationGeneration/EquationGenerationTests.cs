@@ -30,8 +30,6 @@ namespace GeneticAlgorithms.EquationGeneration
     [TestClass]
     public class EquationGenerationTests
     {
-        private delegate int FnEvaluateDelegate(List<string> genes);
-
         private delegate int FnFitnessDelegate(List<string> genes);
 
         private delegate int OperationDelegate(int lhs, int rhs);
@@ -82,7 +80,7 @@ namespace GeneticAlgorithms.EquationGeneration
         private static int Multiply(int a, int b) =>
             a * b;
 
-        private static int GetFitness(List<string> genes, int expectedTotal, FnEvaluateDelegate fnEvaluate)
+        private static int GetFitness(List<string> genes, int expectedTotal, FnFitnessDelegate fnEvaluate)
         {
             try
             {

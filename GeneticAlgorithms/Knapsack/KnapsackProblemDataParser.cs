@@ -25,13 +25,13 @@ namespace GeneticAlgorithms.Knapsack
 {
     public class KnapsackProblemDataParser
     {
+        public delegate FindMethod FindMethod(string line, KnapsackProblemDataParser data);
+
         public List<Resource> Resources { get; } = new List<Resource>();
 
         public int MaxWeight { get; private set; }
 
         public List<ItemQuantity> Solution { get; } = new List<ItemQuantity>();
-
-        public delegate FindMethod FindMethod(string line, KnapsackProblemDataParser data);
 
         public static KnapsackProblemData LoadData(string filename)
         {
