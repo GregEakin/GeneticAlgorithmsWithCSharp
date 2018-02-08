@@ -97,7 +97,6 @@ namespace GeneticAlgorithms.TicTacToe
                 new RowOppositeFilter(null)
             };
 
-            var ticTacToe = new TicTacToeTests();
             var genes = save.ToList();
             Assert.IsTrue(TicTacToeTests.MutateMove(genes));
             CollectionAssert.AreNotEqual(save, genes);

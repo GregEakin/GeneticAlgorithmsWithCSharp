@@ -29,7 +29,7 @@ namespace GeneticAlgorithms.Cards
     [TestClass]
     public class CardTests
     {
-        private static Fitness GetFitness(int[] genes, int size)
+        private static Fitness GetFitness(int[] genes)
         {
             var group1Sum = genes.Take(5).Sum();
             var group2Product = genes.Skip(5).Aggregate(1, (acc, val) => acc * val);
@@ -72,7 +72,7 @@ namespace GeneticAlgorithms.Cards
         public void FitnessTest()
         {
             var genes = new[] {1, 1, 1, 1, 1, 2, 2, 2, 2, 2};
-            var fitness = GetFitness(genes, genes.Length);
+            var fitness = GetFitness(genes);
             Assert.AreEqual(5, fitness.Group1Sum);
             Assert.AreEqual(32, fitness.Group2Product);
             Assert.AreEqual(8, fitness.DuplicateCount);
@@ -82,7 +82,7 @@ namespace GeneticAlgorithms.Cards
         public void DispalyTest()
         {
             var genes = new[] {1, 1, 1, 1, 1, 2, 2, 2, 2, 2};
-            var fitness = GetFitness(genes, genes.Length);
+            var fitness = GetFitness(genes);
             var chromosome = new Chromosome<int, Fitness>(genes, fitness);
             var watch = Stopwatch.StartNew();
 
@@ -96,7 +96,7 @@ namespace GeneticAlgorithms.Cards
             var watch = Stopwatch.StartNew();
 
             void FnDisplay(Chromosome<int, Fitness> candidate) => Display(candidate, watch);
-            Fitness FnGetFitness(int[] genes) => GetFitness(genes, genes.Length);
+            Fitness FnGetFitness(int[] genes) => GetFitness(genes);
             void FnMutate(int[] genes) => Mutate(genes, geneSet);
 
             var optimalFitness = new Fitness(36, 360, 0);
