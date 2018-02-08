@@ -29,15 +29,15 @@ namespace GeneticAlgorithms.Cards
     [TestClass]
     public class CardTests
     {
-        public static Fitness GetFitness(int[] genes, int size)
+        private static Fitness GetFitness(int[] genes, int size)
         {
             var group1Sum = genes.Take(5).Sum();
             var group2Product = genes.Skip(5).Aggregate(1, (acc, val) => acc * val);
             var duplicateCount = genes.Length - new HashSet<int>(genes).Count;
-            return new Fitness(group1Sum, group2Product, duplicateCount );
+            return new Fitness(group1Sum, group2Product, duplicateCount);
         }
 
-        public static void Display(Chromosome<int, Fitness> candidate, Stopwatch watch)
+        private static void Display(Chromosome<int, Fitness> candidate, Stopwatch watch)
         {
             Console.WriteLine("{0} - {1}\t{2},\t{3} ms",
                 string.Join(", ", candidate.Genes.Take(5)),
@@ -45,7 +45,7 @@ namespace GeneticAlgorithms.Cards
                 candidate.Fitness, watch.ElapsedMilliseconds);
         }
 
-        public static void Mutate(int[] genes, int[] geneSet)
+        private static void Mutate(int[] genes, int[] geneSet)
         {
             if (genes.Length == new HashSet<int>(genes).Count)
             {

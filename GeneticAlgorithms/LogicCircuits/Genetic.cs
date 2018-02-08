@@ -37,19 +37,30 @@ namespace GeneticAlgorithms.LogicCircuits
             }
         }
 
-        public delegate TFitness GetFitnessDelegate(List<TGene> gene);
-
         public delegate void DisplayDelegate(Chromosome<TGene, TFitness> child, int? length = null);
 
         public delegate void MutateGeneDelegate(List<TGene> genes);
 
+        public delegate Chromosome<TGene, TFitness> GenerateParentDelegate();
+
+        public delegate Chromosome<TGene, TFitness> OptimizationDelegate(int x);
+
         public delegate Chromosome<TGene, TFitness> MutateChromosomeDelegate(Chromosome<TGene, TFitness> parent);
 
-        public delegate Chromosome<TGene, TFitness> GenerateParentDelegate();
+        public delegate Chromosome<TGene, TFitness> StrategyDelegate(Chromosome<TGene, TFitness> p, int i,
+            List<Chromosome<TGene, TFitness>> o);
 
         public delegate List<TGene> CreateDelegate();
 
-        public delegate List<TGene> CrossoverFun(List<TGene> genes1, List<TGene> genes2);
+        public delegate List<TGene> CrossoverDelegate(List<TGene> genes1, List<TGene> genes2);
+
+        public delegate bool ImprovementDelegate(Chromosome<TGene, TFitness> c, Chromosome<TGene, TFitness> d);
+
+        public delegate bool OptimalDelegate(Chromosome<TGene, TFitness> b);
+
+        public delegate int NextFeatureValueDelegate(Chromosome<TGene, TFitness> i);
+
+        public delegate TFitness GetFitnessDelegate(List<TGene> gene);
 
         private static Chromosome<TGene, TFitness> GenerateParent(int length, TGene[] geneSet,
             GetFitnessDelegate getGetFitness)
@@ -85,7 +96,7 @@ namespace GeneticAlgorithms.LogicCircuits
 
         private static Chromosome<TGene, TFitness> Crossover(List<TGene> parentGenes, int index,
             List<Chromosome<TGene, TFitness>> parents,
-            GetFitnessDelegate getFitness, CrossoverFun crossover, MutateChromosomeDelegate mutate,
+            GetFitnessDelegate getFitness, CrossoverDelegate crossover, MutateChromosomeDelegate mutate,
             GenerateParentDelegate generateParent)
         {
             var donorIndex = Rand.Random.Next(0, parents.Count);
@@ -106,7 +117,7 @@ namespace GeneticAlgorithms.LogicCircuits
 
         public static Chromosome<TGene, TFitness> GetBest(GetFitnessDelegate getFitness, int targetLen,
             TFitness optimalFitness, TGene[] geneSet, DisplayDelegate display, MutateGeneDelegate customMutate = null,
-            CreateDelegate customCreate = null, int maxAge = 0, int poolSize = 1, CrossoverFun crossover = null,
+            CreateDelegate customCreate = null, int maxAge = 0, int poolSize = 1, CrossoverDelegate crossover = null,
             int maxSeconds = 0)
         {
             Chromosome<TGene, TFitness> FnMutate(Chromosome<TGene, TFitness> parent) =>
@@ -125,8 +136,7 @@ namespace GeneticAlgorithms.LogicCircuits
             }
 
             var strategyLookup =
-                new Dictionary<Chromosome<TGene, TFitness>.Strategies, Func<Chromosome<TGene, TFitness>, int,
-                    List<Chromosome<TGene, TFitness>>, Chromosome<TGene, TFitness>>>
+                new Dictionary<Chromosome<TGene, TFitness>.Strategies, StrategyDelegate>
                 {
                     {Chromosome<TGene, TFitness>.Strategies.Create, (p, i, o) => FnGenerateParent()},
                     {Chromosome<TGene, TFitness>.Strategies.Mutate, (p, i, o) => FnMutate(p)},
@@ -136,17 +146,15 @@ namespace GeneticAlgorithms.LogicCircuits
                     }
                 };
 
-            var usedStrategies =
-                new List<Func<Chromosome<TGene, TFitness>, int, List<Chromosome<TGene, TFitness>>,
-                    Chromosome<TGene, TFitness>>> {strategyLookup[Chromosome<TGene, TFitness>.Strategies.Mutate]};
+            var usedStrategies = new List<StrategyDelegate> {strategyLookup[Chromosome<TGene, TFitness>.Strategies.Mutate]};
 
             if (crossover != null)
                 usedStrategies.Add(strategyLookup[Chromosome<TGene, TFitness>.Strategies.Crossover]);
 
             Chromosome<TGene, TFitness> FnNewChild(Chromosome<TGene, TFitness> parent, int index,
-                List<Chromosome<TGene, TFitness>> parents) => 
-                crossover != null 
-                    ? usedStrategies[Rand.Random.Next(usedStrategies.Count)](parent, index, parents) 
+                List<Chromosome<TGene, TFitness>> parents) =>
+                crossover != null
+                    ? usedStrategies[Rand.Random.Next(usedStrategies.Count)](parent, index, parents)
                     : FnMutate(parent);
 
             try
@@ -171,7 +179,7 @@ namespace GeneticAlgorithms.LogicCircuits
         }
 
         private static IEnumerable<Chromosome<TGene, TFitness>> GetImprovement(
-            Func<Chromosome<TGene, TFitness>, int, List<Chromosome<TGene, TFitness>>, Chromosome<TGene, TFitness>>
+            StrategyDelegate
                 newChild, GenerateParentDelegate generateParent, int maxAge, int poolSize, int maxSeconds)
         {
             var watch = Stopwatch.StartNew();
@@ -182,7 +190,7 @@ namespace GeneticAlgorithms.LogicCircuits
             yield return bestParent;
             var parents = new List<Chromosome<TGene, TFitness>> {bestParent};
             var historicalFitnesses = new List<TFitness> {bestParent.Fitness};
-            while(parents.Count < poolSize)
+            while (parents.Count < poolSize)
             {
                 var parent = generateParent();
                 if (maxSeconds > 0 && watch.ElapsedMilliseconds > maxSeconds * 1000)
@@ -254,12 +262,9 @@ namespace GeneticAlgorithms.LogicCircuits
             // ReSharper disable once IteratorNeverReturns
         }
 
-        public static Chromosome<TGene, TFitness> HillClimbing(Func<int, Chromosome<TGene, TFitness>> optimizationFunction,
-            Func<Chromosome<TGene, TFitness>, Chromosome<TGene, TFitness>, bool> isImprovement,
-            Func<Chromosome<TGene, TFitness>, bool> isOptimal,
-            Func<Chromosome<TGene, TFitness>, int> getNextFeatureValue,
-            Action<Chromosome<TGene, TFitness>, int?> display,
-            int initialFeatureValue)
+        public static Chromosome<TGene, TFitness> HillClimbing(OptimizationDelegate optimizationFunction,
+            ImprovementDelegate isImprovement, OptimalDelegate isOptimal, NextFeatureValueDelegate getNextFeatureValue,
+            DisplayDelegate display, int initialFeatureValue)
         {
             var best = optimizationFunction(initialFeatureValue);
             var stdout = Console.Out;

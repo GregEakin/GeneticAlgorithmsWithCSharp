@@ -27,9 +27,13 @@ namespace GeneticAlgorithms.SortedNumbers
     public static class Genetic<TGene, TFitness>
         where TFitness : IComparable<TFitness>
     {
+        public delegate void DisplayFun(Chromosome<TGene, TFitness> child);
+
         public delegate TFitness GetFitnessFun(TGene[] gene);
 
-        public delegate void DisplayFun(Chromosome<TGene, TFitness> child);
+        public delegate Chromosome<TGene, TFitness> MutateChromosomeDelegate(Chromosome<TGene, TFitness> parent);
+
+        public delegate Chromosome<TGene, TFitness> GenerateParentDelegate();
 
         public static Chromosome<TGene, TFitness> GenerateParent(int length, TGene[] geneSet, GetFitnessFun getFitness)
         {
@@ -69,9 +73,8 @@ namespace GeneticAlgorithms.SortedNumbers
             throw new Exception();
         }
 
-        private static IEnumerable<Chromosome<TGene, TFitness>> GetImprovment(
-            Func<Chromosome<TGene, TFitness>, Chromosome<TGene, TFitness>> newChild,
-            Func<Chromosome<TGene, TFitness>> generateParent)
+        private static IEnumerable<Chromosome<TGene, TFitness>> GetImprovment(MutateChromosomeDelegate newChild,
+            GenerateParentDelegate generateParent)
         {
             var bestParent = generateParent();
             yield return bestParent;
@@ -89,7 +92,7 @@ namespace GeneticAlgorithms.SortedNumbers
                 yield return child;
                 bestParent = child;
             }
-        
+
             // ReSharper disable once IteratorNeverReturns
         }
     }

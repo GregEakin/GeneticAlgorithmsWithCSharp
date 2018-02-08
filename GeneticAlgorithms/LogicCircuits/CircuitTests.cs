@@ -150,9 +150,9 @@ namespace GeneticAlgorithms.LogicCircuits
             Console.Write("{0} = {1}", circuit, circuit.Output);
         }
 
-        private Dictionary<char, bool?> _inputs;
-        private List<Tuple<Node.CrateGeneDelegate, ICircuit>> _gates;
-        private List<Tuple<Node.CrateGeneDelegate, ICircuit>> _sources;
+        private static Dictionary<char, bool?> _inputs;
+        private static List<Tuple<Node.CrateGeneDelegate, ICircuit>> _gates;
+        private static List<Tuple<Node.CrateGeneDelegate, ICircuit>> _sources;
 
         [TestInitialize]
         public void SetupTest()
@@ -221,7 +221,7 @@ namespace GeneticAlgorithms.LogicCircuits
             FindCircuit(rules, 12);
         }
 
-        private Tuple<bool[], bool>[] Get2BitAdderRulesForBit(int bit)
+        private static Tuple<bool[], bool>[] Get2BitAdderRulesForBit(int bit)
         {
             var rules = new[]
             {
@@ -275,7 +275,7 @@ namespace GeneticAlgorithms.LogicCircuits
             FindCircuit(rules, 9);
         }
 
-        private void FindCircuit(Tuple<bool[], bool>[] rules, int expectedLength)
+        private static void FindCircuit(Tuple<bool[], bool>[] rules, int expectedLength)
         {
             var watch = Stopwatch.StartNew();
 
@@ -300,7 +300,8 @@ namespace GeneticAlgorithms.LogicCircuits
             Chromosome<Node, int> FnOptimizationFunction(int variableLength)
             {
                 maxLength = variableLength;
-                return Genetic<Node, int>.GetBest(FnGetFitness, 0, rules.Length, null, FnDisplay, FnMutate, FnCreate, 0, 3,
+                return Genetic<Node, int>.GetBest(FnGetFitness, 0, rules.Length, null, FnDisplay, FnMutate, FnCreate, 0,
+                    3,
                     null, 30);
             }
 
@@ -315,7 +316,8 @@ namespace GeneticAlgorithms.LogicCircuits
             int FnGetNextFeatureValue(Chromosome<Node, int> currentBest) =>
                 NodesToCircuit(currentBest.Genes).Item2.Count;
 
-            var best = Genetic<Node, int>.HillClimbing(FnOptimizationFunction, FnIsImprovement, FnIsOptimal, FnGetNextFeatureValue,
+            var best = Genetic<Node, int>.HillClimbing(FnOptimizationFunction, FnIsImprovement, FnIsOptimal,
+                FnGetNextFeatureValue,
                 FnDisplay, maxLength);
             Assert.AreEqual(rules.Length, best.Fitness);
             var circuit = NodesToCircuit(best.Genes).Item2;

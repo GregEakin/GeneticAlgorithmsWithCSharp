@@ -25,6 +25,9 @@ namespace GeneticAlgorithms.TicTacToe
 {
     public abstract class Rule
     {
+        public delegate int[] ValueFromSquareDelegate(Square square);
+        public delegate bool FunctionDelegate(Square square);
+
         public string DescriptionPrefix { get; }
         public ContentType? ExpectedContent { get; }
         public int? Count { get; }
@@ -48,13 +51,14 @@ namespace GeneticAlgorithms.TicTacToe
 
     public class RuleMetadata
     {
-        public Func<ContentType?, int?, Rule> Create { get; }
+        public delegate Rule CreateDelegate(ContentType? a, int? b);
+
+        public CreateDelegate Create { get; }
         public Tuple<ContentType?, int[]>[] Options { get; }
         public bool NeedsSpecificContent { get; }
         public bool NeedsSpecificCount { get; }
 
-        public RuleMetadata(Func<ContentType?, int?, Rule> create,
-            Tuple<ContentType?, int[]>[] options = null,
+        public RuleMetadata(CreateDelegate create, Tuple<ContentType?, int[]>[] options = null,
             bool needsSpecificContent = true, bool needsSpecificCount = true)
         {
             if (needsSpecificCount && !needsSpecificContent)
@@ -108,10 +112,10 @@ namespace GeneticAlgorithms.TicTacToe
 
     public class ContentFilter : Rule
     {
-        public Func<Square, int[]> ValueFromSquare { get; }
+        public ValueFromSquareDelegate ValueFromSquare { get; }
 
         protected ContentFilter(string descriptionPrefix, ContentType? expectedContent, int? count,
-            Func<Square, int[]> valueFromSquare)
+            ValueFromSquareDelegate valueFromSquare)
             : base(descriptionPrefix, expectedContent, count)
         {
             ValueFromSquare = valueFromSquare;
@@ -149,9 +153,9 @@ namespace GeneticAlgorithms.TicTacToe
 
     public class LocationFilter : Rule
     {
-        public Func<Square, bool> Function { get; }
+        public FunctionDelegate Function { get; }
 
-        protected LocationFilter(string expectedLocation, string containerDescription, Func<Square, bool> func)
+        protected LocationFilter(string expectedLocation, string containerDescription, FunctionDelegate func)
             : base($"is in {expectedLocation} {containerDescription}")
         {
             Function = func;
@@ -171,7 +175,7 @@ namespace GeneticAlgorithms.TicTacToe
 
     public class RowLocationFilter : LocationFilter
     {
-        protected RowLocationFilter(string expectedLocation, Func<Square, bool> func)
+        protected RowLocationFilter(string expectedLocation, FunctionDelegate func)
             : base(expectedLocation, "ROW", func)
         {
         }
@@ -179,7 +183,7 @@ namespace GeneticAlgorithms.TicTacToe
 
     public class ColumnLocationFilter : LocationFilter
     {
-        protected ColumnLocationFilter(string expectedLocation, Func<Square, bool> func)
+        protected ColumnLocationFilter(string expectedLocation, FunctionDelegate func)
             : base(expectedLocation, "COLUMN", func)
         {
         }

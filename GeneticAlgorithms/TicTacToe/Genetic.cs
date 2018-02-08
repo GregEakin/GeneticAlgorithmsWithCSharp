@@ -37,19 +37,33 @@ namespace GeneticAlgorithms.TicTacToe
             }
         }
 
-        public delegate TFitness GetFitnessDelegate(List<TGene> gene);
-
         public delegate void DisplayDelegate(Chromosome<TGene, TFitness> child, int? length = null);
+
+        public delegate void DisplayDelegate2(List<TGene> a, int b, int c, int d, int e);
 
         public delegate void MutateGeneDelegate(List<TGene> genes);
 
-        public delegate Chromosome<TGene, TFitness> MutateChromosomeDelegate(Chromosome<TGene, TFitness> parent);
+        public delegate bool OptimalDelegate(Chromosome<TGene, TFitness> b);
 
-        public delegate Chromosome<TGene, TFitness> GenerateParentDelegate();
+        public delegate bool ImprovementDelegate(Chromosome<TGene, TFitness> c, Chromosome<TGene, TFitness> d);
+
+        public delegate int NextFeatureValueDelegate(Chromosome<TGene, TFitness> i);
+
+        public delegate int SortKeyDelegate(List<TGene> a, int b, int c, int d);
+
+        public delegate TFitness GetFitnessDelegate(List<TGene> gene);
 
         public delegate List<TGene> CreateDelegate();
 
-        public delegate List<TGene> CrossoverFun(List<TGene> genes1, List<TGene> genes2);
+        public delegate List<TGene> CrossoverDelegate(List<TGene> genes1, List<TGene> genes2);
+
+        public delegate Chromosome<TGene, TFitness> GenerateParentDelegate();
+
+        public delegate Chromosome<TGene, TFitness> OptimizationDelegate(int x);
+
+        public delegate Chromosome<TGene, TFitness> MutateChromosomeDelegate(Chromosome<TGene, TFitness> parent);
+
+        public delegate CompetitionResult CompeteDelegate(List<TGene> a, List<TGene> b);
 
         private static Chromosome<TGene, TFitness> GenerateParent(int length, TGene[] geneSet,
             GetFitnessDelegate getGetFitness)
@@ -85,7 +99,7 @@ namespace GeneticAlgorithms.TicTacToe
 
         private static Chromosome<TGene, TFitness> Crossover(List<TGene> parentGenes, int index,
             List<Chromosome<TGene, TFitness>> parents,
-            GetFitnessDelegate getFitness, CrossoverFun crossover, MutateChromosomeDelegate mutate,
+            GetFitnessDelegate getFitness, CrossoverDelegate crossover, MutateChromosomeDelegate mutate,
             GenerateParentDelegate generateParent)
         {
             var donorIndex = Rand.Random.Next(0, parents.Count);
@@ -104,9 +118,12 @@ namespace GeneticAlgorithms.TicTacToe
                 Chromosome<TGene, TFitness>.Strategies.Crossover);
         }
 
+        public delegate Chromosome<TGene, TFitness> StrategyDelegate(Chromosome<TGene, TFitness> p, int i,
+            List<Chromosome<TGene, TFitness>> o);
+
         public static Chromosome<TGene, TFitness> GetBest(GetFitnessDelegate getFitness, int targetLen,
             TFitness optimalFitness, TGene[] geneSet, DisplayDelegate display, MutateGeneDelegate customMutate = null,
-            CreateDelegate customCreate = null, int maxAge = 0, int poolSize = 1, CrossoverFun crossover = null,
+            CreateDelegate customCreate = null, int maxAge = 0, int poolSize = 1, CrossoverDelegate crossover = null,
             int maxSeconds = 0)
         {
             Chromosome<TGene, TFitness> FnMutate(Chromosome<TGene, TFitness> parent) =>
@@ -125,8 +142,7 @@ namespace GeneticAlgorithms.TicTacToe
             }
 
             var strategyLookup =
-                new Dictionary<Chromosome<TGene, TFitness>.Strategies, Func<Chromosome<TGene, TFitness>, int,
-                    List<Chromosome<TGene, TFitness>>, Chromosome<TGene, TFitness>>>
+                new Dictionary<Chromosome<TGene, TFitness>.Strategies, StrategyDelegate>
                 {
                     {Chromosome<TGene, TFitness>.Strategies.Create, (p, i, o) => FnGenerateParent()},
                     {Chromosome<TGene, TFitness>.Strategies.Mutate, (p, i, o) => FnMutate(p)},
@@ -137,16 +153,15 @@ namespace GeneticAlgorithms.TicTacToe
                 };
 
             var usedStrategies =
-                new List<Func<Chromosome<TGene, TFitness>, int, List<Chromosome<TGene, TFitness>>,
-                    Chromosome<TGene, TFitness>>> {strategyLookup[Chromosome<TGene, TFitness>.Strategies.Mutate]};
+                new List<StrategyDelegate> {strategyLookup[Chromosome<TGene, TFitness>.Strategies.Mutate]};
 
             if (crossover != null)
                 usedStrategies.Add(strategyLookup[Chromosome<TGene, TFitness>.Strategies.Crossover]);
 
             Chromosome<TGene, TFitness> FnNewChild(Chromosome<TGene, TFitness> parent, int index,
-                List<Chromosome<TGene, TFitness>> parents) => 
-                crossover != null 
-                    ? usedStrategies[Rand.Random.Next(usedStrategies.Count)](parent, index, parents) 
+                List<Chromosome<TGene, TFitness>> parents) =>
+                crossover != null
+                    ? usedStrategies[Rand.Random.Next(usedStrategies.Count)](parent, index, parents)
                     : FnMutate(parent);
 
             try
@@ -170,9 +185,8 @@ namespace GeneticAlgorithms.TicTacToe
             throw new UnauthorizedAccessException();
         }
 
-        private static IEnumerable<Chromosome<TGene, TFitness>> GetImprovement(
-            Func<Chromosome<TGene, TFitness>, int, List<Chromosome<TGene, TFitness>>, Chromosome<TGene, TFitness>>
-                newChild, GenerateParentDelegate generateParent, int maxAge, int poolSize, int maxSeconds)
+        private static IEnumerable<Chromosome<TGene, TFitness>> GetImprovement(StrategyDelegate newChild,
+            GenerateParentDelegate generateParent, int maxAge, int poolSize, int maxSeconds)
         {
             var watch = Stopwatch.StartNew();
             var bestParent = generateParent();
@@ -182,7 +196,7 @@ namespace GeneticAlgorithms.TicTacToe
             yield return bestParent;
             var parents = new List<Chromosome<TGene, TFitness>> {bestParent};
             var historicalFitnesses = new List<TFitness> {bestParent.Fitness};
-            while(parents.Count < poolSize)
+            while (parents.Count < poolSize)
             {
                 var parent = generateParent();
                 if (maxSeconds > 0 && watch.ElapsedMilliseconds > maxSeconds * 1000)
@@ -254,11 +268,12 @@ namespace GeneticAlgorithms.TicTacToe
             // ReSharper disable once IteratorNeverReturns
         }
 
-        public static Chromosome<TGene, TFitness> HillClimbing(Func<int, Chromosome<TGene, TFitness>> optimizationFunction,
-            Func<Chromosome<TGene, TFitness>, Chromosome<TGene, TFitness>, bool> isImprovement,
-            Func<Chromosome<TGene, TFitness>, bool> isOptimal,
-            Func<Chromosome<TGene, TFitness>, int> getNextFeatureValue,
-            Action<Chromosome<TGene, TFitness>, int?> display,
+        public static Chromosome<TGene, TFitness> HillClimbing(
+            OptimizationDelegate optimizationFunction,
+            ImprovementDelegate isImprovement,
+            OptimalDelegate isOptimal,
+            NextFeatureValueDelegate getNextFeatureValue,
+            DisplayDelegate display,
             int initialFeatureValue)
         {
             var best = optimizationFunction(initialFeatureValue);
@@ -281,50 +296,51 @@ namespace GeneticAlgorithms.TicTacToe
             return best;
         }
 
-        internal static List<TGene> Tournament(Func<List<TGene>> fnGenerateParent, Func<List<TGene>, List<TGene>, List<TGene>> fnCrossover,
-            Func<List<TGene>, List<TGene>, CompetitionResult> fnCompete, Action<List<TGene>, int, int, int, int> fnDisplay,
-            Func<List<TGene>, int, int, int, int> fnSortKey, int numParents = 10, int maxGenerations = 100)
+        internal static List<TGene> Tournament(CreateDelegate fnGenerateParent, CrossoverDelegate fnCrossover,
+            CompeteDelegate fnCompete, DisplayDelegate2 fnDisplay, SortKeyDelegate fnSortKey, int numParents = 10,
+            int maxGenerations = 100)
         {
             var pool = Enumerable.Range(0, 1 + numParents * numParents)
-                .Select(x => new Tuple<List<TGene>, int[]>(fnGenerateParent(), new[] { 0, 0, 0 })).ToList();
+                .Select(x => new Tuple<List<TGene>, int[]>(fnGenerateParent(), new[] {0, 0, 0})).ToList();
             var best = pool[0].Item1;
             var bestScore = pool[0].Item2;
 
-            int GetSortKey(Tuple<List<TGene>, int[]> x) => fnSortKey(x.Item1, x.Item2[(int)CompetitionResult.Win],
-                x.Item2[(int)CompetitionResult.Tie], x.Item2[(int)CompetitionResult.Loss]);
+            int GetSortKey(Tuple<List<TGene>, int[]> x) => fnSortKey(x.Item1, x.Item2[(int) CompetitionResult.Win],
+                x.Item2[(int) CompetitionResult.Tie], x.Item2[(int) CompetitionResult.Loss]);
 
             for (var generation = 0; generation < maxGenerations; generation++)
             {
                 for (var i = 0; i < pool.Count; i++)
-                    for (var j = 0; j < pool.Count; j++)
-                    {
-                        if (i == j)
-                            continue;
-                        var playerA = pool[i].Item1;
-                        var scoreA = pool[i].Item2;
-                        var playerB = pool[j].Item1;
-                        var scoreB = pool[j].Item2;
-                        var result = (int)fnCompete(playerA, playerB);
-                        scoreA[result]++;
-                        scoreB[2 - result]++;
-                    }
+                for (var j = 0; j < pool.Count; j++)
+                {
+                    if (i == j)
+                        continue;
+                    var playerA = pool[i].Item1;
+                    var scoreA = pool[i].Item2;
+                    var playerB = pool[j].Item1;
+                    var scoreB = pool[j].Item2;
+                    var result = (int) fnCompete(playerA, playerB);
+                    scoreA[result]++;
+                    scoreB[2 - result]++;
+                }
 
                 pool = pool.OrderByDescending(GetSortKey).ToList();
                 if (GetSortKey(pool[0]) > GetSortKey(new Tuple<List<TGene>, int[]>(best, bestScore)))
                 {
                     best = pool[0].Item1;
                     bestScore = pool[0].Item2;
-                    fnDisplay(best, bestScore[(int)CompetitionResult.Win], bestScore[(int)CompetitionResult.Tie],
-                        bestScore[(int)CompetitionResult.Loss], generation);
+                    fnDisplay(best, bestScore[(int) CompetitionResult.Win], bestScore[(int) CompetitionResult.Tie],
+                        bestScore[(int) CompetitionResult.Loss], generation);
                 }
 
                 var parents = Enumerable.Range(0, numParents).Select(i => pool[i].Item1).ToList();
                 pool = (from i in Enumerable.Range(0, parents.Count)
                         from j in Enumerable.Range(0, parents.Count)
                         where i != j
-                        select new Tuple<List<TGene>, int[]>(fnCrossover(parents[i], parents[j]), new[] { 0, 0, 0 })).ToList();
-                pool.AddRange(parents.Select(parent => new Tuple<List<TGene>, int[]>(parent, new[] { 0, 0, 0 })));
-                pool.Add(new Tuple<List<TGene>, int[]>(fnGenerateParent(), new[] { 0, 0, 0 }));
+                        select new Tuple<List<TGene>, int[]>(fnCrossover(parents[i], parents[j]), new[] {0, 0, 0}))
+                    .ToList();
+                pool.AddRange(parents.Select(parent => new Tuple<List<TGene>, int[]>(parent, new[] {0, 0, 0})));
+                pool.Add(new Tuple<List<TGene>, int[]>(fnGenerateParent(), new[] {0, 0, 0}));
             }
 
             return best;

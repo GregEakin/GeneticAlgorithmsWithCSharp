@@ -29,7 +29,7 @@ namespace GeneticAlgorithms.MagicSquare
     [TestClass]
     public class MagicSquareTests
     {
-        public static Fitness GetFitness(List<int> genes, int diagonalSize, int expectedSum)
+        private static Fitness GetFitness(List<int> genes, int diagonalSize, int expectedSum)
         {
             var sums = Sums(genes, diagonalSize);
             var a1 = sums.Item1.Where(r => r != expectedSum).Select(s => Math.Abs(s - expectedSum)).Sum();
@@ -40,7 +40,7 @@ namespace GeneticAlgorithms.MagicSquare
             return new Fitness(sumOfDifferences);
         }
 
-        public static void Display(Chromosome<int, Fitness> candidate, Stopwatch watch, int diagonalSize)
+        private static void Display(Chromosome<int, Fitness> candidate, Stopwatch watch, int diagonalSize)
         {
             var sums = Sums(candidate.Genes, diagonalSize);
             for (var rowNumber = 0; rowNumber < diagonalSize; rowNumber++)
@@ -53,7 +53,7 @@ namespace GeneticAlgorithms.MagicSquare
             Console.WriteLine(" - - - - - - - - - - - {0}, {1} ms", candidate.Fitness, watch.ElapsedMilliseconds);
         }
 
-        public static Tuple<int[], int[], int, int> Sums(List<int> genes, int diagonalSize)
+        private static Tuple<int[], int[], int, int> Sums(List<int> genes, int diagonalSize)
         {
             var rows = new int[diagonalSize];
             var columns = new int[diagonalSize];
@@ -153,7 +153,7 @@ namespace GeneticAlgorithms.MagicSquare
             Assert.AreEqual(19, index);
         }
 
-        public Tuple<int, double, double> SimulatedAnnealingExp(int value)
+        private static Tuple<int, double, double> SimulatedAnnealingExp(int value)
         {
             var historicalFitnesses = Enumerable.Range(0, 51).Select(n => 50 - n).ToList();
             var index = historicalFitnesses.BinarySearch(value, new Genetic<int, int>.ReverseComparer<int>());

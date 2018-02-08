@@ -69,7 +69,7 @@ namespace GeneticAlgorithms.Knights
             return new Chromosome<TGene, TFitness>(childGenes, fitness);
         }
 
-        internal static Chromosome<TGene, TFitness> GetBest(FitnessDelegate getFitness, int targetLen, TFitness optimalFitness,
+        public static Chromosome<TGene, TFitness> GetBest(FitnessDelegate getFitness, int targetLen, TFitness optimalFitness,
             TGene[] geneSet, DisplayDelegate display, MutateGeneDelegate customMutate = null, CreateDelegate customCreate = null)
         {
             Chromosome<TGene, TFitness> FnMutate(Chromosome<TGene, TFitness> parent) => customMutate == null
@@ -95,7 +95,7 @@ namespace GeneticAlgorithms.Knights
             throw new UnauthorizedAccessException();
         }
 
-        public static IEnumerable<Chromosome<TGene, TFitness>> GetImprovement(MutateChromosomeDelegate newChild,
+        private static IEnumerable<Chromosome<TGene, TFitness>> GetImprovement(MutateChromosomeDelegate newChild,
             GenerateParentDelegate generateParent)
         {
             var bestParent = generateParent();

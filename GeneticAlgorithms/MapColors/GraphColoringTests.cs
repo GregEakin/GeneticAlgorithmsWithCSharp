@@ -83,7 +83,7 @@ namespace GeneticAlgorithms.MapColors
             Assert.AreEqual(100, states.Count);
         }
 
-        public static Rule[] BuildRules(Tuple<string, string[]>[] items)
+        private static Rule[] BuildRules(Tuple<string, string[]>[] items)
         {
             var rulesAdded = new Dictionary<Rule, int>();
             foreach (var item in items)
@@ -122,13 +122,13 @@ namespace GeneticAlgorithms.MapColors
             Assert.AreEqual(3, rules.Length);
         }
 
-        public static int GetFitness(char[] genes, ISet<Rule> rules, Dictionary<string, int> stateIndexLookup)
+        private static int GetFitness(char[] genes, ISet<Rule> rules, Dictionary<string, int> stateIndexLookup)
         {
             var rulesThatPass = rules.Count(r => r.Valid(genes, stateIndexLookup));
             return rulesThatPass;
         }
 
-        public static void Display(Chromosome<char, int> candidate, Stopwatch watch)
+        private static void Display(Chromosome<char, int> candidate, Stopwatch watch)
         {
             Console.WriteLine("{0}\t{1}\t{2} ms",
                 new string(candidate.Genes),

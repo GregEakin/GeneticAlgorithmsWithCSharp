@@ -104,7 +104,7 @@ namespace GeneticAlgorithms.MagicSquare
             throw new UnauthorizedAccessException();
         }
 
-        public static IEnumerable<Chromosome<TGene, TFitness>> GetImprovement(MutateChromosomeDelegate newChild,
+        private static IEnumerable<Chromosome<TGene, TFitness>> GetImprovement(MutateChromosomeDelegate newChild,
             GenerateParentDelegate generateParent, int maxAge = 0)
         {
             var bestParent = generateParent();

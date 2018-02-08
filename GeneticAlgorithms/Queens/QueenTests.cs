@@ -18,12 +18,12 @@
  */
 
 using GeneticAlgorithms.SortedNumbers;
+using GeneticAlgorithms.Utilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using GeneticAlgorithms.Utilities;
 
 namespace GeneticAlgorithms.Queens
 {
@@ -121,8 +121,7 @@ namespace GeneticAlgorithms.Queens
             var geneSet = new[] {1, 2, 3};
             int[] gene;
             do
-                gene = Rand.RandomSampleArray(geneSet, geneSet.Length);
-            while (gene.SequenceEqual(geneSet));
+                gene = Rand.RandomSampleArray(geneSet, geneSet.Length); while (gene.SequenceEqual(geneSet));
 
             CollectionAssert.AreEqual(new[] {1, 2, 3}, geneSet);
             CollectionAssert.AreNotEqual(new[] {1, 2, 3}, gene);

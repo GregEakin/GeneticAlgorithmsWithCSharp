@@ -30,6 +30,8 @@ namespace GeneticAlgorithms.TravelingSalesmanProblem
     [TestClass]
     public class TravelingSalesmanProblemTests
     {
+        public delegate Fitness FitnessDelegate(int[] genes);
+
         private static Fitness GetFitness(int[] genes, Dictionary<int, double[]> idToLocatonLookup)
         {
             var fitness = GetDistance(idToLocatonLookup[genes[0]], idToLocatonLookup[genes[genes.Length - 1]]);
@@ -95,7 +97,7 @@ namespace GeneticAlgorithms.TravelingSalesmanProblem
             Assert.AreEqual(Math.Sqrt(2), GetDistance(locationA, locationB));
         }
 
-        private void Mutate(int[] genes, Func<int[], Fitness> fnGetFitness)
+        private static void Mutate(int[] genes, FitnessDelegate fnGetFitness)
         {
             var count = Rand.Random.Next(2, genes.Length);
             var initialFitness = fnGetFitness(genes);
@@ -129,8 +131,7 @@ namespace GeneticAlgorithms.TravelingSalesmanProblem
             CollectionAssert.AreNotEqual(new[] {0, 1, 2}, genes);
         }
 
-        private int[] Crossover(int[] parentGenes, int[] donorGenes,
-            Func<int[], Fitness> fnGetFitness)
+        private static int[] Crossover(int[] parentGenes, int[] donorGenes, FitnessDelegate fnGetFitness)
         {
             var pairs = new Dictionary<Pair, int> {{new Pair(donorGenes[0], donorGenes[donorGenes.Length - 1]), 0}};
 
@@ -273,7 +274,7 @@ namespace GeneticAlgorithms.TravelingSalesmanProblem
             Benchmark.Run(Ulysses16Test);
         }
 
-        private void Solve(Dictionary<int, double[]> idToLocationLookup, int[] optimalSequence)
+        private static void Solve(Dictionary<int, double[]> idToLocationLookup, int[] optimalSequence)
         {
             var geneSet = idToLocationLookup.Keys.ToArray();
             var watch = Stopwatch.StartNew();
@@ -289,12 +290,13 @@ namespace GeneticAlgorithms.TravelingSalesmanProblem
             int[] FnCrossover(int[] parent, int[] donor) => Crossover(parent, donor, FnGetFitness);
 
             var optimalFitness = FnGetFitness(optimalSequence);
-            var best = Genetic<int, Fitness>.GetBest(FnGetFitness, 0, optimalFitness, null, FnDisplay, FnMutate, FnCreate, 50, 25,
+            var best = Genetic<int, Fitness>.GetBest(FnGetFitness, 0, optimalFitness, null, FnDisplay, FnMutate,
+                FnCreate, 50, 25,
                 FnCrossover);
             Assert.IsTrue(optimalFitness.CompareTo(best.Fitness) <= 0);
         }
 
-        private Dictionary<int, double[]> LoadData(string localFileName)
+        private static Dictionary<int, double[]> LoadData(string localFileName)
         {
             // expects:
             // HEADER section before DATA section, all lines start in column 0

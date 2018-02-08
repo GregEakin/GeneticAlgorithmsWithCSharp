@@ -30,9 +30,11 @@ namespace GeneticAlgorithms.LinearEquation
     [TestClass]
     public class LinearEquationTests
     {
-        public delegate Fraction Equation(IReadOnlyList<Fraction> genes);
+        public delegate Fraction FnEquationDelegate(IReadOnlyList<Fraction> genes);
 
-        public static Fitness GetFitness(List<Fraction> genes, Equation[] equations)
+        public delegate IReadOnlyList<Fraction> FnGenesToImputsDelegate(IReadOnlyList<Fraction> genes);
+
+        private static Fitness GetFitness(List<Fraction> genes, FnEquationDelegate[] equations)
         {
             try
             {
@@ -53,13 +55,13 @@ namespace GeneticAlgorithms.LinearEquation
             var child = new List<Fraction> {new Fraction(2), new Fraction(-1)};
             Fraction E1(IReadOnlyList<Fraction> genes) => genes[0] + 2 * genes[1] - 4;
             Fraction E2(IReadOnlyList<Fraction> genes) => 4 * genes[0] + 4 * genes[1] - 12;
-            var equations = new Equation[] {E1, E2};
+            var equations = new FnEquationDelegate[] {E1, E2};
             var fitness = GetFitness(child, equations);
             Assert.AreEqual(new Fraction(12), fitness.TotalDifference);
         }
 
-        public static void Display(Chromosome<Fraction, Fitness> candidate, Stopwatch watch,
-            Func<IReadOnlyList<Fraction>, IReadOnlyList<Fraction>> fnGenesToImputs)
+        private static void Display(Chromosome<Fraction, Fitness> candidate, Stopwatch watch,
+            FnGenesToImputsDelegate fnGenesToImputs)
         {
             var symbols = "xyza".ToCharArray();
             var result = string.Join(", ", symbols.Zip(fnGenesToImputs(candidate.Genes), (s, v) => $"{s} = {v}"));
@@ -93,7 +95,7 @@ namespace GeneticAlgorithms.LinearEquation
                 Console.WriteLine("{0}, {1}", gene, (double) gene);
         }
 
-        public static void Mutate(List<Fraction> genes, List<Fraction> sortedGeneSet, Window window, int[] geneIndexes)
+        private static void Mutate(List<Fraction> genes, List<Fraction> sortedGeneSet, Window window, int[] geneIndexes)
         {
             var indexes = Rand.Random.Next(10) == 0
                 ? geneIndexes.OrderBy(g => Rand.Random.Next()).Take(1 + Rand.Random.Next(geneIndexes.Length - 1)).ToArray()
@@ -150,7 +152,7 @@ namespace GeneticAlgorithms.LinearEquation
             Fraction E2(IReadOnlyList<Fraction> genes) =>
                 4 * genes[0] + 4 * genes[1] - 12;
 
-            var equations = new Equation[] {E1, E2};
+            var equations = new FnEquationDelegate[] {E1, E2};
             SolveUnknown(2, geneSet, equations, FnGenesToInputs);
             //Assert.AreEqual(new Fraction(0), best.Fitness.TotalDifference);
             //CollectionAssert.AreEqual(
@@ -180,7 +182,7 @@ namespace GeneticAlgorithms.LinearEquation
             Fraction E3(IReadOnlyList<Fraction> genes) =>
                 2 * genes[2] * 6 / genes[0] + 3 * genes[1] / 2 - 6;
 
-            var equations = new Equation[] {E1, E2, E3};
+            var equations = new FnEquationDelegate[] {E1, E2, E3};
             SolveUnknown(3, geneSet, equations, FnGenesToInputs);
             //Assert.AreEqual(new Fraction(0), best.Fitness.TotalDifference);
             //CollectionAssert.AreEqual(
@@ -215,7 +217,7 @@ namespace GeneticAlgorithms.LinearEquation
                 new Fraction(1, 2) * genes[0] + 2 * genes[1] + new Fraction(7, 4) * genes[2] +
                 new Fraction(4, 3) * genes[3] + 9;
 
-            var equations = new Equation[] {E1, E2, E3, E4};
+            var equations = new FnEquationDelegate[] {E1, E2, E3, E4};
             SolveUnknown(4, geneSet, equations, FnGenesToInputs);
             //Assert.AreEqual(new Fraction(0), best.Fitness.TotalDifference);
             //CollectionAssert.AreEqual(
@@ -234,8 +236,8 @@ namespace GeneticAlgorithms.LinearEquation
             Benchmark.Run(FourUnknownsTest);
         }
 
-        public void SolveUnknown(int numUnknowns, Fraction[] geneSet, Equation[] equations,
-            Func<IReadOnlyList<Fraction>, IReadOnlyList<Fraction>> fnGenesToImputs)
+        private static void SolveUnknown(int numUnknowns, Fraction[] geneSet, FnEquationDelegate[] equations,
+            FnGenesToImputsDelegate fnGenesToImputs)
         {
             var watch = Stopwatch.StartNew();
             var maxAge = 50;

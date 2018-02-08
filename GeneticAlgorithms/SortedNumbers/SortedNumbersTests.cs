@@ -17,10 +17,10 @@
  * permissions and limitations under the License.
  */
 
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Diagnostics;
 using System.Linq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace GeneticAlgorithms.SortedNumbers
 {
@@ -55,7 +55,7 @@ namespace GeneticAlgorithms.SortedNumbers
             SortNumbers(10);
         }
 
-        private void SortNumbers(int totalNumbers)
+        private static void SortNumbers(int totalNumbers)
         {
             var geneSet = Enumerable.Range(0, 100).ToArray();
             var watch = Stopwatch.StartNew();

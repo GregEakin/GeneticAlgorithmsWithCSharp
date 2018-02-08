@@ -34,7 +34,7 @@ namespace GeneticAlgorithms.Sudoku
         {
 //            firstFailingRule = next(rule for rule in validationRules 
 //              if genes[rule.Index] == genes[rule.OtherIndex])
-                    return 100;
+            return 100;
         }
 
         public static void Display(Chromosome<int, int> candidate, Stopwatch watch)
@@ -128,16 +128,17 @@ namespace GeneticAlgorithms.Sudoku
 
             var validationRules = BuildValidationRules();
 
-            int FnGetFitness(List<int> genes) => 
+            int FnGetFitness(List<int> genes) =>
                 GetFitness(genes, validationRules);
 
-            List<int> FnCreate() => 
+            List<int> FnCreate() =>
                 Rand.RandomSampleList(geneSet, 81);
 
-            void FnMutate(List<int> genes) => 
+            void FnMutate(List<int> genes) =>
                 Mutate(genes, validationRules);
 
-            var best = Genetic<int, int>.GetBest(FnGetFitness, 0, optimalValue, null, FnDisplay, FnMutate, FnCreate, 50);
+            var best = Genetic<int, int>.GetBest(FnGetFitness, 0, optimalValue, null, FnDisplay, FnMutate, FnCreate,
+                50);
 
             Assert.AreEqual(optimalValue, best.Fitness);
         }

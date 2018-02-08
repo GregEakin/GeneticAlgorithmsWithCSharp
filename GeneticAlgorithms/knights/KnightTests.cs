@@ -31,7 +31,7 @@ namespace GeneticAlgorithms.Knights
     {
         public delegate Position RandomPosition();
 
-        public static int Fitness(Position[] genes, int width, int height)
+        private static int Fitness(Position[] genes, int width, int height)
         {
             var attacks = from kn in genes
                 from pos in GetAttacks(kn, width, height)
@@ -39,7 +39,7 @@ namespace GeneticAlgorithms.Knights
             return attacks.Distinct().Count();
         }
 
-        public static void Display(Chromosome<Position, int> candidate, Stopwatch watch, int width, int height)
+        private static void Display(Chromosome<Position, int> candidate, Stopwatch watch, int width, int height)
         {
             var board = new Board(candidate.Genes, width, height);
             Console.WriteLine(board);
@@ -50,7 +50,7 @@ namespace GeneticAlgorithms.Knights
                 watch.ElapsedMilliseconds);
         }
 
-        public static void Mutate(Position[] genes, int width, int height, Position[] allPositions,
+        private static void Mutate(Position[] genes, int width, int height, Position[] allPositions,
             Position[] nonEdgePositions)
         {
             var loops = Rand.Random.Next(10) == 0 ? 2 : 1;
@@ -93,13 +93,13 @@ namespace GeneticAlgorithms.Knights
             }
         }
 
-        public Position[] Create(RandomPosition randomPositionFun, int expectedKnights)
+        private static Position[] Create(RandomPosition randomPositionFun, int expectedKnights)
         {
             var genes = Enumerable.Range(0, expectedKnights).Select(k => randomPositionFun());
             return genes.ToArray();
         }
 
-        public static Position[] GetAttacks(Position location, int width, int height)
+        private static Position[] GetAttacks(Position location, int width, int height)
         {
             var indexes = new[] {-2, -1, 1, 2};
             var attacks = from x in indexes
@@ -147,7 +147,7 @@ namespace GeneticAlgorithms.Knights
             Benchmark.Run(Knight_10x10Test);
         }
 
-        public void FindKnightPositions(int width, int height, int expectedKnights)
+        private static void FindKnightPositions(int width, int height, int expectedKnights)
         {
             var watch = Stopwatch.StartNew();
 
@@ -169,7 +169,8 @@ namespace GeneticAlgorithms.Knights
             Position[] FnCreate() => Create(FnGetRandomPosition, expectedKnights);
 
             var optimalFitness = width * height;
-            var best = Genetic<Position, int>.GetBest(FnFitness, 0, optimalFitness, null, FnDisplay, FnMutate, FnCreate);
+            var best = Genetic<Position, int>.GetBest(FnFitness, 0, optimalFitness, null, FnDisplay, FnMutate,
+                FnCreate);
             Assert.IsTrue(optimalFitness <= best.Fitness);
         }
 

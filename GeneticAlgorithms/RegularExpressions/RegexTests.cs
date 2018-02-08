@@ -39,9 +39,13 @@ namespace GeneticAlgorithms.RegularExpressions
 
         private static readonly string[] AllMetas = RepeatMetas.Concat(StartMetas).Concat(EndMetas).ToArray();
 
-        private readonly List<ArgumentException> _regexErrorsSeen = new List<ArgumentException>();
+        private static readonly List<ArgumentException> RegexErrorsSeen = new List<ArgumentException>();
 
-        public delegate RepairFunc RepairFunc(string token1, List<string> result1, List<string> finals1);
+        public delegate RepairDelegate RepairDelegate(string token1, List<string> result1, List<string> finals1);
+
+        public delegate Fitness FnGetFitnessDelegate(List<string> genes);
+
+        public delegate bool FnMutateDelegate(List<string> genes);
 
         [TestMethod]
         public void AllMetaTest()
@@ -65,11 +69,11 @@ namespace GeneticAlgorithms.RegularExpressions
             Assert.AreEqual("1[2]", repaired);
         }
 
-        private string RepairRegex(List<string> genes)
+        private static string RepairRegex(List<string> genes)
         {
             var result = new List<string>();
             var finals = new List<string>();
-            RepairFunc f = RepairIgnoreRepeatMetas;
+            RepairDelegate f = RepairIgnoreRepeatMetas;
             foreach (var token in genes)
                 f = f(token, result, finals);
             if (finals.Contains("]") && result[result.Count - 1] == "[")
@@ -79,7 +83,7 @@ namespace GeneticAlgorithms.RegularExpressions
             return string.Join("", result);
         }
 
-        private RepairFunc RepairIgnoreRepeatMetas(string token, List<string> result, List<string> finals)
+        private static RepairDelegate RepairIgnoreRepeatMetas(string token, List<string> result, List<string> finals)
         {
             if (RepeatMetas.Contains(token) || EndMetas.Contains(token))
                 return RepairIgnoreRepeatMetas;
@@ -95,7 +99,8 @@ namespace GeneticAlgorithms.RegularExpressions
             return RepairIgnoreRepeatMetasFollowingRepeatOrStartMetas;
         }
 
-        private RepairFunc RepairIgnoreRepeatMetasFollowingRepeatOrStartMetas(string token, List<string> result,
+        private static RepairDelegate RepairIgnoreRepeatMetasFollowingRepeatOrStartMetas(string token,
+            List<string> result,
             List<string> finals)
         {
             var last = result[result.Count - 1];
@@ -139,7 +144,7 @@ namespace GeneticAlgorithms.RegularExpressions
             return RepairIgnoreRepeatMetasFollowingRepeatOrStartMetas;
         }
 
-        private RepairFunc RepairInCharacterSet(string token, List<string> result, List<string> finals)
+        private static RepairDelegate RepairInCharacterSet(string token, List<string> result, List<string> finals)
         {
             switch (token)
             {
@@ -162,7 +167,7 @@ namespace GeneticAlgorithms.RegularExpressions
             return RepairInCharacterSet;
         }
 
-        private Fitness GetFitness(List<string> genes, List<string> wanted, List<string> unwanted)
+        private static Fitness GetFitness(List<string> genes, List<string> wanted, List<string> unwanted)
         {
             var pattern = RepairRegex(genes);
             var length = pattern.Length;
@@ -175,7 +180,7 @@ namespace GeneticAlgorithms.RegularExpressions
             catch (ArgumentException e)
             {
                 // var key = e.Message;
-                _regexErrorsSeen.Add(e);
+                RegexErrorsSeen.Add(e);
                 return new Fitness(0, wanted.Count, unwanted.Count, length);
             }
 
@@ -199,13 +204,13 @@ namespace GeneticAlgorithms.RegularExpressions
             Assert.AreEqual(7, fitness.Length);
         }
 
-        private void Display(Chromosome<string, Fitness> candidate, Stopwatch watch)
+        private static void Display(Chromosome<string, Fitness> candidate, Stopwatch watch)
         {
             Console.WriteLine("{0}\t{1}\t{2} ms", RepairRegex(candidate.Genes), candidate.Fitness,
                 watch.ElapsedMilliseconds);
         }
 
-        private bool MutateAdd(List<string> genes, string[] geneSet)
+        private static bool MutateAdd(List<string> genes, string[] geneSet)
         {
             var index = genes.Count > 0 ? Rand.Random.Next(genes.Count) : 0;
             genes.Insert(index, geneSet[Rand.Random.Next(geneSet.Length)]);
@@ -222,7 +227,7 @@ namespace GeneticAlgorithms.RegularExpressions
             Assert.AreNotEqual("1*0?10*", string.Join(string.Empty, genes.Select(p => p)));
         }
 
-        private bool MutateRemove(List<string> genes)
+        private static bool MutateRemove(List<string> genes)
         {
             if (genes.Count < 1)
                 return false;
@@ -241,7 +246,7 @@ namespace GeneticAlgorithms.RegularExpressions
             Assert.AreNotEqual("1*0?10*", string.Join(string.Empty, genes.Select(p => p)));
         }
 
-        private bool MutateReplace(List<string> genes, string[] geneSet)
+        private static bool MutateReplace(List<string> genes, string[] geneSet)
         {
             if (genes.Count < 1)
                 return false;
@@ -260,7 +265,7 @@ namespace GeneticAlgorithms.RegularExpressions
             Assert.AreNotEqual("1*0?10*", string.Join(string.Empty, genes.Select(p => p)));
         }
 
-        private bool MutateSwap(List<string> genes)
+        private static bool MutateSwap(List<string> genes)
         {
             if (genes.Count < 2)
                 return false;
@@ -282,7 +287,7 @@ namespace GeneticAlgorithms.RegularExpressions
             Assert.AreNotEqual("1*0?10*", string.Join(string.Empty, genes.Select(p => p)));
         }
 
-        private bool MutateMove(List<string> genes)
+        private static bool MutateMove(List<string> genes)
         {
             if (genes.Count < 3)
                 return false;
@@ -304,7 +309,7 @@ namespace GeneticAlgorithms.RegularExpressions
             Assert.AreNotEqual("1*0?10*", string.Join(string.Empty, genes.Select(p => p)));
         }
 
-        private bool MutateToCharacterSet(List<string> genes)
+        private static bool MutateToCharacterSet(List<string> genes)
         {
             if (genes.Count < 3)
                 return false;
@@ -346,7 +351,7 @@ namespace GeneticAlgorithms.RegularExpressions
             CollectionAssert.AreEqual(new[] {"[", "0", "1", "]"}, genes);
         }
 
-        private bool MutateToCharacterSetLeft(List<string> genes, string[] wanted)
+        private static bool MutateToCharacterSetLeft(List<string> genes, string[] wanted)
         {
             if (genes.Count < 4)
                 return false;
@@ -395,7 +400,7 @@ namespace GeneticAlgorithms.RegularExpressions
                 genes);
         }
 
-        private bool MutateAddWanted(List<string> genes, string[] wanted)
+        private static bool MutateAddWanted(List<string> genes, string[] wanted)
         {
             var index = genes.Count > 0 ? Rand.Random.Next(genes.Count) : 0;
             genes.Insert(index, "|");
@@ -403,11 +408,7 @@ namespace GeneticAlgorithms.RegularExpressions
             return true;
         }
 
-        public delegate Fitness FnGetFitnessDelegate(List<string> genes);
-
-        public delegate bool FnMutateDelegate(List<string> genes);
-
-        private void Mutate(List<string> genes, FnGetFitnessDelegate fnGetFitness,
+        private static void Mutate(List<string> genes, FnGetFitnessDelegate fnGetFitness,
             List<FnMutateDelegate> mutationOperators,
             List<int> mutationRoundCounts)
         {
@@ -517,7 +518,7 @@ namespace GeneticAlgorithms.RegularExpressions
             FindRegex(wanted, unwanted, 120, customOperators);
         }
 
-        private Chromosome<string, Fitness> FindRegex(string[] wanted, string[] unwanted, int expectedLength,
+        private static Chromosome<string, Fitness> FindRegex(string[] wanted, string[] unwanted, int expectedLength,
             FnMutateDelegate[] customOperators = null)
         {
             var watch = Stopwatch.StartNew();
@@ -551,17 +552,18 @@ namespace GeneticAlgorithms.RegularExpressions
 
             var optimalFitness = new Fitness(wanted.Length, wanted.Length, 0, expectedLength);
 
-            var best = Genetic<string, Fitness>.GetBest(FnGetFitness, textGenes.Max(i => i.Length), optimalFitness, fullGeneSet,
+            var best = Genetic<string, Fitness>.GetBest(FnGetFitness, textGenes.Max(i => i.Length), optimalFitness,
+                fullGeneSet,
                 FnDisplay, FnMutate, null, 0, 10);
 
             Assert.IsTrue(optimalFitness.CompareTo(best.Fitness) <= 0);
 
-            if (!_regexErrorsSeen.Any())
+            if (!RegexErrorsSeen.Any())
                 return best;
 
             Console.WriteLine();
             Console.WriteLine("Errors:");
-            foreach (var error in _regexErrorsSeen)
+            foreach (var error in RegexErrorsSeen)
                 Console.WriteLine("  {0}", error.Message);
 
             return best;
