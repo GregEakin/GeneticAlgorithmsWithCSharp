@@ -72,9 +72,9 @@ namespace GeneticAlgorithms.TicTacToe
                 board[index] = new Square(index, piece);
 
                 var mostRecentMoveOnly = new[] {board[index]};
-                if (new RowContentFilter(piece, 3).Matches(board, mostRecentMoveOnly).Any() ||
-                    new ColumnContentFilter(piece, 3).Matches(board, mostRecentMoveOnly).Any() ||
-                    new DiagonalContentFilter(piece, 3).Matches(board, mostRecentMoveOnly).Any())
+                if (new RowContentFilter(piece, 3).GetMatches(board, mostRecentMoveOnly).Any() ||
+                    new ColumnContentFilter(piece, 3).GetMatches(board, mostRecentMoveOnly).Any() ||
+                    new DiagonalContentFilter(piece, 3).GetMatches(board, mostRecentMoveOnly).Any())
                     return winResult;
 
                 empties = board.Values.Where(v => v.Content == ContentType.Empty).ToArray();
@@ -134,9 +134,9 @@ namespace GeneticAlgorithms.TicTacToe
 
                 // if we now have three MINE in any ROW, COLUMN or DIAGONAL, we won
                 var mostRecentMoveOnly = new[] {board[index]};
-                if (HaveThreeInRow.Matches(board, mostRecentMoveOnly).Any() ||
-                    HaveThreeInColumn.Matches(board, mostRecentMoveOnly).Any() ||
-                    HaveThreeInDiagonal.Matches(board, mostRecentMoveOnly).Any())
+                if (HaveThreeInRow.GetMatches(board, mostRecentMoveOnly).Any() ||
+                    HaveThreeInColumn.GetMatches(board, mostRecentMoveOnly).Any() ||
+                    HaveThreeInDiagonal.GetMatches(board, mostRecentMoveOnly).Any())
                 {
                     var ruleId = candidateIndexAndRuleIndex[1];
                     if (!winningRules.ContainsKey(ruleId))
@@ -149,7 +149,7 @@ namespace GeneticAlgorithms.TicTacToe
 
                 // we lose if any empties have two OPPONENT pieces in ROW, COL or DIAG
                 empties = board.Values.Where(v => v.Content == ContentType.Empty).ToArray();
-                if (OpponentHasTwoInARow.Matches(board, empties).Any())
+                if (OpponentHasTwoInARow.GetMatches(board, empties).Any())
                 {
                     losses++;
                     // Go to next board
@@ -177,7 +177,7 @@ namespace GeneticAlgorithms.TicTacToe
             for (var ruleIndex = startingRuleIndex; ruleIndex < ruleSetCopy.Length; ruleIndex++)
             {
                 var gene = ruleSetCopy[ruleIndex];
-                var matches = gene.Matches(board, empties);
+                var matches = gene.GetMatches(board, empties);
                 if (matches.Count == 0)
                     continue;
                 if (matches.Count == 1)
@@ -347,7 +347,7 @@ namespace GeneticAlgorithms.TicTacToe
             var optimalFitness = new Fitness(620, 120, 0, 11);
 
             var best = Genetic<Rule, Fitness>.GetBest(FnGetFitness, minGenes, optimalFitness, null, FnDisplay, FnMutate,
-                FnCreate, 500, 20, FnCrossover, 60);
+                FnCreate, 500, 20, FnCrossover);
             Assert.IsTrue(optimalFitness.CompareTo(best.Fitness) <= 0);
         }
 

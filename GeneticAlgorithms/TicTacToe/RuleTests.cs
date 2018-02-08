@@ -46,7 +46,7 @@ namespace GeneticAlgorithms.TicTacToe
             //Assert.AreEqual(3, rule.Count);
             Assert.AreEqual("its ROW has 3 Empty ", rule.ToString());
 
-            var matches = rule.Matches(board, empties);
+            var matches = rule.GetMatches(board, empties);
             CollectionAssert.AreEqual(new[] {7, 8, 9}, matches.ToArray());
         }
 
@@ -59,7 +59,7 @@ namespace GeneticAlgorithms.TicTacToe
             var rule = new TopRowFilter();
             Assert.AreEqual("is in TOP ROW ", rule.ToString());
 
-            var matches = rule.Matches(board, empties);
+            var matches = rule.GetMatches(board, empties);
             CollectionAssert.AreEqual(new[] {1, 2, 3}, matches.ToArray());
         }
 
@@ -72,7 +72,7 @@ namespace GeneticAlgorithms.TicTacToe
             var rule = new MiddleRowFilter();
             Assert.AreEqual("is in MIDDLE ROW ", rule.ToString());
 
-            var matches = rule.Matches(board, empties);
+            var matches = rule.GetMatches(board, empties);
             CollectionAssert.AreEqual(new[] {4, 5, 6}, matches.ToArray());
         }
 
@@ -85,7 +85,7 @@ namespace GeneticAlgorithms.TicTacToe
             var rule = new BottomRowFilter();
             Assert.AreEqual("is in BOTTOM ROW ", rule.ToString());
 
-            var matches = rule.Matches(board, empties);
+            var matches = rule.GetMatches(board, empties);
             CollectionAssert.AreEqual(new[] {7, 8, 9}, matches.ToArray());
         }
 
@@ -100,7 +100,7 @@ namespace GeneticAlgorithms.TicTacToe
             var rule = new ColumnContentFilter(ContentType.Empty, 3);
             Assert.AreEqual("its COLUMN has 3 Empty ", rule.ToString());
 
-            var matches = rule.Matches(board, empties);
+            var matches = rule.GetMatches(board, empties);
             CollectionAssert.AreEqual(new[] {3, 6, 9}, matches.ToArray());
         }
 
@@ -113,7 +113,7 @@ namespace GeneticAlgorithms.TicTacToe
             var rule = new LeftColumnFilter();
             Assert.AreEqual("is in LEFT COLUMN ", rule.ToString());
 
-            var matches = rule.Matches(board, empties);
+            var matches = rule.GetMatches(board, empties);
             CollectionAssert.AreEqual(new[] {1, 4, 7}, matches.ToArray());
         }
 
@@ -126,7 +126,7 @@ namespace GeneticAlgorithms.TicTacToe
             var rule = new MiddleColumnFilter();
             Assert.AreEqual("is in MIDDLE COLUMN ", rule.ToString());
 
-            var matches = rule.Matches(board, empties);
+            var matches = rule.GetMatches(board, empties);
             CollectionAssert.AreEqual(new[] {2, 5, 8}, matches.ToArray());
         }
 
@@ -139,7 +139,7 @@ namespace GeneticAlgorithms.TicTacToe
             var rule = new RightColumnFilter();
             Assert.AreEqual("is in RIGHT COLUMN ", rule.ToString());
 
-            var matches = rule.Matches(board, empties);
+            var matches = rule.GetMatches(board, empties);
             CollectionAssert.AreEqual(new[] {3, 6, 9}, matches.ToArray());
         }
 
@@ -154,7 +154,7 @@ namespace GeneticAlgorithms.TicTacToe
             var rule = new DiagonalContentFilter(ContentType.Empty, 3);
             Assert.AreEqual("its DIAGONAL has 3 Empty ", rule.ToString());
 
-            var matches = rule.Matches(board, empties);
+            var matches = rule.GetMatches(board, empties);
             CollectionAssert.AreEqual(new[] {3, 5, 7}, matches.ToArray());
         }
 
@@ -169,7 +169,7 @@ namespace GeneticAlgorithms.TicTacToe
             var rule = new DiagonalLocationFilter();
             Assert.AreEqual("is in DIAGONAL  ", rule.ToString());
 
-            var matches = rule.Matches(board, empties);
+            var matches = rule.GetMatches(board, empties);
             CollectionAssert.AreEqual(new[] {3, 5, 7, 9}, matches.ToArray());
         }
 
@@ -182,7 +182,7 @@ namespace GeneticAlgorithms.TicTacToe
             var rule = new CornerFilter();
             Assert.AreEqual("is a CORNER ", rule.ToString());
 
-            var matches = rule.Matches(board, empties);
+            var matches = rule.GetMatches(board, empties);
             CollectionAssert.AreEqual(new[] {1, 3, 7, 9}, matches.ToArray());
         }
 
@@ -195,7 +195,7 @@ namespace GeneticAlgorithms.TicTacToe
             var rule = new SideFilter();
             Assert.AreEqual("is SIDE ", rule.ToString());
 
-            var matches = rule.Matches(board, empties);
+            var matches = rule.GetMatches(board, empties);
             CollectionAssert.AreEqual(new[] {2, 4, 6, 8}, matches.ToArray());
         }
 
@@ -208,7 +208,7 @@ namespace GeneticAlgorithms.TicTacToe
             var rule = new CenterFilter();
             Assert.AreEqual("is in CENTER ", rule.ToString());
 
-            var matches = rule.Matches(board, empties);
+            var matches = rule.GetMatches(board, empties);
             CollectionAssert.AreEqual(new[] {5}, matches.ToArray());
         }
 
@@ -223,7 +223,7 @@ namespace GeneticAlgorithms.TicTacToe
             var rule = new RowOppositeFilter(ContentType.Mine);
             Assert.AreEqual("ROW-OPPOSITE is Mine ", rule.ToString());
 
-            var matches = rule.Matches(board, empties);
+            var matches = rule.GetMatches(board, empties);
             CollectionAssert.AreEqual(new[] { 3 }, matches.ToArray());
         }
 
@@ -238,7 +238,7 @@ namespace GeneticAlgorithms.TicTacToe
             var rule = new ColumnOppositeFilter(ContentType.Mine);
             Assert.AreEqual("COLUMN-OPPOSITE is Mine ", rule.ToString());
 
-            var matches = rule.Matches(board, empties);
+            var matches = rule.GetMatches(board, empties);
             CollectionAssert.AreEqual(new[] { 7 }, matches.ToArray());
         }
 
@@ -253,7 +253,7 @@ namespace GeneticAlgorithms.TicTacToe
             var rule = new DiagonalOppositeFilter(ContentType.Mine);
             Assert.AreEqual("DIAGONAL-OPPOSITE is Mine ", rule.ToString());
 
-            var matches = rule.Matches(board, empties);
+            var matches = rule.GetMatches(board, empties);
             CollectionAssert.AreEqual(new[] { 9 }, matches.ToArray());
         }
 
@@ -268,7 +268,7 @@ namespace GeneticAlgorithms.TicTacToe
             var rule = new WinFilter(ContentType.Mine);
             Assert.AreEqual("WIN ", rule.ToString());
 
-            var matches = rule.Matches(board, empties);
+            var matches = rule.GetMatches(board, empties);
             CollectionAssert.AreEqual(new[] { 9 }, matches.ToArray());
         }
 
@@ -283,7 +283,7 @@ namespace GeneticAlgorithms.TicTacToe
             var rule = new WinFilter(ContentType.Opponent);
             Assert.AreEqual("block OPPONENT WIN ", rule.ToString());
 
-            var matches = rule.Matches(board, empties);
+            var matches = rule.GetMatches(board, empties);
             CollectionAssert.AreEqual(new[] { 9 }, matches.ToArray());
         }
     }

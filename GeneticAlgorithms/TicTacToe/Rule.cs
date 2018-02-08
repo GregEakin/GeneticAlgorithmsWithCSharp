@@ -47,7 +47,7 @@ namespace GeneticAlgorithms.TicTacToe
             return $"{DescriptionPrefix} {a1}{b1}";
         }
 
-        public abstract ISet<int> Matches(IDictionary<int, Square> board, Square[] squares);
+        public abstract ISet<int> GetMatches(IDictionary<int, Square> board, Square[] squares);
     }
 
     public class RuleMetadata
@@ -122,7 +122,7 @@ namespace GeneticAlgorithms.TicTacToe
             ValueFromSquare = valueFromSquare;
         }
 
-        public override ISet<int> Matches(IDictionary<int, Square> board, Square[] squares)
+        public override ISet<int> GetMatches(IDictionary<int, Square> board, Square[] squares)
         {
             var result = new HashSet<int>();
             foreach (var square in squares)
@@ -162,7 +162,7 @@ namespace GeneticAlgorithms.TicTacToe
             Function = func;
         }
 
-        public override ISet<int> Matches(IDictionary<int, Square> board, Square[] squares)
+        public override ISet<int> GetMatches(IDictionary<int, Square> board, Square[] squares)
         {
             // var results = squares.Where(square => Function(square)).Select(square => square.Index).Distinct().ToList();
 
@@ -253,7 +253,7 @@ namespace GeneticAlgorithms.TicTacToe
         {
         }
 
-        public override ISet<int> Matches(IDictionary<int, Square> board, Square[] squares)
+        public override ISet<int> GetMatches(IDictionary<int, Square> board, Square[] squares)
         {
             var result = new HashSet<int>();
             foreach (var square in squares)
@@ -282,17 +282,17 @@ namespace GeneticAlgorithms.TicTacToe
             DiagonalRule = new DiagonalContentFilter(content, 2);
         }
 
-        public override ISet<int> Matches(IDictionary<int, Square> board, Square[] squares)
+        public override ISet<int> GetMatches(IDictionary<int, Square> board, Square[] squares)
         {
-            var inDiagonal = DiagonalRule.Matches(board, squares);
+            var inDiagonal = DiagonalRule.GetMatches(board, squares);
             if (inDiagonal.Count > 0)
                 return inDiagonal;
 
-            var inRow = RowRule.Matches(board, squares);
+            var inRow = RowRule.GetMatches(board, squares);
             if (inRow.Count > 0)
                 return inRow;
 
-            var inColumn = ColumnRule.Matches(board, squares);
+            var inColumn = ColumnRule.GetMatches(board, squares);
             return inColumn;
         }
     }
@@ -304,7 +304,7 @@ namespace GeneticAlgorithms.TicTacToe
         {
         }
 
-        public override ISet<int> Matches(IDictionary<int, Square> board, Square[] squares)
+        public override ISet<int> GetMatches(IDictionary<int, Square> board, Square[] squares)
         {
             var result = new HashSet<int>();
             foreach (var square in squares)
@@ -327,7 +327,7 @@ namespace GeneticAlgorithms.TicTacToe
         {
         }
 
-        public override ISet<int> Matches(IDictionary<int, Square> board, Square[] squares)
+        public override ISet<int> GetMatches(IDictionary<int, Square> board, Square[] squares)
         {
             var result = new HashSet<int>();
             foreach (var square in squares)
@@ -350,7 +350,7 @@ namespace GeneticAlgorithms.TicTacToe
         {
         }
 
-        public override ISet<int> Matches(IDictionary<int, Square> board, Square[] squares)
+        public override ISet<int> GetMatches(IDictionary<int, Square> board, Square[] squares)
         {
             //var result = new HashSet<int>();
             //foreach (var square in squares)
@@ -377,7 +377,7 @@ namespace GeneticAlgorithms.TicTacToe
         {
         }
 
-        public override ISet<int> Matches(IDictionary<int, Square> board, Square[] squares)
+        public override ISet<int> GetMatches(IDictionary<int, Square> board, Square[] squares)
         {
             var result = new HashSet<int>(squares.Where(square => square.Center).Select(square => square.Index));
             return result;
@@ -391,7 +391,7 @@ namespace GeneticAlgorithms.TicTacToe
         {
         }
 
-        public override ISet<int> Matches(IDictionary<int, Square> board, Square[] squares)
+        public override ISet<int> GetMatches(IDictionary<int, Square> board, Square[] squares)
         {
             var result = new HashSet<int>();
             foreach (var square in squares)
@@ -411,7 +411,7 @@ namespace GeneticAlgorithms.TicTacToe
         {
         }
 
-        public override ISet<int> Matches(IDictionary<int, Square> board, Square[] squares)
+        public override ISet<int> GetMatches(IDictionary<int, Square> board, Square[] squares)
         {
             var result = new HashSet<int>();
             foreach (var square in squares)
