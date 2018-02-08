@@ -82,9 +82,6 @@
     <Compile Include="Password\Benchmark.cs" />
     <Compile Include="Password\GuessPassordTests.cs" />
     <Compile Include="Password\OneMaxTests.cs" />
-    <Compile Include="Primes\enumerable\DateTimeFixture.cs" />
-    <Compile Include="Primes\enumerable\PrimeFactorTests.cs" />
-    <Compile Include="Primes\enumerable\PrimeTests.cs" />
     <Compile Include="Knapsack\Fitness.cs" />
     <Compile Include="Knapsack\ItemQuantity.cs" />
     <Compile Include="Knapsack\KnapsackProblemData.cs" />
@@ -97,11 +94,6 @@
     <Compile Include="Knights\Genetic.cs" />
     <Compile Include="Knights\KnightTests.cs" />
     <Compile Include="Knights\Position.cs" />
-    <Compile Include="Primes\lazy\EmptyList.cs" />
-    <Compile Include="Primes\lazy\LazyList.cs" />
-    <Compile Include="Primes\lazy\MyLinkedList.cs" />
-    <Compile Include="Primes\lazy\MyList.cs" />
-    <Compile Include="Primes\lazy\PrimeTests.cs" />
     <Compile Include="LinearEquation\Fitness.cs" />
     <Compile Include="LinearEquation\Fraction.cs" />
     <Compile Include="LinearEquation\FractionTests.cs" />
@@ -129,11 +121,7 @@
     <Compile Include="SortedNumbers\SortedNumbersTests.cs" />
     <Compile Include="Sudoku\Rule.cs" />
     <Compile Include="Sudoku\SudokuTests.cs" />
-    <Compile Include="Primes\UnitTest1.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Primes\yield\EmptyList.cs" />
-    <Compile Include="Primes\yield\LazyList.cs" />
-    <Compile Include="Primes\yield\MyList.cs" />
     <Compile Include="TicTacToe\Benchmark.cs" />
     <Compile Include="TicTacToe\Chromosome.cs" />
     <Compile Include="TicTacToe\CompetitionResult.cs" />
