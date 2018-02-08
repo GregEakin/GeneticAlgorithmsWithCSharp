@@ -129,6 +129,7 @@
     <Compile Include="TicTacToe\Fitness.cs" />
     <Compile Include="TicTacToe\Genetic.cs" />
     <Compile Include="TicTacToe\Rule.cs" />
+    <Compile Include="TicTacToe\RuleMetadataTests.cs" />
     <Compile Include="TicTacToe\RuleTests.cs" />
     <Compile Include="TicTacToe\SearchTimeoutException.cs" />
     <Compile Include="TicTacToe\Square.cs" />

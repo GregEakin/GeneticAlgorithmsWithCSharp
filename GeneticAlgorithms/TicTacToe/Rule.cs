@@ -85,25 +85,15 @@ namespace GeneticAlgorithms.TicTacToe
                 if (NeedsSpecificCount)
                 {
                     var optionCounts = optionInfo.Item2;
-
-                    foreach (var count in optionCounts)
-                    {
-                        var gene = Create(option, count);
-                        if (seen.Contains(gene.ToString()))
-                            continue;
-
-                        seen.Add(gene.ToString());
-                        rules.Add(gene);
-                    }
+                    rules.AddRange(optionCounts
+                        .Select(count => Create(option, count))
+                        .Where(gene => seen.Add(gene.ToString())));
                 }
                 else
                 {
                     var gene = Create(option, null);
-                    if (seen.Contains(gene.ToString()))
-                        continue;
-
-                    seen.Add(gene.ToString());
-                    rules.Add(gene);
+                    if (seen.Add(gene.ToString()))
+                        rules.Add(gene);
                 }
             }
 
