@@ -60,7 +60,7 @@ namespace GeneticAlgorithms.ApproximatingPi
             var genes = Rand.RandomSampleList(geneSet, length);
             var fitness = getGetFitness(genes);
             var chromosome =
-                new Chromosome<TGene, TFitness>(genes, fitness, Chromosome<TGene, TFitness>.Strategies.Create);
+                new Chromosome<TGene, TFitness>(genes, fitness, Strategies.Create);
             return chromosome;
         }
 
@@ -74,7 +74,7 @@ namespace GeneticAlgorithms.ApproximatingPi
             var alternate = randomSample[1];
             childGenes[index] = newGene.Equals(childGenes[index]) ? alternate : newGene;
             var fitness = getFitness(childGenes);
-            return new Chromosome<TGene, TFitness>(childGenes, fitness, Chromosome<TGene, TFitness>.Strategies.Mutate);
+            return new Chromosome<TGene, TFitness>(childGenes, fitness, Strategies.Mutate);
         }
 
         private static Chromosome<TGene, TFitness> MutateCustom(Chromosome<TGene, TFitness> parent,
@@ -83,7 +83,7 @@ namespace GeneticAlgorithms.ApproximatingPi
             var childGenes = parent.Genes.ToList();
             customMutate(childGenes);
             var fitness = getFitness(childGenes);
-            return new Chromosome<TGene, TFitness>(childGenes, fitness, Chromosome<TGene, TFitness>.Strategies.Mutate);
+            return new Chromosome<TGene, TFitness>(childGenes, fitness, Strategies.Mutate);
         }
 
         private static Chromosome<TGene, TFitness> Crossover(List<TGene> parentGenes, int index,
@@ -104,7 +104,7 @@ namespace GeneticAlgorithms.ApproximatingPi
 
             var fitness = getFitness(childGenes);
             return new Chromosome<TGene, TFitness>(childGenes, fitness,
-                Chromosome<TGene, TFitness>.Strategies.Crossover);
+                Strategies.Crossover);
         }
 
         public static Chromosome<TGene, TFitness> GetBest(GetFitnessDelegate getFitness, int targetLen,
@@ -124,25 +124,25 @@ namespace GeneticAlgorithms.ApproximatingPi
 
                 var genes = customCreate();
                 return new Chromosome<TGene, TFitness>(genes, getFitness(genes),
-                    Chromosome<TGene, TFitness>.Strategies.Create);
+                    Strategies.Create);
             }
 
             var strategyLookup =
-                new Dictionary<Chromosome<TGene, TFitness>.Strategies, MutateDelegate>
+                new Dictionary<Strategies, MutateDelegate>
                 {
-                    {Chromosome<TGene, TFitness>.Strategies.Create, (p, i, o) => FnGenerateParent()},
-                    {Chromosome<TGene, TFitness>.Strategies.Mutate, (p, i, o) => FnMutate(p)},
+                    {Strategies.Create, (p, i, o) => FnGenerateParent()},
+                    {Strategies.Mutate, (p, i, o) => FnMutate(p)},
                     {
-                        Chromosome<TGene, TFitness>.Strategies.Crossover,
+                        Strategies.Crossover,
                         (p, i, o) => Crossover(p.Genes, i, o, getFitness, crossover, FnMutate, FnGenerateParent)
                     }
                 };
 
             var usedStrategies =
-                new List<MutateDelegate> {strategyLookup[Chromosome<TGene, TFitness>.Strategies.Mutate]};
+                new List<MutateDelegate> {strategyLookup[Strategies.Mutate]};
 
             if (crossover != null)
-                usedStrategies.Add(strategyLookup[Chromosome<TGene, TFitness>.Strategies.Crossover]);
+                usedStrategies.Add(strategyLookup[Strategies.Crossover]);
 
             Chromosome<TGene, TFitness> FnNewChild(Chromosome<TGene, TFitness> parent, int index,
                 List<Chromosome<TGene, TFitness>> parents) =>

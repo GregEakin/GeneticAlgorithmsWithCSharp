@@ -1,5 +1,5 @@
-﻿/* File: Chromosome.cs
- *     from chapter 16 of _Genetic Algorithms with Python_
+﻿/* File: Strategies.cs
+ *     from chapter 18 of _Genetic Algorithms with Python_
  *     writen by Clinton Sheppard
  *
  * Author: Greg Eakin <gregory.eakin@gmail.com>
@@ -17,25 +17,13 @@
  * permissions and limitations under the License.
  */
 
-using System.Collections.Generic;
-
-namespace GeneticAlgorithms.LogicCircuits
+namespace GeneticAlgorithms.TicTacToe
 {
-    public class Chromosome<TGene, TFitness>
+    public enum Strategies
     {
-        public List<TGene> Genes { get; }
-
-        public TFitness Fitness { get; }
-
-        public Strategies Strategy { get; }
-
-        public int Age { get; set; }
-
-        public Chromosome(List<TGene> genes, TFitness fitness, Strategies strategy)
-        {
-            Genes = genes;
-            Fitness = fitness;
-            Strategy = strategy;
-        }
+        None = -1,
+        Create = 0,
+        Mutate = 1,
+        Crossover = 2
     }
 }

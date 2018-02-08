@@ -21,13 +21,6 @@ namespace GeneticAlgorithms.TravelingSalesmanProblem
 {
     public class Chromosome<TGene, TFitness>
     {
-        public enum Strategies
-        {
-            Create = 0,
-            Mutate = 1,
-            Crossover = 2
-        }
-
         public TGene[] Genes { get; }
 
         public TFitness Fitness { get; }

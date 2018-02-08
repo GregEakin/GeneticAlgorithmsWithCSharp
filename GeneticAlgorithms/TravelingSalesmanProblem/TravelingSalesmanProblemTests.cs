@@ -76,7 +76,7 @@ namespace GeneticAlgorithms.TravelingSalesmanProblem
                 {2, new[] {3.0, 0.0}},
             };
             var fitness = GetFitness(genes, idToLocation);
-            var candidate = new Chromosome<int, Fitness>(genes, fitness, Chromosome<int, Fitness>.Strategies.Create);
+            var candidate = new Chromosome<int, Fitness>(genes, fitness, Strategies.Create);
             var watch = Stopwatch.StartNew();
             Display(candidate, watch);
         }

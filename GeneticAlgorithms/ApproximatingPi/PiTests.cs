@@ -72,7 +72,7 @@ namespace GeneticAlgorithms.ApproximatingPi
             };
             var bitValues = new List<int> {512, 256, 128, 64, 32, 16, 8, 4, 2, 1};
             var candidate =
-                new Chromosome<bool, double>(genes, 3.1415923868256, Chromosome<bool, double>.Strategies.Create);
+                new Chromosome<bool, double>(genes, 3.1415923868256, Strategies.Create);
             var watch = Stopwatch.StartNew();
             Display(candidate, watch, bitValues);
         }

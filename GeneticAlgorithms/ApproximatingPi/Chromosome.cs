@@ -23,13 +23,6 @@ namespace GeneticAlgorithms.ApproximatingPi
 {
     public class Chromosome<TGene, TFitness>
     {
-        public enum Strategies
-        {
-            Create = 0,
-            Mutate = 1,
-            Crossover = 2
-        }
-
         public List<TGene> Genes { get; }
 
         public TFitness Fitness { get; }

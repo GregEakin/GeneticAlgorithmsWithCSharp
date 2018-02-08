@@ -23,14 +23,6 @@ namespace GeneticAlgorithms.TicTacToe
 {
     public class Chromosome<TGene, TFitness>
     {
-        public enum Strategies
-        {
-            None = -1,
-            Create = 0,
-            Mutate = 1,
-            Crossover = 2
-        }
-
         public List<TGene> Genes { get; }
 
         public TFitness Fitness { get; }

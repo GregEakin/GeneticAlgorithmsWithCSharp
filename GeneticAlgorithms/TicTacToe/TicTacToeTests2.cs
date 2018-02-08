@@ -17,7 +17,6 @@
  * permissions and limitations under the License.
  */
 
-using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -45,7 +44,7 @@ namespace GeneticAlgorithms.TicTacToe
             var geneSet = TicTacToeTests.CreateGeneSet().ToList();
             var fitness = new Fitness(1, 2, 3, 4);
             var candidate =
-                new Chromosome<Rule, Fitness>(geneSet, fitness, Chromosome<Rule, Fitness>.Strategies.None);
+                new Chromosome<Rule, Fitness>(geneSet, fitness, Strategies.None);
             var watch = Stopwatch.StartNew();
             TicTacToeTests.Display(candidate, watch);
         }

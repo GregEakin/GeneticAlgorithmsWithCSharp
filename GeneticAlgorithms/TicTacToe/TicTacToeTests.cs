@@ -365,8 +365,7 @@ namespace GeneticAlgorithms.TicTacToe
             {
                 Console.WriteLine("-- generation {0} --", generation);
                 Display(
-                    new Chromosome<Rule, Fitness>(genes, new Fitness(wins, ties, losses, genes.Count),
-                        Chromosome<Rule, Fitness>.Strategies.None), watch);
+                    new Chromosome<Rule, Fitness>(genes, new Fitness(wins, ties, losses, genes.Count), Strategies.None), watch);
             }
 
             var mutationRoundCounts = new List<int> {1};
