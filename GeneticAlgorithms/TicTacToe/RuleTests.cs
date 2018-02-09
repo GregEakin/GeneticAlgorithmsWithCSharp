@@ -44,7 +44,7 @@ namespace GeneticAlgorithms.TicTacToe
         [TestMethod]
         public void RowContentFilterTest()
         {
-            _board[1] = new Square(_board[1].Index, ContentType.Mine);
+            _board[8] = new Square(_board[8].Index, ContentType.Mine);
             _board[5] = new Square(_board[5].Index, ContentType.Opponent);
             var rule = new RowContentFilter(ContentType.Empty, 2);
             //Assert.AreEqual("its ROW has", rule.DescriptionPrefix);
@@ -54,7 +54,7 @@ namespace GeneticAlgorithms.TicTacToe
 
             var empties = _board.Values.Where(v => v.Content == ContentType.Empty).ToArray();
             var matches = rule.GetMatches(_board, empties);
-            CollectionAssert.AreEqual(new[] {2, 3, 4, 6}, matches.ToArray());
+            CollectionAssert.AreEquivalent(new[] {1, 3, 4, 9}, matches.ToArray());
         }
 
         [TestMethod]
@@ -66,7 +66,7 @@ namespace GeneticAlgorithms.TicTacToe
             Assert.AreEqual("is in TOP ROW ", rule.ToString());
 
             var matches = rule.GetMatches(_board, empties);
-            CollectionAssert.AreEqual(new[] {1, 2, 3}, matches.ToArray());
+            CollectionAssert.AreEquivalent(new[] {8, 3, 4}, matches.ToArray());
         }
 
         [TestMethod]
@@ -78,7 +78,7 @@ namespace GeneticAlgorithms.TicTacToe
             Assert.AreEqual("is in MIDDLE ROW ", rule.ToString());
 
             var matches = rule.GetMatches(_board, empties);
-            CollectionAssert.AreEqual(new[] {4, 5, 6}, matches.ToArray());
+            CollectionAssert.AreEquivalent(new[] {1, 5, 9}, matches.ToArray());
         }
 
         [TestMethod]
@@ -90,13 +90,13 @@ namespace GeneticAlgorithms.TicTacToe
             Assert.AreEqual("is in BOTTOM ROW ", rule.ToString());
 
             var matches = rule.GetMatches(_board, empties);
-            CollectionAssert.AreEqual(new[] {7, 8, 9}, matches.ToArray());
+            CollectionAssert.AreEquivalent(new[] {2, 6, 7}, matches.ToArray());
         }
 
         [TestMethod]
         public void ColumnContentFilterTest()
         {
-            _board[1] = new Square(_board[1].Index, ContentType.Mine);
+            _board[8] = new Square(_board[8].Index, ContentType.Mine);
             _board[5] = new Square(_board[5].Index, ContentType.Opponent);
             var empties = _board.Values.Where(v => v.Content == ContentType.Empty).ToArray();
 
@@ -104,7 +104,7 @@ namespace GeneticAlgorithms.TicTacToe
             Assert.AreEqual("its COLUMN has 2 Empty ", rule.ToString());
 
             var matches = rule.GetMatches(_board, empties);
-            CollectionAssert.AreEqual(new[] {2, 4, 7, 8}, matches.ToArray());
+            CollectionAssert.AreEquivalent(new[] {1, 3, 6, 7}, matches.ToArray());
         }
 
         [TestMethod]
@@ -116,7 +116,7 @@ namespace GeneticAlgorithms.TicTacToe
             Assert.AreEqual("is in LEFT COLUMN ", rule.ToString());
 
             var matches = rule.GetMatches(_board, empties);
-            CollectionAssert.AreEqual(new[] {1, 4, 7}, matches.ToArray());
+            CollectionAssert.AreEquivalent(new[] {1, 6, 8}, matches.ToArray());
         }
 
         [TestMethod]
@@ -128,7 +128,7 @@ namespace GeneticAlgorithms.TicTacToe
             Assert.AreEqual("is in MIDDLE COLUMN ", rule.ToString());
 
             var matches = rule.GetMatches(_board, empties);
-            CollectionAssert.AreEqual(new[] {2, 5, 8}, matches.ToArray());
+            CollectionAssert.AreEquivalent(new[] {3, 5, 7}, matches.ToArray());
         }
 
         [TestMethod]
@@ -140,13 +140,13 @@ namespace GeneticAlgorithms.TicTacToe
             Assert.AreEqual("is in RIGHT COLUMN ", rule.ToString());
 
             var matches = rule.GetMatches(_board, empties);
-            CollectionAssert.AreEqual(new[] {3, 6, 9}, matches.ToArray());
+            CollectionAssert.AreEquivalent(new[] {2, 4, 9}, matches.ToArray());
         }
 
         [TestMethod]
         public void DiagonalContentFilterTest()
         {
-            _board[1] = new Square(_board[1].Index, ContentType.Mine);
+            _board[8] = new Square(_board[8].Index, ContentType.Mine);
             _board[5] = new Square(_board[5].Index, ContentType.Opponent);
             var empties = _board.Values.Where(v => v.Content == ContentType.Empty).ToArray();
 
@@ -154,21 +154,21 @@ namespace GeneticAlgorithms.TicTacToe
             Assert.AreEqual("its DIAGONAL has 2 Empty ", rule.ToString());
 
             var matches = rule.GetMatches(_board, empties);
-            CollectionAssert.AreEqual(new[] {3, 7}, matches.ToArray());
+            CollectionAssert.AreEquivalent(new[] {4, 6}, matches.ToArray());
         }
 
         [TestMethod]
         public void DiagonalLocationFilterTest()
         {
-            _board[1] = new Square(_board[1].Index, ContentType.Mine);
-            _board[2] = new Square(_board[2].Index, ContentType.Opponent);
+            _board[8] = new Square(_board[8].Index, ContentType.Mine);
+            _board[3] = new Square(_board[3].Index, ContentType.Opponent);
             var empties = _board.Values.Where(v => v.Content == ContentType.Empty).ToArray();
 
             var rule = new DiagonalLocationFilter();
             Assert.AreEqual("is in DIAGONAL  ", rule.ToString());
 
             var matches = rule.GetMatches(_board, empties);
-            CollectionAssert.AreEqual(new[] {3, 5, 7, 9}, matches.ToArray());
+            CollectionAssert.AreEquivalent(new[] {2, 4, 5, 6}, matches.ToArray());
         }
 
         [TestMethod]
@@ -180,7 +180,7 @@ namespace GeneticAlgorithms.TicTacToe
             Assert.AreEqual("is a CORNER ", rule.ToString());
 
             var matches = rule.GetMatches(_board, empties);
-            CollectionAssert.AreEqual(new[] {1, 3, 7, 9}, matches.ToArray());
+            CollectionAssert.AreEquivalent(new[] {2, 4, 6, 8}, matches.ToArray());
         }
 
         [TestMethod]
@@ -192,7 +192,7 @@ namespace GeneticAlgorithms.TicTacToe
             Assert.AreEqual("is SIDE ", rule.ToString());
 
             var matches = rule.GetMatches(_board, empties);
-            CollectionAssert.AreEqual(new[] {2, 4, 6, 8}, matches.ToArray());
+            CollectionAssert.AreEquivalent(new[] {1, 3, 9, 7}, matches.ToArray());
         }
 
         [TestMethod]
@@ -204,13 +204,13 @@ namespace GeneticAlgorithms.TicTacToe
             Assert.AreEqual("is in CENTER ", rule.ToString());
 
             var matches = rule.GetMatches(_board, empties);
-            CollectionAssert.AreEqual(new[] {5}, matches.ToArray());
+            CollectionAssert.AreEquivalent(new[] {5}, matches.ToArray());
         }
 
         [TestMethod]
         public void RowOppositeFilterTest()
         {
-            _board[1] = new Square(_board[1].Index, ContentType.Mine);
+            _board[8] = new Square(_board[8].Index, ContentType.Mine);
             _board[5] = new Square(_board[5].Index, ContentType.Opponent);
             var empties = _board.Values.Where(v => v.Content == ContentType.Empty).ToArray();
 
@@ -218,13 +218,13 @@ namespace GeneticAlgorithms.TicTacToe
             Assert.AreEqual("ROW-OPPOSITE is Mine ", rule.ToString());
 
             var matches = rule.GetMatches(_board, empties);
-            CollectionAssert.AreEqual(new[] {3}, matches.ToArray());
+            CollectionAssert.AreEquivalent(new[] {4}, matches.ToArray());
         }
 
         [TestMethod]
         public void ColumnOppositeFilterTest()
         {
-            _board[1] = new Square(_board[1].Index, ContentType.Mine);
+            _board[8] = new Square(_board[8].Index, ContentType.Mine);
             _board[5] = new Square(_board[5].Index, ContentType.Opponent);
             var empties = _board.Values.Where(v => v.Content == ContentType.Empty).ToArray();
 
@@ -232,13 +232,13 @@ namespace GeneticAlgorithms.TicTacToe
             Assert.AreEqual("COLUMN-OPPOSITE is Mine ", rule.ToString());
 
             var matches = rule.GetMatches(_board, empties);
-            CollectionAssert.AreEqual(new[] {7}, matches.ToArray());
+            CollectionAssert.AreEquivalent(new[] {6}, matches.ToArray());
         }
 
         [TestMethod]
         public void DiagonalOppositeFilterTest()
         {
-            _board[1] = new Square(_board[1].Index, ContentType.Mine);
+            _board[8] = new Square(_board[8].Index, ContentType.Mine);
             _board[5] = new Square(_board[5].Index, ContentType.Opponent);
             var empties = _board.Values.Where(v => v.Content == ContentType.Empty).ToArray();
 
@@ -246,13 +246,13 @@ namespace GeneticAlgorithms.TicTacToe
             Assert.AreEqual("DIAGONAL-OPPOSITE is Mine ", rule.ToString());
 
             var matches = rule.GetMatches(_board, empties);
-            CollectionAssert.AreEqual(new[] {9}, matches.ToArray());
+            CollectionAssert.AreEquivalent(new[] {2}, matches.ToArray());
         }
 
         [TestMethod]
         public void WinFilterTest()
         {
-            _board[1] = new Square(_board[1].Index, ContentType.Mine);
+            _board[8] = new Square(_board[8].Index, ContentType.Mine);
             _board[5] = new Square(_board[5].Index, ContentType.Mine);
             var empties = _board.Values.Where(v => v.Content == ContentType.Empty).ToArray();
 
@@ -260,13 +260,13 @@ namespace GeneticAlgorithms.TicTacToe
             Assert.AreEqual("WIN ", rule.ToString());
 
             var matches = rule.GetMatches(_board, empties);
-            CollectionAssert.AreEqual(new[] {9}, matches.ToArray());
+            CollectionAssert.AreEquivalent(new[] {2}, matches.ToArray());
         }
 
         [TestMethod]
         public void BlockFilterTest()
         {
-            _board[1] = new Square(_board[1].Index, ContentType.Opponent);
+            _board[8] = new Square(_board[8].Index, ContentType.Opponent);
             _board[5] = new Square(_board[5].Index, ContentType.Opponent);
             var empties = _board.Values.Where(v => v.Content == ContentType.Empty).ToArray();
 
@@ -274,7 +274,7 @@ namespace GeneticAlgorithms.TicTacToe
             Assert.AreEqual("block OPPONENT WIN ", rule.ToString());
 
             var matches = rule.GetMatches(_board, empties);
-            CollectionAssert.AreEqual(new[] {9}, matches.ToArray());
+            CollectionAssert.AreEquivalent(new[] {2}, matches.ToArray());
         }
     }
 }
