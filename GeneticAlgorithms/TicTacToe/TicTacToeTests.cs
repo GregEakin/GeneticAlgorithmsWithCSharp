@@ -29,7 +29,7 @@ namespace GeneticAlgorithms.TicTacToe
     [TestClass]
     public class TicTacToeTests
     {
-        private static readonly int[] SquareIndexes = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+        private static readonly int[] SquareIndexes = {8, 3, 4, 1, 5, 9, 6, 7, 2};
 
         public delegate bool FnMutateDelegate(List<Rule> genes);
 
@@ -44,7 +44,7 @@ namespace GeneticAlgorithms.TicTacToe
 
         private static CompetitionResult PlayOneOnOne(List<Rule> xGenes, List<Rule> oGenes)
         {
-            var board = Enumerable.Range(1, 9).ToDictionary(i => i, i => new Square(i));
+            var board = SquareIndexes.ToDictionary(i => i, i => new Square(i));
             var empties = board.Values.Where(v => v.Content == ContentType.Empty).ToArray();
             var roundData = new[]
             {
@@ -89,7 +89,7 @@ namespace GeneticAlgorithms.TicTacToe
                 string.Join("", SquareIndexes.Select(i =>
                     b[i].Content == ContentType.Empty ? "." : b[i].Content == ContentType.Mine ? "x" : "o"));
 
-            var board = Enumerable.Range(1, 9).ToDictionary(i => i, i => new Square(i));
+            var board = SquareIndexes.ToDictionary(i => i, i => new Square(i));
             var queue = new Queue<Dictionary<int, Square>>();
             queue.Enqueue(board);
             foreach (var square in board.Values)
@@ -108,9 +108,7 @@ namespace GeneticAlgorithms.TicTacToe
             while (queue.Any())
             {
                 board = queue.Dequeue();
-                var boardString = GetBoardString(board);
                 var empties = board.Values.Where(v => v.Content == ContentType.Empty).ToArray();
-
                 if (!empties.Any())
                 {
                     ties++;
@@ -118,12 +116,10 @@ namespace GeneticAlgorithms.TicTacToe
                 }
 
                 var candidateIndexAndRuleIndex = GetMove(genes, board, empties);
-
                 if (candidateIndexAndRuleIndex == null) // could not find a move
                 {
                     // There are empties, but didn't find a move
                     losses++;
-                    // Go to next board
                     continue;
                 }
 
@@ -141,6 +137,7 @@ namespace GeneticAlgorithms.TicTacToe
                     var ruleId = candidateIndexAndRuleIndex[1];
                     if (!winningRules.ContainsKey(ruleId))
                         winningRules[ruleId] = new List<string>();
+                    var boardString = GetBoardString(board);
                     winningRules[ruleId].Add(boardString);
                     wins++;
                     // Go to next board
@@ -163,6 +160,7 @@ namespace GeneticAlgorithms.TicTacToe
                     {
                         [square.Index] = new Square(square.Index, ContentType.Opponent)
                     };
+
                     queue.Enqueue(candiateCopy);
                 }
             }
