@@ -256,20 +256,22 @@ namespace GeneticAlgorithms.TicTacToe
             var count = mutationRoundCounts[Rand.Random.Next(mutationRoundCounts.Count)];
             for (var i = 1; i < count + 2; i++)
             {
-                var copy = mutationOperators.ToList();
-                var func = copy[Rand.Random.Next(copy.Count)];
-                while (!func(genes))
+                foreach (var func in mutationOperators.OrderBy(o => Rand.Random.Next()))
                 {
-                    copy.Remove(func);
-                    func = copy[Rand.Random.Next(copy.Count)];
+                    var worked = func(genes);
+                    if (worked)
+                        break;
                 }
 
-                if (fnGetFitness(genes).CompareTo(initialFitness) > 0)
-                {
-                    mutationRoundCounts.Add(i);
-                    return;
-                }
+                if (fnGetFitness(genes).CompareTo(initialFitness) <= 0)
+                    continue;
+
+                mutationRoundCounts.Add(i);
+                break;
             }
+
+            var seen = new HashSet<string>();
+            genes.RemoveAll(x => !seen.Add(x.ToString()));
         }
 
         public static Rule[] CreateGeneSet()
@@ -347,7 +349,7 @@ namespace GeneticAlgorithms.TicTacToe
             var optimalFitness = new Fitness(620, 120, 0, 11);
 
             var best = Genetic<Rule, Fitness>.GetBest(FnGetFitness, minGenes, optimalFitness, null, FnDisplay, FnMutate,
-                FnCreate, 500, 20, FnCrossover);
+                FnCreate, 500, 20, FnCrossover, 3);
             Assert.IsTrue(optimalFitness.CompareTo(best.Fitness) <= 0);
         }
 

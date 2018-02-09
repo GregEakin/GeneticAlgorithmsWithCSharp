@@ -30,14 +30,34 @@ namespace GeneticAlgorithms.Sudoku
     [TestClass]
     public class SudokuTests
     {
-        public static int GetFitness(List<int> genes, Rule[] validationRules)
+        private static int GetFitness(IReadOnlyList<int> genes, IEnumerable<Rule> validationRules)
         {
-//            firstFailingRule = next(rule for rule in validationRules 
-//              if genes[rule.Index] == genes[rule.OtherIndex])
+            foreach (var firstFailingRule in validationRules.Where(rule => genes[rule.Index] == genes[rule.OtherIndex]))
+            {
+                var fitness = 10 * (IndexRow(firstFailingRule.OtherIndex) + 1) +
+                              IndexColumn(firstFailingRule.OtherIndex) + 1;
+                return fitness;
+            }
+
             return 100;
         }
 
-        public static void Display(Chromosome<int, int> candidate, Stopwatch watch)
+        [TestMethod]
+        public void GetFitnessTest()
+        {
+            var genes = new List<int> {0, 1, 0};
+            var rules = new[]
+            {
+                new Rule(0, 1),
+                new Rule(0, 2), // This rule fails
+                new Rule(1, 2),
+            };
+
+            var fitness = GetFitness(genes, rules);
+            Assert.AreEqual(13, fitness);
+        }
+
+        private static void Display(Chromosome<int, int> candidate, Stopwatch watch)
         {
             for (var row = 0; row < 9; row++)
             {
@@ -53,40 +73,6 @@ namespace GeneticAlgorithms.Sudoku
             Console.WriteLine();
         }
 
-        public static void Mutate(List<int> genes, Rule[] validationRules)
-        {
-            foreach (var selectedRule in validationRules)
-            {
-                if (selectedRule.Index == selectedRule.OtherIndex)
-                    continue;
-
-                var row = IndexRow(selectedRule.OtherIndex);
-                var start = row * 9;
-                var indexA = selectedRule.OtherIndex;
-                var indexB = Rand.Random.Next(start, genes.Count);
-
-                Console.WriteLine("Swap {0} - {1}", indexA, indexB);
-                if (genes[indexA] == genes[indexB])
-                    Console.WriteLine("Same items!");
-
-                var temp = genes[indexA];
-                genes[indexA] = genes[indexB];
-                genes[indexB] = temp;
-            }
-        }
-
-        public static void ShuffleInPlace(List<int> genes, int first, int last)
-        {
-            while (first < last)
-            {
-                var index = Rand.Random.Next(first, last);
-                var temp = genes[index];
-                genes[index] = genes[first];
-                genes[first] = temp;
-                first++;
-            }
-        }
-
         [TestMethod]
         public void DisplayTest()
         {
@@ -100,6 +86,44 @@ namespace GeneticAlgorithms.Sudoku
             Display(candidate, watch);
         }
 
+        private static void Mutate(List<int> genes, IEnumerable<Rule> validationRules)
+        {
+            using (var enumerator = validationRules.Where(rule => genes[rule.Index] == genes[rule.OtherIndex])
+                .AsEnumerable().GetEnumerator())
+            {
+                if (!enumerator.MoveNext())
+                    return;
+                var selectedRule = enumerator.Current;
+                if (selectedRule == null)
+                    return;
+
+                if (IndexRow(selectedRule.OtherIndex) % 3 == 2 && Rand.Random.Next(0, 10) == 0)
+                {
+                    var sectionStart = SectionStart(selectedRule.Index);
+                    var current = selectedRule.OtherIndex;
+                    while (selectedRule.OtherIndex == current)
+                    {
+                        ShuffleInPlace(genes, sectionStart, 80);
+                        if (!enumerator.MoveNext())
+                            return;
+                        selectedRule = enumerator.Current;
+                        if (selectedRule == null)
+                            return;
+                    }
+
+                    return;
+                }
+
+                var row = IndexRow(selectedRule.OtherIndex);
+                var start = row * 9;
+                var indexA = selectedRule.OtherIndex;
+                var indexB = Rand.Random.Next(start, genes.Count);
+                var temp = genes[indexA];
+                genes[indexA] = genes[indexB];
+                genes[indexB] = temp;
+            }
+        }
+
         [TestMethod]
         public void MutateTest()
         {
@@ -107,13 +131,35 @@ namespace GeneticAlgorithms.Sudoku
             var geneSet = Enumerable.Range(1, 9).ToArray();
             var genes = Rand.RandomSampleList(geneSet, 81);
             var validationRules = BuildValidationRules();
-            var fitness = GetFitness(genes, validationRules);
 
-            Display(new Chromosome<int, int>(genes, fitness), watch);
+            var fitness1 = GetFitness(genes, validationRules);
+            Display(new Chromosome<int, int>(genes, fitness1), watch);
+
             Mutate(genes, validationRules);
-
             var fitness2 = GetFitness(genes, validationRules);
             Display(new Chromosome<int, int>(genes, fitness2), watch);
+        }
+
+        private static void ShuffleInPlace(List<int> genes, int first, int last)
+        {
+            while (first < last)
+            {
+                var index = Rand.Random.Next(first, last + 1);
+                var temp = genes[first];
+                genes[first] = genes[index];
+                genes[index] = temp;
+                first++;
+            }
+        }
+
+        [TestMethod]
+        public void ShuffleInPlaceTest()
+        {
+            var data = new List<int> {0, 1, 2, 3, 4};
+            ShuffleInPlace(data, 1, 3);
+            Console.WriteLine(string.Join(", ", data));
+            Assert.AreEqual(0, data[0]);
+            Assert.AreEqual(4, data[4]);
         }
 
         [TestMethod]
@@ -149,7 +195,7 @@ namespace GeneticAlgorithms.Sudoku
             Benchmark.Run(SudokuTest);
         }
 
-        public static Rule[] BuildValidationRules()
+        private static Rule[] BuildValidationRules()
         {
             var rules = new List<Rule>();
             for (var index = 0; index < 80; index++)
@@ -163,8 +209,9 @@ namespace GeneticAlgorithms.Sudoku
                     var otherRow = IndexRow(index2);
                     var otherColumn = IndexColumn(index2);
                     var otherSection = RowColumnSection(otherRow, otherColumn);
-
-                    if (itsRow == otherRow || itsColumn == otherColumn || itsSection == otherSection)
+                    if (itsRow == otherRow ||
+                        itsColumn == otherColumn ||
+                        itsSection == otherSection)
                         rules.Add(new Rule(index, index2));
                 }
             }
@@ -179,14 +226,14 @@ namespace GeneticAlgorithms.Sudoku
             Assert.AreEqual(810, rules.Length);
         }
 
-        public static int IndexRow(int index) => index / 9;
+        private static int IndexRow(int index) => index / 9;
 
-        public static int IndexColumn(int index) => index % 9;
+        private static int IndexColumn(int index) => index % 9;
 
-        public static int RowColumnSection(int row, int column) => (row / 3) * 3 + (column / 3);
+        private static int RowColumnSection(int row, int column) => (row / 3) * 3 + (column / 3);
 
-        public static int IndexSelection(int index) => RowColumnSection(IndexRow(index), IndexColumn(index));
+        private static int IndexSelection(int index) => RowColumnSection(IndexRow(index), IndexColumn(index));
 
-        public static int SectionStart(int index) => ((IndexRow(index) % 9) / 3) * 27 + (IndexColumn(index) / 3) * 3;
+        private static int SectionStart(int index) => ((IndexRow(index) % 9) / 3) * 27 + (IndexColumn(index) / 3) * 3;
     }
 }
