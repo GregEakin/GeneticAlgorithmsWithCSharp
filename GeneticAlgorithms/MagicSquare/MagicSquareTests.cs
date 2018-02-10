@@ -150,9 +150,9 @@ namespace GeneticAlgorithms.MagicSquare
             Assert.AreEqual(19, index);
         }
 
-        private static Tuple<int, double, double> SimulatedAnnealingExp(int value)
+        private static Tuple<int, double, double> SimulatedAnnealingExp(int value, int count)
         {
-            var historicalFitnesses = Enumerable.Range(0, 51).Select(n => 50 - n).ToList();
+            var historicalFitnesses = Enumerable.Range(1, count).Reverse().ToList();
             var index = historicalFitnesses.BinarySearch(value, new Genetic<int, int>.ReverseComparer<int>());
             if (index < 0) index = ~index;
             var difference = historicalFitnesses.Count - index;
@@ -167,9 +167,9 @@ namespace GeneticAlgorithms.MagicSquare
             var samples = new[]
             {
                 // index, difference, proportion simular, exp(-proportion)
-                new Tuple<int, int, double, double>(0, 50, 0.02, 0.98),
-                new Tuple<int, int, double, double>(5, 45, 0.12, 0.89),
-                new Tuple<int, int, double, double>(10, 40, 0.22, 0.81),
+                new Tuple<int, int, double, double>(0, 50, 0.00, 1.00),
+                new Tuple<int, int, double, double>(5, 45, 0.10, 0.90),
+                new Tuple<int, int, double, double>(10, 40, 0.20, 0.82),
                 new Tuple<int, int, double, double>(40, 10, 0.80, 0.45),
                 new Tuple<int, int, double, double>(45, 5, 0.90, 0.41),
                 new Tuple<int, int, double, double>(50, 0, 1.00, 0.37),
@@ -177,7 +177,8 @@ namespace GeneticAlgorithms.MagicSquare
 
             foreach (var sample in samples)
             {
-                var result = SimulatedAnnealingExp(sample.Item1);
+                var result = SimulatedAnnealingExp(sample.Item1, 50);
+                Console.WriteLine("{0}, {1}, {2}, {3}", sample.Item1, result.Item1, result.Item2, result.Item3);
                 Assert.AreEqual(sample.Item2, result.Item1);
                 Assert.AreEqual(sample.Item3, result.Item2, 0.01);
                 Assert.AreEqual(sample.Item4, result.Item3, 0.01);
