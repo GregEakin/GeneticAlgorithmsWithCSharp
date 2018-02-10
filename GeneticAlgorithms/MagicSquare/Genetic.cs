@@ -35,19 +35,19 @@ namespace GeneticAlgorithms.MagicSquare
             }
         }
 
-        public delegate void DisplayDelegate(Chromosome<TGene, TFitness> child);
-
         public delegate void MutateGeneDelegate(List<TGene> genes);
 
-        public delegate TFitness FitnessDelegate(List<TGene> gene);
+        public delegate void DisplayDelegate(Chromosome<TGene, TFitness> child);
 
-        public delegate Chromosome<TGene, TFitness> MutateChromosomeDelegate(Chromosome<TGene, TFitness> parent);
-
-        public delegate Chromosome<TGene, TFitness> GenerateParentDelegate();
+        public delegate TFitness GetFitnessDelegate(List<TGene> gene);
 
         public delegate List<TGene> CreateDelegate();
 
-        private static Chromosome<TGene, TFitness> GenerateParent(int length, TGene[] geneSet, FitnessDelegate getFitness)
+        public delegate Chromosome<TGene, TFitness> GenerateParentDelegate();
+
+        public delegate Chromosome<TGene, TFitness> MutateChromosomeDelegate(Chromosome<TGene, TFitness> parent);
+
+        private static Chromosome<TGene, TFitness> GenerateParent(int length, TGene[] geneSet, GetFitnessDelegate getFitness)
         {
             var genes = Rand.RandomSampleList(geneSet, length);
             var fitness = getFitness(genes);
@@ -56,7 +56,7 @@ namespace GeneticAlgorithms.MagicSquare
         }
 
         private static Chromosome<TGene, TFitness> Mutate(Chromosome<TGene, TFitness> parent, TGene[] geneSet,
-            FitnessDelegate getFitness)
+            GetFitnessDelegate getFitness)
         {
             var childGenes = parent.Genes.ToList();
             var index = Rand.Random.Next(childGenes.Count);
@@ -69,7 +69,7 @@ namespace GeneticAlgorithms.MagicSquare
         }
 
         private static Chromosome<TGene, TFitness> MutateCustom(Chromosome<TGene, TFitness> parent,
-            MutateGeneDelegate customMutate, FitnessDelegate getFitness)
+            MutateGeneDelegate customMutate, GetFitnessDelegate getFitness)
         {
             var childGenes = parent.Genes.ToList();
             customMutate(childGenes);
@@ -77,13 +77,14 @@ namespace GeneticAlgorithms.MagicSquare
             return new Chromosome<TGene, TFitness>(childGenes, fitness);
         }
 
-        public static Chromosome<TGene, TFitness> GetBest(FitnessDelegate getFitness, int targetLen, TFitness optimalFitness,
+        public static Chromosome<TGene, TFitness> GetBest(GetFitnessDelegate getFitness, int targetLen, TFitness optimalFitness,
             TGene[] geneSet, DisplayDelegate display, MutateGeneDelegate customMutate = null, CreateDelegate customCreate = null,
             int maxAge = 0)
         {
-            Chromosome<TGene, TFitness> FnMutate(Chromosome<TGene, TFitness> parent) => customMutate == null
-                ? Mutate(parent, geneSet, getFitness)
-                : MutateCustom(parent, customMutate, getFitness);
+            Chromosome<TGene, TFitness> FnMutate(Chromosome<TGene, TFitness> parent) => 
+                customMutate == null
+                    ? Mutate(parent, geneSet, getFitness)
+                    : MutateCustom(parent, customMutate, getFitness);
 
             Chromosome<TGene, TFitness> FnGenerateParent()
             {

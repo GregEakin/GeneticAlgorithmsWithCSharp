@@ -65,13 +65,11 @@ namespace GeneticAlgorithms.TicTacToe
 
         public delegate CompetitionResult CompeteDelegate(List<TGene> a, List<TGene> b);
 
-        private static Chromosome<TGene, TFitness> GenerateParent(int length, TGene[] geneSet,
-            GetFitnessDelegate getGetFitness)
+        private static Chromosome<TGene, TFitness> GenerateParent(int length, TGene[] geneSet, GetFitnessDelegate getFitness)
         {
             var genes = Rand.RandomSampleList(geneSet, length);
-            var fitness = getGetFitness(genes);
-            var chromosome =
-                new Chromosome<TGene, TFitness>(genes, fitness, Strategies.Create);
+            var fitness = getFitness(genes);
+            var chromosome = new Chromosome<TGene, TFitness>(genes, fitness, Strategies.Create);
             return chromosome;
         }
 
@@ -137,8 +135,7 @@ namespace GeneticAlgorithms.TicTacToe
                     return GenerateParent(targetLen, geneSet, getFitness);
 
                 var genes = customCreate();
-                return new Chromosome<TGene, TFitness>(genes, getFitness(genes),
-                    Strategies.Create);
+                return new Chromosome<TGene, TFitness>(genes, getFitness(genes), Strategies.Create);
             }
 
             var strategyLookup =

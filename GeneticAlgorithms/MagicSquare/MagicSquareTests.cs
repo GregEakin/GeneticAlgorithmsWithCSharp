@@ -169,6 +169,7 @@ namespace GeneticAlgorithms.MagicSquare
         {
             var samples = new[]
             {
+                // index, difference, proportion simular, exp(-proportion)
                 new Tuple<int, int, double, double>(0, 50, 0.02, 0.98),
                 new Tuple<int, int, double, double>(5, 45, 0.12, 0.89),
                 new Tuple<int, int, double, double>(10, 40, 0.22, 0.81),
