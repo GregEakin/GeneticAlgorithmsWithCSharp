@@ -81,7 +81,7 @@ namespace GeneticAlgorithms.TicTacToe
             return CompetitionResult.Tie;
         }
 
-        public static Fitness GetFitnessForAllGames(List<Rule> genes)
+        public static Fitness GetFitnessForAllGames(IList<Rule> genes)
         {
             var board = Square.Indexes.ToDictionary(i => i, i => new Square(i));
             var queue = new Queue<Dictionary<int, Square>>();
@@ -181,10 +181,9 @@ namespace GeneticAlgorithms.TicTacToe
             return false;
         }
 
-        public static int? GetMove(List<Rule> ruleSet, Dictionary<int, Square> board, Square[] empties, int startingRuleIndex = 0)
+        public static int? GetMove(IEnumerable<Rule> ruleSet, Dictionary<int, Square> board, Square[] empties, int startingRuleIndex = 0)
         {
-            var ruleSetCopy = ruleSet.ToArray();
-            foreach (var gene in ruleSetCopy)
+            foreach (var gene in ruleSet.Skip(startingRuleIndex))
             {
                 var matches = gene.GetMatches(board, empties);
                 if (matches.Count == 0)
