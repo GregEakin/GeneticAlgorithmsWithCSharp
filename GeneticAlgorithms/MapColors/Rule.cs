@@ -17,6 +17,7 @@
  * permissions and limitations under the License.
  */
 
+using System;
 using System.Collections.Generic;
 
 namespace GeneticAlgorithms.MapColors
@@ -28,7 +29,7 @@ namespace GeneticAlgorithms.MapColors
 
         public Rule(string node, string adjacent)
         {
-            if (node.CompareTo(adjacent) < 0)
+            if (string.Compare(node, adjacent, StringComparison.Ordinal) < 0)
             {
                 var temp = node;
                 node = adjacent;

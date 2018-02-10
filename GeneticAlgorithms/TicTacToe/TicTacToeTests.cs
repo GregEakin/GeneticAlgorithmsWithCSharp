@@ -38,7 +38,7 @@ namespace GeneticAlgorithms.TicTacToe
         private static Fitness GetFitness(List<Rule> genes)
         {
             var localCopy = genes.ToList();
-            var fitness = GetFitnessForGames(localCopy);
+            var fitness = GetFitnessForAllGames(localCopy);
             return new Fitness(fitness.Wins, fitness.Ties, fitness.Losses, genes.Count);
         }
 
@@ -68,7 +68,7 @@ namespace GeneticAlgorithms.TicTacToe
                 if (moveAndRuleIndex == null) // could not find a move
                     return lossResult;
 
-                var index = moveAndRuleIndex[0];
+                var index = moveAndRuleIndex.Item1;
                 board[index] = new Square(index, piece);
 
                 var mostRecentMoveOnly = new[] {board[index]};
@@ -83,15 +83,15 @@ namespace GeneticAlgorithms.TicTacToe
             return CompetitionResult.Tie;
         }
 
-        public static Fitness GetFitnessForGames(List<Rule> genes)
+        public static Fitness GetFitnessForAllGames(List<Rule> genes)
         {
-            string GetBoardString(IReadOnlyDictionary<int, Square> b) =>
-                string.Join("", SquareIndexes.Select(i =>
-                    b[i].Content == ContentType.Empty ? "." : b[i].Content == ContentType.Mine ? "x" : "o"));
-
             var board = SquareIndexes.ToDictionary(i => i, i => new Square(i));
             var queue = new Queue<Dictionary<int, Square>>();
+
+            // if we go first, we get to pick any square
             queue.Enqueue(board);
+
+            // If the opponet starts, let them start at each square
             foreach (var square in board.Values)
             {
                 var candiateCopy = new Dictionary<int, Square>(board)
@@ -101,7 +101,6 @@ namespace GeneticAlgorithms.TicTacToe
                 queue.Enqueue(candiateCopy);
             }
 
-            var winningRules = new Dictionary<int, List<string>>();
             var wins = 0;
             var ties = 0;
             var losses = 0;
@@ -111,10 +110,12 @@ namespace GeneticAlgorithms.TicTacToe
                 var empties = board.Values.Where(v => v.Content == ContentType.Empty).ToArray();
                 if (!empties.Any())
                 {
+                    // no moves left
                     ties++;
                     continue;
                 }
 
+                // It's our turn
                 var candidateIndexAndRuleIndex = GetMove(genes, board, empties);
                 if (candidateIndexAndRuleIndex == null) // could not find a move
                 {
@@ -123,38 +124,55 @@ namespace GeneticAlgorithms.TicTacToe
                     continue;
                 }
 
-                // found at least one move
-                var index = candidateIndexAndRuleIndex[0];
+                var index = candidateIndexAndRuleIndex.Item1;
                 board[index] = new Square(index, ContentType.Mine);
-                // newBoardString = getBoardString(board)
 
-                // if we now have three MINE in any ROW, COLUMN or DIAGONAL, we won
-                var mostRecentMoveOnly = new[] {board[index]};
-                if (HaveThreeInRow.GetMatches(board, mostRecentMoveOnly).Any() ||
-                    HaveThreeInColumn.GetMatches(board, mostRecentMoveOnly).Any() ||
-                    HaveThreeInDiagonal.GetMatches(board, mostRecentMoveOnly).Any())
+                // see if we won
                 {
-                    var ruleId = candidateIndexAndRuleIndex[1];
-                    if (!winningRules.ContainsKey(ruleId))
-                        winningRules[ruleId] = new List<string>();
-                    var boardString = GetBoardString(board);
-                    winningRules[ruleId].Add(boardString);
-                    wins++;
-                    // Go to next board
-                    continue;
+                    var won = false;
+
+                    var mine = board.Values.Where(s => s.Content == ContentType.Mine).ToArray();
+                    for (var i = 0; i < mine.Length - 2; i++)
+                    for (var j = i + 1; j < mine.Length - 1; j++)
+                    for (var k = j + 1; k < mine.Length; k++)
+                    {
+                        var sum = 15 - mine[i].Index - mine[j].Index - mine[k].Index;
+                        if (sum != 0)
+                            continue;
+                        won = true;
+                        break;
+                    }
+
+                    if (won)
+                    {
+                        wins++;
+                        continue;
+                    }
                 }
 
-                // we lose if any empties have two OPPONENT pieces in ROW, COL or DIAG
-                empties = board.Values.Where(v => v.Content == ContentType.Empty).ToArray();
-                if (OpponentHasTwoInARow.GetMatches(board, empties).Any())
+                // concede if we lose in the next move
                 {
-                    losses++;
-                    // Go to next board
-                    continue;
+                    var lost = false;
+                    var theirs = board.Values.Where(s => s.Content == ContentType.Opponent).ToArray();
+                    for (var i = 0; i < theirs.Length - 1; i++)
+                    for (var j = i + 1; j < theirs.Length; j++)
+                    {
+                        var sum = 15 - theirs[i].Index - theirs[j].Index;
+                        if (sum <= 0 || sum > 9 || board[sum].Content != ContentType.Empty)
+                            continue;
+                        lost = true;
+                        break;
+                    }
+
+                    if (lost)
+                    {
+                        losses++;
+                        continue;
+                    }
                 }
 
-                // queue all possible OPPONENT responses
-                foreach (var square in empties)
+                // queue all remaning OPPONENT responses
+                foreach (var square in empties.Where(s => s.Index != index))
                 {
                     var candiateCopy = new Dictionary<int, Square>(board)
                     {
@@ -168,7 +186,7 @@ namespace GeneticAlgorithms.TicTacToe
             return new Fitness(wins, ties, losses, genes.Count);
         }
 
-        public static int[] GetMove(List<Rule> ruleSet, Dictionary<int, Square> board, Square[] empties,
+        public static Tuple<int, int> GetMove(List<Rule> ruleSet, Dictionary<int, Square> board, Square[] empties,
             int startingRuleIndex = 0)
         {
             var ruleSetCopy = ruleSet.ToArray();
@@ -179,7 +197,7 @@ namespace GeneticAlgorithms.TicTacToe
                 if (matches.Count == 0)
                     continue;
                 if (matches.Count == 1)
-                    return new[] {matches.First(), ruleIndex};
+                    return new Tuple<int, int>(matches.First(), ruleIndex);
                 if (empties.Length > matches.Count)
                     empties = empties.Where(e => matches.Contains(e.Index)).ToArray();
             }
@@ -268,8 +286,8 @@ namespace GeneticAlgorithms.TicTacToe
                 break;
             }
 
-            var seen = new HashSet<string>();
-            genes.RemoveAll(x => !seen.Add(x.ToString()));
+            //var seen = new HashSet<string>();
+            //genes.RemoveAll(x => !seen.Add(x.ToString()));
         }
 
         public static Rule[] CreateGeneSet()
@@ -299,6 +317,7 @@ namespace GeneticAlgorithms.TicTacToe
                 new RuleMetadata((expectedContent, count) => new RowOppositeFilter(expectedContent), options),
                 new RuleMetadata((expectedContent, count) => new ColumnOppositeFilter(expectedContent), options),
                 new RuleMetadata((expectedContent, count) => new DiagonalOppositeFilter(expectedContent), options),
+                new RuleMetadata((expectedContent, count) => new Noop()),
             };
 
             var genes = geneSet.SelectMany(g => g.CreateRules()).ToArray();
@@ -342,12 +361,12 @@ namespace GeneticAlgorithms.TicTacToe
             }
 
             List<Rule> FnCreate() =>
-                Rand.RandomSampleList(geneset.ToArray(), Rand.Random.Next(minGenes, maxGenes));
+                Rand.RandomSampleList(geneset, Rand.Random.Next(minGenes, maxGenes));
 
             var optimalFitness = new Fitness(620, 120, 0, 11);
 
             var best = Genetic<Rule, Fitness>.GetBest(FnGetFitness, minGenes, optimalFitness, null, FnDisplay, FnMutate,
-                FnCreate, 500, 20, FnCrossover, 3);
+                FnCreate, 500, 20, FnCrossover);
             Assert.IsTrue(optimalFitness.CompareTo(best.Fitness) <= 0);
         }
 
@@ -396,10 +415,5 @@ namespace GeneticAlgorithms.TicTacToe
             var unused =
                 Genetic<Rule, Fitness>.Tournament(FnCreate, FnCrossover, PlayOneOnOne, FnDisplay, FnSortKey, 13);
         }
-
-        static Rule HaveThreeInRow => new RowContentFilter(ContentType.Mine, 3);
-        static Rule HaveThreeInColumn => new ColumnContentFilter(ContentType.Mine, 3);
-        static Rule HaveThreeInDiagonal => new DiagonalContentFilter(ContentType.Mine, 3);
-        static Rule OpponentHasTwoInARow => new WinFilter(ContentType.Opponent);
     }
 }

@@ -101,6 +101,19 @@ namespace GeneticAlgorithms.TicTacToe
         }
     }
 
+    public class Noop : Rule
+    {
+        public Noop()
+            : base("Noop")
+        {
+        }
+
+        public override ISet<int> GetMatches(IDictionary<int, Square> board, Square[] squares)
+        {
+            return new HashSet<int>();
+        }
+    }
+
     public class ContentFilter : Rule
     {
         public ValueFromSquareDelegate ValueFromSquare { get; }

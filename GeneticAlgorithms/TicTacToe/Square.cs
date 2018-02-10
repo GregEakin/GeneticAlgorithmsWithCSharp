@@ -25,6 +25,7 @@ namespace GeneticAlgorithms.TicTacToe
     public class Square
     {
         //# board layout is a magic square
+        //# each row, column, and diagonal sums to 15
         //#   8  3  4
         //#   1  5  9
         //#   6  7  2

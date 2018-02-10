@@ -17,6 +17,7 @@
  * permissions and limitations under the License.
  */
 
+using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -116,7 +117,7 @@ namespace GeneticAlgorithms.TicTacToe
             var empties = board.Values.Where(v => v.Content == ContentType.Empty).ToArray();
 
             var x = TicTacToeTests.GetMove(genes, board, empties);
-            CollectionAssert.AreEqual(new[] {5, 0}, x);
+            Assert.AreEqual(new Tuple<int, int>(5, 0), x);
         }
 
         [TestMethod]
@@ -135,14 +136,14 @@ namespace GeneticAlgorithms.TicTacToe
         }
 
         [TestMethod]
-        public void GetFitnessForGameTest()
+        public void GetFitnessForAllGamesTest()
         {
             var geneSet = new[]
             {
                 new RuleMetadata((expectedContent, count) => new CenterFilter()),
             };
             var genes = geneSet.SelectMany(g => g.CreateRules()).ToList();
-            var fitness = TicTacToeTests.GetFitnessForGames(genes);
+            var fitness = TicTacToeTests.GetFitnessForAllGames(genes);
             Assert.AreEqual("100.0% Losses (65), 0.0% Ties (0), 0.0% Wins (0), 1 rules", fitness.ToString());
         }
     }

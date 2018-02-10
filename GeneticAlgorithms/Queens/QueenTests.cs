@@ -163,7 +163,7 @@ namespace GeneticAlgorithms.Queens
             Test(8);
         }
 
-        private static void Test(int size = 8)
+        private static void Test(int size)
         {
             var geneSet = Enumerable.Range(0, size).ToArray();
             var watch = Stopwatch.StartNew();

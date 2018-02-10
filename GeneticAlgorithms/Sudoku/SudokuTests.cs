@@ -232,7 +232,7 @@ namespace GeneticAlgorithms.Sudoku
 
         private static int RowColumnSection(int row, int column) => (row / 3) * 3 + (column / 3);
 
-        private static int IndexSelection(int index) => RowColumnSection(IndexRow(index), IndexColumn(index));
+        // private static int IndexSelection(int index) => RowColumnSection(IndexRow(index), IndexColumn(index));
 
         private static int SectionStart(int index) => ((IndexRow(index) % 9) / 3) * 27 + (IndexColumn(index) / 3) * 3;
     }
