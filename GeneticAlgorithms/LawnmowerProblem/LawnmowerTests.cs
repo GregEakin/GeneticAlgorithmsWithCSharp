@@ -341,7 +341,7 @@ namespace GeneticAlgorithms.LawnmowerProblem
             var optimalFitness = new Fitness(width * height, expectedNumberOfInstructions, expectedNumberOfSteps);
 
             var best = Genetic<INode, Fitness>.GetBest(FnGetFitness, 0, optimalFitness, null, FnDisplay, FnMutate,
-                FnCreate, 0, 10, Crossover, 10);
+                FnCreate, null, 10, Crossover);
 
             Assert.IsTrue(optimalFitness.CompareTo(best.Fitness) <= 0);
         }
