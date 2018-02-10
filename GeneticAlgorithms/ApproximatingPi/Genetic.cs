@@ -162,7 +162,7 @@ namespace GeneticAlgorithms.ApproximatingPi
         }
 
         private static IEnumerable<Chromosome<TGene, TFitness>> GetImprovement(
-            MutateDelegate newChild, GenerateParentDelegate generateParent, int maxAge, int poolSize, int maxSeconds)
+            MutateDelegate newChild, GenerateParentDelegate generateParent, int? maxAge, int poolSize, int maxSeconds)
         {
             var watch = Stopwatch.StartNew();
             var bestParent = generateParent();
@@ -200,11 +200,11 @@ namespace GeneticAlgorithms.ApproximatingPi
                 var child = newChild(parent, pIndex, parents);
                 if (parent.Fitness.CompareTo(child.Fitness) > 0)
                 {
-                    if (maxAge <= 0)
+                    if (maxAge == null)
                         continue;
 
                     parent.Age++;
-                    if (maxAge > parent.Age)
+                    if (parent.Age < maxAge)
                         continue;
 
                     var index = historicalFitnesses.BinarySearch(child.Fitness);
@@ -223,9 +223,8 @@ namespace GeneticAlgorithms.ApproximatingPi
                     continue;
                 }
 
-                if (child.Fitness.CompareTo(parent.Fitness) <= 0)
+                if (parent.Fitness.CompareTo(child.Fitness) == 0)
                 {
-                    // same fitness
                     child.Age = parent.Age + 1;
                     parents[pIndex] = child;
                     continue;
@@ -233,12 +232,12 @@ namespace GeneticAlgorithms.ApproximatingPi
 
                 child.Age = 0;
                 parents[pIndex] = child;
-                if (child.Fitness.CompareTo(bestParent.Fitness) <= 0)
+                if (bestParent.Fitness.CompareTo(child.Fitness) > 0)
                     continue;
 
-                yield return child;
                 bestParent = child;
-                historicalFitnesses.Add(child.Fitness);
+                historicalFitnesses.Add(bestParent.Fitness);
+                yield return bestParent;
             }
 
             // ReSharper disable once IteratorNeverReturns

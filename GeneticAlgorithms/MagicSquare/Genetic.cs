@@ -98,7 +98,7 @@ namespace GeneticAlgorithms.MagicSquare
         }
 
         private static IEnumerable<Chromosome<TGene, TFitness>> GetImprovement(MutateChromosomeDelegate newChild,
-            GenerateParentDelegate generateParent, int maxAge = 0)
+            GenerateParentDelegate generateParent, int? maxAge = null)
         {
             var bestParent = generateParent();
             var parent = bestParent;
@@ -110,11 +110,11 @@ namespace GeneticAlgorithms.MagicSquare
                 var child = newChild(parent);
                 if (parent.Fitness.CompareTo(child.Fitness) > 0)
                 {
-                    if (maxAge <= 0)
+                    if (maxAge == null)
                         continue;
 
                     parent.Age++;
-                    if (maxAge > parent.Age)
+                    if (parent.Age < maxAge)
                         continue;
 
                     var index = historicalFitnesses.BinarySearch(child.Fitness);
@@ -133,7 +133,7 @@ namespace GeneticAlgorithms.MagicSquare
                     continue;
                 }
 
-                if (parent.Fitness.CompareTo(child.Fitness) >= 0)
+                if (parent.Fitness.CompareTo(child.Fitness) == 0)
                 {
                     child.Age = parent.Age + 1;
                     parent = child;
@@ -142,12 +142,12 @@ namespace GeneticAlgorithms.MagicSquare
 
                 child.Age = 0;
                 parent = child;
-                if (child.Fitness.CompareTo(bestParent.Fitness) <= 0)
+                if (bestParent.Fitness.CompareTo(child.Fitness) > 0)
                     continue;
 
                 bestParent = child;
-                historicalFitnesses.Add(child.Fitness);
-                yield return child;
+                historicalFitnesses.Add(bestParent.Fitness);
+                yield return bestParent;
             }
 
             // ReSharper disable once IteratorNeverReturns
