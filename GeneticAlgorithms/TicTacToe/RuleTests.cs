@@ -248,33 +248,5 @@ namespace GeneticAlgorithms.TicTacToe
             var matches = rule.GetMatches(_board, empties);
             CollectionAssert.AreEquivalent(new[] {2}, matches.ToArray());
         }
-
-        [TestMethod]
-        public void WinFilterTest()
-        {
-            _board[8] = new Square(_board[8].Index, ContentType.Mine);
-            _board[5] = new Square(_board[5].Index, ContentType.Mine);
-            var empties = _board.Values.Where(v => v.Content == ContentType.Empty).ToArray();
-
-            var rule = new WinFilter(ContentType.Mine);
-            Assert.AreEqual("WIN ", rule.ToString());
-
-            var matches = rule.GetMatches(_board, empties);
-            CollectionAssert.AreEquivalent(new[] {2}, matches.ToArray());
-        }
-
-        [TestMethod]
-        public void BlockFilterTest()
-        {
-            _board[8] = new Square(_board[8].Index, ContentType.Opponent);
-            _board[5] = new Square(_board[5].Index, ContentType.Opponent);
-            var empties = _board.Values.Where(v => v.Content == ContentType.Empty).ToArray();
-
-            var rule = new WinFilter(ContentType.Opponent);
-            Assert.AreEqual("block OPPONENT WIN ", rule.ToString());
-
-            var matches = rule.GetMatches(_board, empties);
-            CollectionAssert.AreEquivalent(new[] {2}, matches.ToArray());
-        }
     }
 }

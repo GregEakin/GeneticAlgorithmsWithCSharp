@@ -29,8 +29,6 @@ namespace GeneticAlgorithms.TicTacToe
     [TestClass]
     public class TicTacToeTests
     {
-        private static readonly int[] SquareIndexes = {8, 3, 4, 1, 5, 9, 6, 7, 2};
-
         public delegate bool FnMutateDelegate(List<Rule> genes);
 
         public delegate Fitness FnGetFitness(List<Rule> genes);
@@ -44,7 +42,7 @@ namespace GeneticAlgorithms.TicTacToe
 
         private static CompetitionResult PlayOneOnOne(List<Rule> xGenes, List<Rule> oGenes)
         {
-            var board = SquareIndexes.ToDictionary(i => i, i => new Square(i));
+            var board = Square.Indexes.ToDictionary(i => i, i => new Square(i));
             var empties = board.Values.Where(v => v.Content == ContentType.Empty).ToArray();
             var roundData = new[]
             {
@@ -85,7 +83,7 @@ namespace GeneticAlgorithms.TicTacToe
 
         public static Fitness GetFitnessForAllGames(List<Rule> genes)
         {
-            var board = SquareIndexes.ToDictionary(i => i, i => new Square(i));
+            var board = Square.Indexes.ToDictionary(i => i, i => new Square(i));
             var queue = new Queue<Dictionary<int, Square>>();
 
             // if we go first, we get to pick any square
@@ -127,48 +125,16 @@ namespace GeneticAlgorithms.TicTacToe
                 var index = candidateIndexAndRuleIndex.Item1;
                 board[index] = new Square(index, ContentType.Mine);
 
-                // see if we won
+                if (DidWeWin(board))
                 {
-                    var won = false;
-
-                    var mine = board.Values.Where(s => s.Content == ContentType.Mine).ToArray();
-                    for (var i = 0; i < mine.Length - 2; i++)
-                    for (var j = i + 1; j < mine.Length - 1; j++)
-                    for (var k = j + 1; k < mine.Length; k++)
-                    {
-                        var sum = 15 - mine[i].Index - mine[j].Index - mine[k].Index;
-                        if (sum != 0)
-                            continue;
-                        won = true;
-                        break;
-                    }
-
-                    if (won)
-                    {
-                        wins++;
-                        continue;
-                    }
+                    wins++;
+                    continue;
                 }
 
-                // concede if we lose in the next move
+                if (WillWeLose(board))
                 {
-                    var lost = false;
-                    var theirs = board.Values.Where(s => s.Content == ContentType.Opponent).ToArray();
-                    for (var i = 0; i < theirs.Length - 1; i++)
-                    for (var j = i + 1; j < theirs.Length; j++)
-                    {
-                        var sum = 15 - theirs[i].Index - theirs[j].Index;
-                        if (sum <= 0 || sum > 9 || board[sum].Content != ContentType.Empty)
-                            continue;
-                        lost = true;
-                        break;
-                    }
-
-                    if (lost)
-                    {
-                        losses++;
-                        continue;
-                    }
+                    losses++;
+                    continue;
                 }
 
                 // queue all remaning OPPONENT responses
@@ -186,6 +152,35 @@ namespace GeneticAlgorithms.TicTacToe
             return new Fitness(wins, ties, losses, genes.Count);
         }
 
+        private static bool DidWeWin(Dictionary<int, Square> board)
+        {
+            var mine = board.Values.Where(s => s.Content == ContentType.Mine).ToArray();
+            for (var i = 0; i < mine.Length - 2; i++)
+            for (var j = i + 1; j < mine.Length - 1; j++)
+            for (var k = j + 1; k < mine.Length; k++)
+            {
+                var sum = 15 - mine[i].Index - mine[j].Index - mine[k].Index;
+                if (sum == 0)
+                    return true;
+            }
+
+            return false;
+        }
+
+        private static bool WillWeLose(Dictionary<int, Square> board)
+        {
+            var theirs = board.Values.Where(s => s.Content == ContentType.Opponent).ToArray();
+            for (var i = 0; i < theirs.Length - 1; i++)
+            for (var j = i + 1; j < theirs.Length; j++)
+            {
+                var sum = 15 - theirs[i].Index - theirs[j].Index;
+                if (sum > 0 && sum <= 9 && board[sum].Content == ContentType.Empty)
+                    return true;
+            }
+
+            return false;
+        }
+
         public static Tuple<int, int> GetMove(List<Rule> ruleSet, Dictionary<int, Square> board, Square[] empties,
             int startingRuleIndex = 0)
         {
@@ -197,7 +192,7 @@ namespace GeneticAlgorithms.TicTacToe
                 if (matches.Count == 0)
                     continue;
                 if (matches.Count == 1)
-                    return new Tuple<int, int>(matches.First(), ruleIndex);
+                    return new Tuple<int, int>(matches.Single(), ruleIndex);
                 if (empties.Length > matches.Count)
                     empties = empties.Where(e => matches.Contains(e.Index)).ToArray();
             }
@@ -286,6 +281,7 @@ namespace GeneticAlgorithms.TicTacToe
                 break;
             }
 
+            // Is it worth it to remove duplicate genes?
             //var seen = new HashSet<string>();
             //genes.RemoveAll(x => !seen.Add(x.ToString()));
         }
@@ -366,7 +362,7 @@ namespace GeneticAlgorithms.TicTacToe
             var optimalFitness = new Fitness(620, 120, 0, 11);
 
             var best = Genetic<Rule, Fitness>.GetBest(FnGetFitness, minGenes, optimalFitness, null, FnDisplay, FnMutate,
-                FnCreate, 500, 20, FnCrossover);
+                FnCreate, 500, 20, FnCrossover, 30);
             Assert.IsTrue(optimalFitness.CompareTo(best.Fitness) <= 0);
         }
 

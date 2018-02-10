@@ -30,6 +30,8 @@ namespace GeneticAlgorithms.TicTacToe
         //#   1  5  9
         //#   6  7  2
 
+        public static readonly int[] Indexes = { 8, 3, 4, 1, 5, 9, 6, 7, 2 };
+
         public ContentType Content { get; }
         public int Index { get; }
         public List<int[]> Diagonals { get; } = new List<int[]>();
