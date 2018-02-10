@@ -29,6 +29,10 @@ namespace GeneticAlgorithms.LogicCircuits
     [TestClass]
     public class CircuitTests
     {
+        private static Dictionary<char, bool?> _inputs;
+        private static List<Tuple<Node.CrateGeneDelegate, ICircuit>> _gates;
+        private static List<Tuple<Node.CrateGeneDelegate, ICircuit>> _sources;
+
         public delegate int FnGetFitnessDelegate(List<Node> genes);
 
         public delegate Node FnCreateGene(int index);
@@ -41,7 +45,7 @@ namespace GeneticAlgorithms.LogicCircuits
             foreach (var rule in rules)
             {
                 inputs.Clear();
-                for (var i = 0; i < rule.Item1.Length; i++)
+                for (var i = 0; i < sourceLabels.Length && i < rule.Item1.Length; i++)
                     inputs.Add(sourceLabels[i], rule.Item1[i]);
                 if (circuit.Output == rule.Item2)
                     rulesPassed++;
@@ -150,10 +154,6 @@ namespace GeneticAlgorithms.LogicCircuits
             Console.Write("{0} = {1}", circuit, circuit.Output);
         }
 
-        private static Dictionary<char, bool?> _inputs;
-        private static List<Tuple<Node.CrateGeneDelegate, ICircuit>> _gates;
-        private static List<Tuple<Node.CrateGeneDelegate, ICircuit>> _sources;
-
         [TestInitialize]
         public void SetupTest()
         {
@@ -181,8 +181,7 @@ namespace GeneticAlgorithms.LogicCircuits
                 new Tuple<bool[], bool>(new[] {true, true}, true)
             };
 
-            var optimalLength = 6;
-            FindCircuit(rules, optimalLength);
+            FindCircuit(rules, 6);
         }
 
         [TestMethod]
@@ -287,41 +286,44 @@ namespace GeneticAlgorithms.LogicCircuits
                     Display(candidate, watch);
             }
 
-            int FnGetFitness(List<Node> genes) => Fitness(genes, rules, _inputs);
+            int FnGetFitness(List<Node> genes) =>
+                Fitness(genes, rules, _inputs);
 
-            Node FnCreateGene(int index) => CreateGene(index, _gates.ToArray(), _sources.ToArray());
+            Node FnCreateGene(int index) =>
+                CreateGene(index, _gates.ToArray(), _sources.ToArray());
 
-            void FnMutate(List<Node> genes) => Mutate(genes, FnCreateGene, FnGetFitness, _sources.Count);
+            void FnMutate(List<Node> genes) =>
+                Mutate(genes, FnCreateGene, FnGetFitness, _sources.Count);
 
             var maxLength = 50;
 
-            List<Node> FnCreate() => Enumerable.Range(0, maxLength).Select(FnCreateGene).ToList();
+            List<Node> FnCreate() =>
+                Enumerable.Range(0, maxLength).Select(FnCreateGene).ToList();
 
             Chromosome<Node, int> FnOptimizationFunction(int variableLength)
             {
                 maxLength = variableLength;
-                return Genetic<Node, int>.GetBest(FnGetFitness, 0, rules.Length, null, FnDisplay, FnMutate, FnCreate, 0,
-                    3,
-                    null, 30);
+                var chromosome = Genetic<Node, int>.GetBest(FnGetFitness, 0, rules.Length, null, FnDisplay, FnMutate,
+                    FnCreate, 0, 3, null, 30);
+                return chromosome;
             }
 
             bool FnIsImprovement(Chromosome<Node, int> currentBest, Chromosome<Node, int> child) =>
-                child.Fitness == rules.Length &&
+                child.Fitness.CompareTo(rules.Length) == 0 &&
                 NodesToCircuit(child.Genes).Item2.Count < NodesToCircuit(currentBest.Genes).Item2.Count;
 
             bool FnIsOptimal(Chromosome<Node, int> child) =>
-                child.Fitness == rules.Length &&
+                child.Fitness.CompareTo(rules.Length) == 0 &&
                 NodesToCircuit(child.Genes).Item2.Count <= expectedLength;
 
             int FnGetNextFeatureValue(Chromosome<Node, int> currentBest) =>
                 NodesToCircuit(currentBest.Genes).Item2.Count;
 
             var best = Genetic<Node, int>.HillClimbing(FnOptimizationFunction, FnIsImprovement, FnIsOptimal,
-                FnGetNextFeatureValue,
-                FnDisplay, maxLength);
+                FnGetNextFeatureValue, FnDisplay, maxLength);
             Assert.AreEqual(rules.Length, best.Fitness);
             var circuit = NodesToCircuit(best.Genes).Item2;
-            Assert.IsFalse(circuit.Count > expectedLength);
+            Assert.IsTrue(circuit.Count <= expectedLength);
         }
 
         private static Tuple<ICircuit, ISet<int>> NodesToCircuit(List<Node> genes)

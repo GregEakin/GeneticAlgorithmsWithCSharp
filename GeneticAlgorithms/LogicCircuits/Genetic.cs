@@ -33,17 +33,17 @@ namespace GeneticAlgorithms.LogicCircuits
 
         public delegate void DisplayDelegate(Chromosome<TGene, TFitness> child, int? length = null);
 
-        public delegate bool ImprovementDelegate(Chromosome<TGene, TFitness> c, Chromosome<TGene, TFitness> d);
-
         public delegate bool OptimalDelegate(Chromosome<TGene, TFitness> b);
 
+        public delegate bool ImprovementDelegate(Chromosome<TGene, TFitness> c, Chromosome<TGene, TFitness> d);
+
         public delegate int NextFeatureValueDelegate(Chromosome<TGene, TFitness> i);
+
+        public delegate TFitness GetFitnessDelegate(List<TGene> gene);
 
         public delegate List<TGene> CreateDelegate();
 
         public delegate List<TGene> CrossoverDelegate(List<TGene> genes1, List<TGene> genes2);
-
-        public delegate TFitness GetFitnessDelegate(List<TGene> gene);
 
         public delegate Chromosome<TGene, TFitness> GenerateParentDelegate();
 
@@ -54,13 +54,11 @@ namespace GeneticAlgorithms.LogicCircuits
         public delegate Chromosome<TGene, TFitness> StrategyDelegate(Chromosome<TGene, TFitness> p, int i,
             List<Chromosome<TGene, TFitness>> o);
 
-        private static Chromosome<TGene, TFitness> GenerateParent(int length, TGene[] geneSet,
-            GetFitnessDelegate getGetFitness)
+        private static Chromosome<TGene, TFitness> GenerateParent(int length, TGene[] geneSet, GetFitnessDelegate getFitness)
         {
             var genes = Rand.RandomSampleList(geneSet, length);
-            var fitness = getGetFitness(genes);
-            var chromosome =
-                new Chromosome<TGene, TFitness>(genes, fitness, Strategies.Create);
+            var fitness = getFitness(genes);
+            var chromosome = new Chromosome<TGene, TFitness>(genes, fitness, Strategies.Create);
             return chromosome;
         }
 
@@ -123,8 +121,7 @@ namespace GeneticAlgorithms.LogicCircuits
                     return GenerateParent(targetLen, geneSet, getFitness);
 
                 var genes = customCreate();
-                return new Chromosome<TGene, TFitness>(genes, getFitness(genes),
-                    Strategies.Create);
+                return new Chromosome<TGene, TFitness>(genes, getFitness(genes), Strategies.Create);
             }
 
             var strategyLookup =
@@ -226,8 +223,8 @@ namespace GeneticAlgorithms.LogicCircuits
                         continue;
                     }
 
+                    bestParent.Age = 0;
                     parents[pIndex] = bestParent;
-                    parent.Age = 0;
                     continue;
                 }
 
@@ -239,8 +236,8 @@ namespace GeneticAlgorithms.LogicCircuits
                     continue;
                 }
 
+                child.Age = 0;
                 parents[pIndex] = child;
-                parent.Age = 0;
                 if (child.Fitness.CompareTo(bestParent.Fitness) <= 0)
                     continue;
 

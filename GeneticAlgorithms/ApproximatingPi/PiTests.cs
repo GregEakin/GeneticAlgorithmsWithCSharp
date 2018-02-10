@@ -250,7 +250,7 @@ namespace GeneticAlgorithms.ApproximatingPi
         [TestMethod]
         public void ApproximatePiTest()
         {
-            var found = ApproximatePi(new List<int> {512, 256, 128, 64, 32, 16, 8, 4, 2, 1}, 5);
+            var found = ApproximatePi(new List<int> {512, 256, 128, 64, 32, 16, 8, 4, 2, 1}, 10);
             Assert.IsTrue(found);
         }
 

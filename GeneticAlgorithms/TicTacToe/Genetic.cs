@@ -55,6 +55,9 @@ namespace GeneticAlgorithms.TicTacToe
 
         public delegate Chromosome<TGene, TFitness> MutateChromosomeDelegate(Chromosome<TGene, TFitness> parent);
 
+        public delegate Chromosome<TGene, TFitness> StrategyDelegate(Chromosome<TGene, TFitness> p, int i,
+            List<Chromosome<TGene, TFitness>> o);
+
         public delegate CompetitionResult CompeteDelegate(List<TGene> a, List<TGene> b);
 
         private static Chromosome<TGene, TFitness> GenerateParent(int length, TGene[] geneSet, GetFitnessDelegate getFitness)
@@ -108,9 +111,6 @@ namespace GeneticAlgorithms.TicTacToe
                 Strategies.Crossover);
         }
 
-        public delegate Chromosome<TGene, TFitness> StrategyDelegate(Chromosome<TGene, TFitness> p, int i,
-            List<Chromosome<TGene, TFitness>> o);
-
         public static Chromosome<TGene, TFitness> GetBest(GetFitnessDelegate getFitness, int targetLen,
             TFitness optimalFitness, TGene[] geneSet, DisplayDelegate display, MutateGeneDelegate customMutate = null,
             CreateDelegate customCreate = null, int maxAge = 0, int poolSize = 1, CrossoverDelegate crossover = null,
@@ -141,8 +141,7 @@ namespace GeneticAlgorithms.TicTacToe
                     }
                 };
 
-            var usedStrategies =
-                new List<StrategyDelegate> {strategyLookup[Strategies.Mutate]};
+            var usedStrategies = new List<StrategyDelegate> {strategyLookup[Strategies.Mutate]};
 
             if (crossover != null)
                 usedStrategies.Add(strategyLookup[Strategies.Crossover]);
@@ -230,8 +229,8 @@ namespace GeneticAlgorithms.TicTacToe
                         continue;
                     }
 
+                    bestParent.Age = 0;
                     parents[pIndex] = bestParent;
-                    parent.Age = 0;
                     continue;
                 }
 
@@ -243,8 +242,8 @@ namespace GeneticAlgorithms.TicTacToe
                     continue;
                 }
 
+                child.Age = 0;
                 parents[pIndex] = child;
-                parent.Age = 0;
                 if (child.Fitness.CompareTo(bestParent.Fitness) <= 0)
                     continue;
 

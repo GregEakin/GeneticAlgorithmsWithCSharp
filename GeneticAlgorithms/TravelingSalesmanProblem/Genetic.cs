@@ -198,8 +198,8 @@ namespace GeneticAlgorithms.TravelingSalesmanProblem
                         continue;
                     }
 
+                    bestParent.Age = 0;
                     parents[pIndex] = bestParent;
-                    parent.Age = 0;
                     continue;
                 }
 
@@ -211,8 +211,8 @@ namespace GeneticAlgorithms.TravelingSalesmanProblem
                     continue;
                 }
 
+                child.Age = 0;
                 parents[pIndex] = child;
-                parent.Age = 0;
                 if (child.Fitness.CompareTo(bestParent.Fitness) <= 0)
                     continue;
 

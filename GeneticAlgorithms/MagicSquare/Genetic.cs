@@ -128,8 +128,8 @@ namespace GeneticAlgorithms.MagicSquare
                         continue;
                     }
 
+                    bestParent.Age = 0;
                     parent = bestParent;
-                    parent.Age = 0;
                     continue;
                 }
 
@@ -140,8 +140,8 @@ namespace GeneticAlgorithms.MagicSquare
                     continue;
                 }
 
+                child.Age = 0;
                 parent = child;
-                parent.Age = 0;
                 if (child.Fitness.CompareTo(bestParent.Fitness) <= 0)
                     continue;
 
