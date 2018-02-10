@@ -62,11 +62,11 @@ namespace GeneticAlgorithms.TicTacToe
                 var lossResult = playerData.Item3;
                 var winResult = playerData.Item4;
 
-                var moveAndRuleIndex = GetMove(genes, board, empties);
-                if (moveAndRuleIndex == null) // could not find a move
+                var move = GetMove(genes, board, empties);
+                if (move == null) // could not find a move
                     return lossResult;
 
-                var index = moveAndRuleIndex.Item1;
+                var index = (int)move;
                 board[index] = new Square(index, piece);
 
                 var mostRecentMoveOnly = new[] {board[index]};
@@ -114,15 +114,15 @@ namespace GeneticAlgorithms.TicTacToe
                 }
 
                 // It's our turn
-                var candidateIndexAndRuleIndex = GetMove(genes, board, empties);
-                if (candidateIndexAndRuleIndex == null) // could not find a move
+                var move = GetMove(genes, board, empties);
+                if (move == null) // could not find a move
                 {
                     // There are empties, but didn't find a move
                     losses++;
                     continue;
                 }
 
-                var index = candidateIndexAndRuleIndex.Item1;
+                var index = (int)move;
                 board[index] = new Square(index, ContentType.Mine);
 
                 if (DidWeWin(board))
@@ -181,18 +181,16 @@ namespace GeneticAlgorithms.TicTacToe
             return false;
         }
 
-        public static Tuple<int, int> GetMove(List<Rule> ruleSet, Dictionary<int, Square> board, Square[] empties,
-            int startingRuleIndex = 0)
+        public static int? GetMove(List<Rule> ruleSet, Dictionary<int, Square> board, Square[] empties, int startingRuleIndex = 0)
         {
             var ruleSetCopy = ruleSet.ToArray();
-            for (var ruleIndex = startingRuleIndex; ruleIndex < ruleSetCopy.Length; ruleIndex++)
+            foreach (var gene in ruleSetCopy)
             {
-                var gene = ruleSetCopy[ruleIndex];
                 var matches = gene.GetMatches(board, empties);
                 if (matches.Count == 0)
                     continue;
                 if (matches.Count == 1)
-                    return new Tuple<int, int>(matches.Single(), ruleIndex);
+                    return matches.Single();
                 if (empties.Length > matches.Count)
                     empties = empties.Where(e => matches.Contains(e.Index)).ToArray();
             }

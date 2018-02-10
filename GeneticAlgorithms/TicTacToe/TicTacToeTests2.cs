@@ -116,8 +116,9 @@ namespace GeneticAlgorithms.TicTacToe
             var board = Enumerable.Range(1, 9).ToDictionary(i => i, i => new Square(i));
             var empties = board.Values.Where(v => v.Content == ContentType.Empty).ToArray();
 
-            var x = TicTacToeTests.GetMove(genes, board, empties);
-            Assert.AreEqual(new Tuple<int, int>(5, 0), x);
+            var move = TicTacToeTests.GetMove(genes, board, empties);
+            Assert.IsNotNull(move);
+            Assert.AreEqual(5, (int)move);
         }
 
         [TestMethod]
