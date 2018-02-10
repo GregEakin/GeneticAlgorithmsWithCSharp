@@ -135,8 +135,8 @@ namespace GeneticAlgorithms.MagicSquare
         [TestMethod]
         public void SimulatedAnnealingSearchTestOdd()
         {
-            var historicalFitnesses = Enumerable.Range(0, 26).Select(n => 50 - 2 * n).ToArray();
-            var index = Array.BinarySearch(historicalFitnesses, 13, new Genetic<int, int>.ReverseComparer<int>());
+            var historicalFitnesses = Enumerable.Range(0, 26).Select(n => new Fitness(50 - 2 * n)).ToArray();
+            var index = Array.BinarySearch(historicalFitnesses, new Fitness(13));
             if (index < 0) index = ~index;
             Assert.AreEqual(19, index);
         }
@@ -144,16 +144,16 @@ namespace GeneticAlgorithms.MagicSquare
         [TestMethod]
         public void SimulatedAnnealingSearchTestEven()
         {
-            var historicalFitnesses = Enumerable.Range(0, 26).Select(n => 50 - 2 * n).ToArray();
-            var index = Array.BinarySearch(historicalFitnesses, 12, new Genetic<int, int>.ReverseComparer<int>());
+            var historicalFitnesses = Enumerable.Range(0, 26).Select(n => new Fitness(50 - 2 * n)).ToArray();
+            var index = Array.BinarySearch(historicalFitnesses, new Fitness(12));
             if (index < 0) index = ~index;
             Assert.AreEqual(19, index);
         }
 
-        private static Tuple<int, double, double> SimulatedAnnealingExp(int value, int count)
+        private static Tuple<int, double, double> SimulatedAnnealingExp(Fitness value, int count)
         {
-            var historicalFitnesses = Enumerable.Range(1, count).Reverse().ToList();
-            var index = historicalFitnesses.BinarySearch(value, new Genetic<int, int>.ReverseComparer<int>());
+            var historicalFitnesses = Enumerable.Range(1, count).Select(f => new Fitness(f)).Reverse().ToList();
+            var index = historicalFitnesses.BinarySearch(value);
             if (index < 0) index = ~index;
             var difference = historicalFitnesses.Count - index;
             var proportionSimilar = (double) difference / historicalFitnesses.Count;
@@ -167,12 +167,12 @@ namespace GeneticAlgorithms.MagicSquare
             var samples = new[]
             {
                 // index, difference, proportion simular, exp(-proportion)
-                new Tuple<int, int, double, double>(0, 50, 0.00, 1.00),
-                new Tuple<int, int, double, double>(5, 45, 0.10, 0.90),
-                new Tuple<int, int, double, double>(10, 40, 0.20, 0.82),
-                new Tuple<int, int, double, double>(40, 10, 0.80, 0.45),
-                new Tuple<int, int, double, double>(45, 5, 0.90, 0.41),
-                new Tuple<int, int, double, double>(50, 0, 1.00, 0.37),
+                new Tuple<Fitness, int, double, double>(new Fitness(0), 50, 0.00, 1.00),
+                new Tuple<Fitness, int, double, double>(new Fitness(5), 45, 0.10, 0.90),
+                new Tuple<Fitness, int, double, double>(new Fitness(10), 40, 0.20, 0.82),
+                new Tuple<Fitness, int, double, double>(new Fitness(40), 10, 0.80, 0.45),
+                new Tuple<Fitness, int, double, double>(new Fitness(45), 5, 0.90, 0.41),
+                new Tuple<Fitness, int, double, double>(new Fitness(50), 0, 1.00, 0.37),
             };
 
             foreach (var sample in samples)
@@ -182,6 +182,42 @@ namespace GeneticAlgorithms.MagicSquare
                 Assert.AreEqual(sample.Item2, result.Item1);
                 Assert.AreEqual(sample.Item3, result.Item2, 0.01);
                 Assert.AreEqual(sample.Item4, result.Item3, 0.01);
+            }
+        }
+
+        private static int FindIt<TFitness>(List<TFitness> history, TFitness fitness)
+            where TFitness : IComparable<TFitness>
+        {
+            var index = history.BinarySearch(fitness);
+            if (index < 0) index = ~index;
+            return index;
+        }
+
+        [TestMethod]
+        public void SearchIntTest()
+        {
+            // ints are increasung
+            Assert.IsTrue(6.CompareTo(2) > 0);
+
+            var history = new List<int> {2, 4, 6};
+            for (var fitness = 0; fitness < 8; fitness++)
+            {
+                var index = FindIt(history, fitness);
+                Console.WriteLine("{0}: {1}", fitness, index);
+            }
+        }
+
+        [TestMethod]
+        public void SearchFitnessTest()
+        {
+            // Fitness are decreasing
+            Assert.IsTrue(new Fitness(6).CompareTo(new Fitness(2)) < 0);
+
+            var history = new List<Fitness> {new Fitness(6), new Fitness(4), new Fitness(2)};
+            for (var fitness = 0; fitness < 8; fitness++)
+            {
+                var index = FindIt(history, new Fitness(fitness));
+                Console.WriteLine("{0}: {1}", fitness, index);
             }
         }
     }

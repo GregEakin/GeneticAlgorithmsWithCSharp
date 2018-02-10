@@ -27,14 +27,6 @@ namespace GeneticAlgorithms.MagicSquare
     public static class Genetic<TGene, TFitness>
         where TFitness : IComparable<TFitness>
     {
-        public class ReverseComparer<T> : IComparer<T>
-        {
-            public int Compare(T x, T y)
-            {
-                return Comparer<T>.Default.Compare(y, x);
-            }
-        }
-
         public delegate void MutateGeneDelegate(List<TGene> genes);
 
         public delegate void DisplayDelegate(Chromosome<TGene, TFitness> child);
@@ -125,7 +117,7 @@ namespace GeneticAlgorithms.MagicSquare
                     if (maxAge > parent.Age)
                         continue;
 
-                    var index = historicalFitnesses.BinarySearch(child.Fitness, new ReverseComparer<TFitness>());
+                    var index = historicalFitnesses.BinarySearch(child.Fitness);
                     if (index < 0) index = ~index;
                     var difference = historicalFitnesses.Count - index;
                     var proportionSimilar = (double)difference / historicalFitnesses.Count;
