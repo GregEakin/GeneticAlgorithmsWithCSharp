@@ -362,7 +362,7 @@ namespace GeneticAlgorithms.TicTacToe
             var optimalFitness = new Fitness(620, 120, 0, 11);
 
             var best = Genetic<Rule, Fitness>.GetBest(FnGetFitness, minGenes, optimalFitness, null, FnDisplay, FnMutate,
-                FnCreate, 500, 20, FnCrossover, 30);
+                FnCreate, 500, 20, FnCrossover);
             Assert.IsTrue(optimalFitness.CompareTo(best.Fitness) <= 0);
         }
 
