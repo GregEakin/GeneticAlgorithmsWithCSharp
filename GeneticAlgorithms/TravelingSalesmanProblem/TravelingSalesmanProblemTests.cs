@@ -291,8 +291,7 @@ namespace GeneticAlgorithms.TravelingSalesmanProblem
 
             var optimalFitness = FnGetFitness(optimalSequence);
             var best = Genetic<int, Fitness>.GetBest(FnGetFitness, 0, optimalFitness, null, FnDisplay, FnMutate,
-                FnCreate, 50, 25,
-                FnCrossover);
+                FnCreate, 50, 25, FnCrossover);
             Assert.IsTrue(optimalFitness.CompareTo(best.Fitness) <= 0);
         }
 

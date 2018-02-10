@@ -553,8 +553,7 @@ namespace GeneticAlgorithms.RegularExpressions
             var optimalFitness = new Fitness(wanted.Length, wanted.Length, 0, expectedLength);
 
             var best = Genetic<string, Fitness>.GetBest(FnGetFitness, textGenes.Max(i => i.Length), optimalFitness,
-                fullGeneSet,
-                FnDisplay, FnMutate, null, 0, 10);
+                fullGeneSet, FnDisplay, FnMutate, null, null, 10);
 
             Assert.IsTrue(optimalFitness.CompareTo(best.Fitness) <= 0);
 

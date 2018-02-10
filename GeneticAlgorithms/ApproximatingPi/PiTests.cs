@@ -147,7 +147,7 @@ namespace GeneticAlgorithms.ApproximatingPi
             CollectionAssert.AreNotEqual(save, bits);
         }
 
-        private static bool ApproximatePi(List<int> bitValues = null, int maxSeconds = 0)
+        private static bool ApproximatePi(List<int> bitValues = null, int? maxSeconds = null)
         {
             if (bitValues == null)
                 bitValues = new List<int> {512, 256, 128, 64, 32, 16, 8, 4, 2, 1};
@@ -168,8 +168,7 @@ namespace GeneticAlgorithms.ApproximatingPi
 
             var length = 2 * bitValues.Count;
             var best = Genetic<bool, double>.GetBest(FnGetFitness, length, optimalFitness, geneSet, FnDispaly, FnMutate,
-                null, 250,
-                1, null, maxSeconds);
+                null, 250, 1, null, maxSeconds);
 
             return optimalFitness <= best.Fitness;
         }
@@ -208,8 +207,7 @@ namespace GeneticAlgorithms.ApproximatingPi
 
             var optimalFitness = 10 * maxSeconds;
             var unused = Genetic<int, double>.GetBest(FnGetFitness, length, optimalFitness, geneSet, FnDisplay, null,
-                null, 0, 1,
-                null, 600);
+                null, null, 1, null, 600);
         }
 
         [TestMethod]

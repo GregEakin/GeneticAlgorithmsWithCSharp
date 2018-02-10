@@ -71,7 +71,7 @@ namespace GeneticAlgorithms.MagicSquare
 
         public static Chromosome<TGene, TFitness> GetBest(GetFitnessDelegate getFitness, int targetLen, TFitness optimalFitness,
             TGene[] geneSet, DisplayDelegate display, MutateGeneDelegate customMutate = null, CreateDelegate customCreate = null,
-            int maxAge = 0)
+            int? maxAge = null)
         {
             Chromosome<TGene, TFitness> FnMutate(Chromosome<TGene, TFitness> parent) => 
                 customMutate == null

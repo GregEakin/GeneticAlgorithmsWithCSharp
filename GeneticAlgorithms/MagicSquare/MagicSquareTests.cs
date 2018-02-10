@@ -112,7 +112,7 @@ namespace GeneticAlgorithms.MagicSquare
             Benchmark.Run(Size4Test);
         }
 
-        private static void Generate(int diagonalSize, int maxAge)
+        private static void Generate(int diagonalSize, int? maxAge)
         {
             var watch = Stopwatch.StartNew();
 

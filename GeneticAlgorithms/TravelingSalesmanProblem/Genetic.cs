@@ -99,8 +99,7 @@ namespace GeneticAlgorithms.TravelingSalesmanProblem
 
         public static Chromosome<TGene, TFitness> GetBest(GetFitnessDelegate getFitness, int targetLen,
             TFitness optimalFitness, TGene[] geneSet, DisplayDelegate display, MutateGeneDelegate customMutate = null,
-            CreateDelegate customCreate = null,
-            int maxAge = 0, int poolSize = 1, CrossoverFun crossover = null)
+            CreateDelegate customCreate = null, int? maxAge = null, int poolSize = 1, CrossoverFun crossover = null)
         {
             Chromosome<TGene, TFitness> FnMutate(Chromosome<TGene, TFitness> parent) =>
                 customMutate == null

@@ -304,7 +304,7 @@ namespace GeneticAlgorithms.LogicCircuits
             {
                 maxLength = variableLength;
                 var chromosome = Genetic<Node, int>.GetBest(FnGetFitness, 0, rules.Length, null, FnDisplay, FnMutate,
-                    FnCreate, 0, 3, null, 30);
+                    FnCreate, null, 3, null, 30);
                 return chromosome;
             }
 

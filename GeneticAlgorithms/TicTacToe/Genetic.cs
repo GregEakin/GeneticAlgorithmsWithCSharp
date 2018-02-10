@@ -113,8 +113,8 @@ namespace GeneticAlgorithms.TicTacToe
 
         public static Chromosome<TGene, TFitness> GetBest(GetFitnessDelegate getFitness, int targetLen,
             TFitness optimalFitness, TGene[] geneSet, DisplayDelegate display, MutateGeneDelegate customMutate = null,
-            CreateDelegate customCreate = null, int maxAge = 0, int poolSize = 1, CrossoverDelegate crossover = null,
-            int maxSeconds = 0)
+            CreateDelegate customCreate = null, int? maxAge = null, int poolSize = 1, CrossoverDelegate crossover = null,
+            int? maxSeconds = null)
         {
             Chromosome<TGene, TFitness> FnMutate(Chromosome<TGene, TFitness> parent) =>
                 customMutate == null
@@ -173,11 +173,11 @@ namespace GeneticAlgorithms.TicTacToe
         }
 
         private static IEnumerable<Chromosome<TGene, TFitness>> GetImprovement(StrategyDelegate newChild,
-            GenerateParentDelegate generateParent, int? maxAge, int poolSize, int maxSeconds)
+            GenerateParentDelegate generateParent, int? maxAge, int poolSize, int? maxSeconds)
         {
             var watch = Stopwatch.StartNew();
             var bestParent = generateParent();
-            if (maxSeconds > 0 && watch.ElapsedMilliseconds > maxSeconds * 1000)
+            if (maxSeconds != null && watch.ElapsedMilliseconds > maxSeconds * 1000)
                 throw new SearchTimeoutException(bestParent);
 
             yield return bestParent;
@@ -186,7 +186,7 @@ namespace GeneticAlgorithms.TicTacToe
             while (parents.Count < poolSize)
             {
                 var parent = generateParent();
-                if (maxSeconds > 0 && watch.ElapsedMilliseconds > maxSeconds * 1000)
+                if (maxSeconds != null && watch.ElapsedMilliseconds > maxSeconds * 1000)
                     throw new SearchTimeoutException(parent);
 
                 if (parent.Fitness.CompareTo(bestParent.Fitness) > 0)
@@ -203,7 +203,7 @@ namespace GeneticAlgorithms.TicTacToe
             var pIndex = 1;
             while (true)
             {
-                if (maxSeconds > 0 && watch.ElapsedMilliseconds > maxSeconds * 1000)
+                if (maxSeconds != null && watch.ElapsedMilliseconds > maxSeconds * 1000)
                     throw new SearchTimeoutException(bestParent);
 
                 pIndex = pIndex > 0 ? pIndex - 1 : lastParentIndex;
