@@ -31,18 +31,15 @@ namespace GeneticAlgorithms.MagicSquare
     {
         private static Fitness GetFitness(List<int> genes, int diagonalSize, int expectedSum)
         {
-            var sums = Sums(genes, diagonalSize);
-            var a1 = sums.Item1.Where(r => r != expectedSum).Select(s => Math.Abs(s - expectedSum)).Sum();
-            var a2 = sums.Item2.Where(c => c != expectedSum).Select(s => Math.Abs(s - expectedSum)).Sum();
-            var a3 = (sums.Item3 != expectedSum) ? Math.Abs(sums.Item3 - expectedSum) : 0;
-            var a4 = (sums.Item4 != expectedSum) ? Math.Abs(sums.Item4 - expectedSum) : 0;
-            var sumOfDifferences = a1 + a2 + a3 + a4;
+            var sums = GetSums(genes, diagonalSize);
+            var sumOfDifferences = sums.Item1.Concat(sums.Item2).Concat(new[] {sums.Item3, sums.Item4})
+                .Where(s => s != expectedSum).Select(s => Math.Abs(s - expectedSum)).Sum();
             return new Fitness(sumOfDifferences);
         }
 
         private static void Display(Chromosome<int, Fitness> candidate, Stopwatch watch, int diagonalSize)
         {
-            var sums = Sums(candidate.Genes, diagonalSize);
+            var sums = GetSums(candidate.Genes, diagonalSize);
             for (var rowNumber = 0; rowNumber < diagonalSize; rowNumber++)
             {
                 var row = candidate.Genes.Skip(rowNumber * diagonalSize).Take(diagonalSize);
@@ -53,7 +50,7 @@ namespace GeneticAlgorithms.MagicSquare
             Console.WriteLine(" - - - - - - - - - - - {0}, {1} ms", candidate.Fitness, watch.ElapsedMilliseconds);
         }
 
-        private static Tuple<int[], int[], int, int> Sums(List<int> genes, int diagonalSize)
+        private static Tuple<int[], int[], int, int> GetSums(List<int> genes, int diagonalSize)
         {
             var rows = new int[diagonalSize];
             var columns = new int[diagonalSize];
@@ -68,16 +65,16 @@ namespace GeneticAlgorithms.MagicSquare
                     columns[column] += value;
                 }
 
-                northeastDiagonalSum += genes[row * diagonalSize + (diagonalSize - 1 - row)];
                 southeastDiagonalSum += genes[row * diagonalSize + row];
+                northeastDiagonalSum += genes[row * diagonalSize + (diagonalSize - 1 - row)];
             }
 
             return new Tuple<int[], int[], int, int>(rows, columns, northeastDiagonalSum, southeastDiagonalSum);
         }
 
-        private static void Mutate(List<int> genes, int[] allPositions)
+        private static void Mutate(List<int> genes, int[] indexes)
         {
-            var randomSample = Rand.RandomSampleArray(allPositions, 2);
+            var randomSample = Rand.RandomSampleArray(indexes, 2);
             var indexA = randomSample[0];
             var indexB = randomSample[1];
             var temp = genes[indexA];
