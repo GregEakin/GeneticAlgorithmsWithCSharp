@@ -68,7 +68,8 @@ namespace GeneticAlgorithms.LawnmowerProblem
                 if (adding)
                 {
                     var gene1 = geneSet[Rand.Random.Next(geneSet.Length)]();
-                    genes.Add(gene1);
+                    var index1 = Rand.Random.Next(genes.Count + 1);
+                    genes.Insert(index1, gene1);
                     continue;
                 }
 
@@ -80,8 +81,9 @@ namespace GeneticAlgorithms.LawnmowerProblem
                     continue;
                 }
 
-                var index = Rand.Random.Next(genes.Count);
+                // Replace gene
                 var gene = geneSet[Rand.Random.Next(geneSet.Length)]();
+                var index = Rand.Random.Next(genes.Count);
                 genes[index] = gene;
             }
         }

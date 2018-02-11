@@ -245,9 +245,9 @@ namespace GeneticAlgorithms.TicTacToe
         public static bool MutateMove(List<Rule> genes)
         {
             if (genes.Count < 3)
-                return false;
-            var skip = Rand.Random.Next(genes.Count - 1);
+                return MutateSwapAdjacent(genes);
             var length = Rand.Random.Next(1, 3);
+            var skip = Rand.Random.Next(genes.Count - length + 1);
             var toMove = genes.Skip(skip).Take(length).ToArray();
             genes.RemoveRange(skip, length);
             var index = Rand.Random.Next(genes.Count);

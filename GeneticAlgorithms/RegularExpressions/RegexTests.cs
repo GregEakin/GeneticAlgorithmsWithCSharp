@@ -290,7 +290,7 @@ namespace GeneticAlgorithms.RegularExpressions
         private static bool MutateMove(List<string> genes)
         {
             if (genes.Count < 3)
-                return false;
+                return MutateSwap(genes);
             var length = Rand.Random.Next(1, 3);
             var skip = Rand.Random.Next(genes.Count - length + 1);
             var toMove = genes.Skip(skip).Take(length).ToArray();
