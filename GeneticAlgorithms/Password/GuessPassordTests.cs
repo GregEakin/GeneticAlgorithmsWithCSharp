@@ -72,7 +72,7 @@ namespace GeneticAlgorithms.Password
         {
             const int length = 150;
             var target = string.Join("",
-                Enumerable.Range(0, length).Select(x => GeneSet[Rand.Random.Next(GeneSet.Length)]));
+                Enumerable.Range(0, length).Select(x => Rand.Select(GeneSet)));
             GuessPassword(target);
         }
 

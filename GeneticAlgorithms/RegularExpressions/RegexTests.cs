@@ -213,7 +213,7 @@ namespace GeneticAlgorithms.RegularExpressions
         private static bool MutateAdd(List<string> genes, string[] geneSet)
         {
             var index = Rand.Random.Next(genes.Count + 1);
-            genes.Insert(index, geneSet[Rand.Random.Next(geneSet.Length)]);
+            genes.Insert(index, Rand.Select(geneSet));
             return true;
         }
 
@@ -251,7 +251,7 @@ namespace GeneticAlgorithms.RegularExpressions
             if (genes.Count < 1)
                 return false;
             var index = Rand.Random.Next(genes.Count);
-            genes[index] = geneSet[Rand.Random.Next(geneSet.Length)];
+            genes[index] = Rand.Select(geneSet);
             return true;
         }
 
@@ -331,7 +331,7 @@ namespace GeneticAlgorithms.RegularExpressions
 
             if (shorter.Count == 0)
                 return false;
-            var index = ors[Rand.Random.Next(ors.Count)];
+            var index = Rand.Select(ors);
             var distinct = genes.Skip(index - 1).Take(3).Where((x, j) => j % 2 == 0).SelectMany(s => s.ToCharArray())
                 .Select(c => c.ToString()).Distinct();
 
@@ -377,7 +377,7 @@ namespace GeneticAlgorithms.RegularExpressions
             var min2 = lookup.Values.Where(i => i.Count > 1).ToList();
             if (min2.Count <= 0)
                 return false;
-            var choice = min2[Rand.Random.Next(min2.Count)];
+            var choice = Rand.Select(min2);
             var characterSet = new List<string> {"|", genes[choice[0] + 1][0].ToString(), "["};
             foreach (var i in choice)
                 characterSet.Add(genes[i + 1][1].ToString());
@@ -406,7 +406,7 @@ namespace GeneticAlgorithms.RegularExpressions
         {
             var index = genes.Count > 0 ? Rand.Random.Next(genes.Count) : 0;
             genes.Insert(index, "|");
-            genes.Insert(index + 1, wanted[Rand.Random.Next(wanted.Length)]);
+            genes.Insert(index + 1, Rand.Select(wanted));
             return true;
         }
 
@@ -415,15 +415,15 @@ namespace GeneticAlgorithms.RegularExpressions
             List<int> mutationRoundCounts)
         {
             var initialFitness = fnGetFitness(genes);
-            var count = mutationRoundCounts[Rand.Random.Next(mutationRoundCounts.Count)];
+            var count = Rand.Select(mutationRoundCounts);
             for (var i = 1; i < count + 3; i++)
             {
                 var copy = mutationOperators.ToList();
-                var func = copy[Rand.Random.Next(copy.Count)];
+                var func = Rand.Select(copy);
                 while (!func(genes))
                 {
                     copy.Remove(func);
-                    func = copy[Rand.Random.Next(copy.Count)];
+                    func = Rand.Select(copy);
                 }
 
                 if (fnGetFitness(genes).CompareTo(initialFitness) <= 0)

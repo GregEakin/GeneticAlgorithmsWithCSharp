@@ -133,8 +133,8 @@ namespace GeneticAlgorithms.EquationGeneration
                 var adding = numberCount < maxNumbers && Rand.PercentChance(1);
                 if (adding)
                 {
-                    genes.Add(operations[Rand.Random.Next(operations.Length)]);
-                    genes.Add(numbers[Rand.Random.Next(numbers.Count)]);
+                    genes.Add(Rand.Select(operations));
+                    genes.Add(Rand.Select(numbers));
                     continue;
                 }
 
@@ -149,8 +149,8 @@ namespace GeneticAlgorithms.EquationGeneration
 
                 var index2 = Rand.Random.Next(0, genes.Count);
                 genes[index2] = (index2 & 1) == 1
-                    ? operations[Rand.Random.Next(operations.Length)]
-                    : numbers[Rand.Random.Next(numbers.Count)];
+                    ? Rand.Select(operations)
+                    : Rand.Select(numbers);
             }
         }
 

@@ -138,7 +138,7 @@ namespace GeneticAlgorithms.ApproximatingPi
             Chromosome<TGene, TFitness> FnNewChild(Chromosome<TGene, TFitness> parent, int index,
                 List<Chromosome<TGene, TFitness>> parents) =>
                 crossover != null
-                    ? usedStrategies[Rand.Random.Next(usedStrategies.Count)](parent, index, parents)
+                    ? Rand.Select(usedStrategies)(parent, index, parents)
                     : FnMutate(parent);
 
             try
