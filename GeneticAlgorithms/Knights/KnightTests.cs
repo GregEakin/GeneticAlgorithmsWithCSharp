@@ -88,7 +88,7 @@ namespace GeneticAlgorithms.Knights
                     ? Rand.Random.Next(genes.Length)
                     : knightIndexes.ElementAt(Rand.Random.Next(knightIndexes.Count));
 
-                var position1 = Rand.Select(potentialKnightPositions);
+                var position1 = Rand.SelectItem(potentialKnightPositions);
                 genes[geneIndex] = position1;
             }
         }
@@ -164,7 +164,7 @@ namespace GeneticAlgorithms.Knights
                     where 0 < p.X && p.X < width - 1 && 0 < p.Y && p.Y < height - 1
                     select p)).ToArray();
 
-            Position FnGetRandomPosition() => Rand.Select(nonEdgePositions);
+            Position FnGetRandomPosition() => Rand.SelectItem(nonEdgePositions);
             void FnMutate(Position[] genes) => Mutate(genes, width, height, allPositions, nonEdgePositions);
             Position[] FnCreate() => Create(FnGetRandomPosition, expectedKnights);
 

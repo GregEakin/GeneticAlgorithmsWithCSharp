@@ -213,7 +213,7 @@ namespace GeneticAlgorithms.RegularExpressions
         private static bool MutateAdd(List<string> genes, string[] geneSet)
         {
             var index = Rand.Random.Next(genes.Count + 1);
-            genes.Insert(index, Rand.Select(geneSet));
+            genes.Insert(index, Rand.SelectItem(geneSet));
             return true;
         }
 
@@ -251,7 +251,7 @@ namespace GeneticAlgorithms.RegularExpressions
             if (genes.Count < 1)
                 return false;
             var index = Rand.Random.Next(genes.Count);
-            genes[index] = Rand.Select(geneSet);
+            genes[index] = Rand.SelectItem(geneSet);
             return true;
         }
 
@@ -331,7 +331,7 @@ namespace GeneticAlgorithms.RegularExpressions
 
             if (shorter.Count == 0)
                 return false;
-            var index = Rand.Select(ors);
+            var index = Rand.SelectItem(ors);
             var distinct = genes.Skip(index - 1).Take(3).Where((x, j) => j % 2 == 0).SelectMany(s => s.ToCharArray())
                 .Select(c => c.ToString()).Distinct();
 
@@ -377,7 +377,7 @@ namespace GeneticAlgorithms.RegularExpressions
             var min2 = lookup.Values.Where(i => i.Count > 1).ToList();
             if (min2.Count <= 0)
                 return false;
-            var choice = Rand.Select(min2);
+            var choice = Rand.SelectItem(min2);
             var characterSet = new List<string> {"|", genes[choice[0] + 1][0].ToString(), "["};
             foreach (var i in choice)
                 characterSet.Add(genes[i + 1][1].ToString());
@@ -406,7 +406,7 @@ namespace GeneticAlgorithms.RegularExpressions
         {
             var index = genes.Count > 0 ? Rand.Random.Next(genes.Count) : 0;
             genes.Insert(index, "|");
-            genes.Insert(index + 1, Rand.Select(wanted));
+            genes.Insert(index + 1, Rand.SelectItem(wanted));
             return true;
         }
 
@@ -415,15 +415,15 @@ namespace GeneticAlgorithms.RegularExpressions
             List<int> mutationRoundCounts)
         {
             var initialFitness = fnGetFitness(genes);
-            var count = Rand.Select(mutationRoundCounts);
+            var count = Rand.SelectItem(mutationRoundCounts);
             for (var i = 1; i < count + 3; i++)
             {
                 var copy = mutationOperators.ToList();
-                var func = Rand.Select(copy);
+                var func = Rand.SelectItem(copy);
                 while (!func(genes))
                 {
                     copy.Remove(func);
-                    func = Rand.Select(copy);
+                    func = Rand.SelectItem(copy);
                 }
 
                 if (fnGetFitness(genes).CompareTo(initialFitness) <= 0)

@@ -25,7 +25,18 @@ namespace GeneticAlgorithms.Utilities
     {
         public static Random Random { get; } = new Random();
 
-        public static T Select<T>(IReadOnlyList<T> list)
+        public static T SelectItemNotIn<T>(IReadOnlyList<T> list, IReadOnlyList<T> except)
+        {
+            var subList = list.Where(i => !except.Contains(i)).ToList();
+            return SelectItem(subList);
+            //T item;
+            //do
+            //    item = SelectItem(list);
+            //while (except.Contains(item));
+            //return item;
+        }
+
+        public static T SelectItem<T>(IReadOnlyList<T> list)
         {
             var index = Random.Next(list.Count);
             return list[index];

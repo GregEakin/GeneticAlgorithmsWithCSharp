@@ -135,7 +135,7 @@ namespace GeneticAlgorithms.TravelingSalesmanProblem
             Chromosome<TGene, TFitness> FnNewChild(Chromosome<TGene, TFitness> parent, int index,
                 List<Chromosome<TGene, TFitness>> parents) =>
                 crossover != null
-                    ? Rand.Select(usedStrategies)(parent, index, parents)
+                    ? Rand.SelectItem(usedStrategies)(parent, index, parents)
                     : FnMutate(parent);
 
             foreach (var improvement in GetImprovement(FnNewChild, FnGenerateParent, maxAge, poolSize))

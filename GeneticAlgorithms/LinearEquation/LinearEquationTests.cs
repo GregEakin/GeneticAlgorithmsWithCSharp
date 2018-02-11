@@ -99,7 +99,7 @@ namespace GeneticAlgorithms.LinearEquation
         {
             var indexes = Rand.PercentChance(10)
                 ? geneIndexes.OrderBy(g => Rand.Random.Next()).Take(1 + Rand.Random.Next(geneIndexes.Length - 1)).ToArray()
-                : new[] {Rand.Select(geneIndexes)};
+                : new[] {Rand.SelectItem(geneIndexes)};
             window.Slide();
             foreach (var index in indexes)
             {

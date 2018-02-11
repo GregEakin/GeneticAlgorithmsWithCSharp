@@ -67,7 +67,7 @@ namespace GeneticAlgorithms.LawnmowerProblem
                 var adding = genes.Count == 0 || genes.Count < maxGenes - 1 && Rand.PercentChance(20);
                 if (adding)
                 {
-                    var gene1 = Rand.Select(geneSet)();
+                    var gene1 = Rand.SelectItem(geneSet)();
                     var index1 = Rand.Random.Next(genes.Count + 1);
                     genes.Insert(index1, gene1);
                     continue;
@@ -82,7 +82,7 @@ namespace GeneticAlgorithms.LawnmowerProblem
                 }
 
                 // Replace gene
-                var gene = Rand.Select(geneSet)();
+                var gene = Rand.SelectItem(geneSet)();
                 var index = Rand.Random.Next(genes.Count);
                 genes[index] = gene;
             }
@@ -93,7 +93,7 @@ namespace GeneticAlgorithms.LawnmowerProblem
             var numGenes = Rand.Random.Next(minGenes, maxGenes + 1);
             var genes = new List<INode>(numGenes);
             for (var i = 0; i < numGenes; i++)
-                genes.Add(Rand.Select(geneSet)());
+                genes.Add(Rand.SelectItem(geneSet)());
             return genes;
         }
 

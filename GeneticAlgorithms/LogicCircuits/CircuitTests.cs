@@ -88,7 +88,7 @@ namespace GeneticAlgorithms.LogicCircuits
             if (index < sources.Count)
                 return new Node(sources[index].Item1);
 
-            var gateType = Rand.Select(gates);
+            var gateType = Rand.SelectItem(gates);
             int? indexA = null;
             int? indexB = null;
 
@@ -171,7 +171,7 @@ namespace GeneticAlgorithms.LogicCircuits
                 //var gatesUsed = NodesToCircuit(childGenes).Item2.Where(s => s >= sourceCount).ToArray();
                 //if (!gatesUsed.Any())
                 //    return;
-                //var index = Rand.Select(gatesUsed);
+                //var index = Rand.SelectItem(gatesUsed);
                 var index = Rand.Random.Next(childGenes.Count - sourceCount) + sourceCount;
                 childGenes[index] = fnCreateGene(index);
                 if (fnGetFitness(childGenes).CompareTo(initialFitness) > 0)

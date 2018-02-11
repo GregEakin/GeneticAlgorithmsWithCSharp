@@ -208,7 +208,7 @@ namespace GeneticAlgorithms.TicTacToe
         public static bool MutateAdd(List<Rule> genes, Rule[] geneSet)
         {
             var index = Rand.Random.Next(genes.Count + 1);
-            genes.Insert(index, Rand.Select(geneSet));
+            genes.Insert(index, Rand.SelectItem(geneSet));
             return true;
         }
 
@@ -227,7 +227,7 @@ namespace GeneticAlgorithms.TicTacToe
             if (!genes.Any())
                 return false;
             var index = Rand.Random.Next(genes.Count);
-            genes[index] = Rand.Select(geneSet);
+            genes[index] = Rand.SelectItem(geneSet);
             return true;
         }
 
@@ -261,7 +261,7 @@ namespace GeneticAlgorithms.TicTacToe
             List<int> mutationRoundCounts)
         {
             var initialFitness = fnGetFitness(genes);
-            var count = Rand.Select(mutationRoundCounts);
+            var count = Rand.SelectItem(mutationRoundCounts);
             for (var i = 1; i < count + 2; i++)
             {
                 foreach (var func in mutationOperators.OrderBy(o => Rand.Random.Next()))
