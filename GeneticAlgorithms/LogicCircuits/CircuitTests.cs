@@ -30,8 +30,8 @@ namespace GeneticAlgorithms.LogicCircuits
     public class CircuitTests
     {
         private static Dictionary<char, bool?> _inputs;
-        private static List<Tuple<Node.CrateGeneDelegate, ICircuit>> _gates;
-        private static List<Tuple<Node.CrateGeneDelegate, ICircuit>> _sources;
+        private static List<Tuple<Node.CrateGeneDelegate, int>> _gates;
+        private static List<Tuple<Node.CrateGeneDelegate, int>> _sources;
 
         public delegate int FnGetFitnessDelegate(List<Node> genes);
 
@@ -87,8 +87,8 @@ namespace GeneticAlgorithms.LogicCircuits
             Console.WriteLine("{0}\t{1}\t{2} ms", circuit, candidate.Fitness, watch.ElapsedMilliseconds);
         }
 
-        private static Node CreateGene(int index, Tuple<Node.CrateGeneDelegate, ICircuit>[] gates,
-            Tuple<Node.CrateGeneDelegate, ICircuit>[] sources)
+        private static Node CreateGene(int index, Tuple<Node.CrateGeneDelegate, int>[] sources,
+            Tuple<Node.CrateGeneDelegate, int>[] gates)
         {
             var gateType = index < sources.Length
                 ? sources[index]
@@ -96,14 +96,14 @@ namespace GeneticAlgorithms.LogicCircuits
 
             int? indexA = null;
             int? indexB = null;
-            if (gateType.Item2.InputCount > 0)
+            if (gateType.Item2 > 0)
             {
                 if (index == 0)
                     throw new Exception("Not enough inputs for this gate.");
                 indexA = Rand.Random.Next(index);
             }
 
-            if (gateType.Item2.InputCount > 1)
+            if (gateType.Item2 > 1)
             {
                 if (index == 1)
                     throw new Exception("Not enough inputs for this gate.");
@@ -121,21 +121,19 @@ namespace GeneticAlgorithms.LogicCircuits
 
             var sources = new[]
             {
-                new Tuple<Node.CrateGeneDelegate, ICircuit>((a, b) => new Source('A', sourceContainer),
-                    new Source('A', null)),
-                new Tuple<Node.CrateGeneDelegate, ICircuit>((a, b) => new Source('B', sourceContainer),
-                    new Source('B', null))
+                new Tuple<Node.CrateGeneDelegate, int>((a, b) => new Source('A', sourceContainer), 0),
+                new Tuple<Node.CrateGeneDelegate, int>((a, b) => new Source('B', sourceContainer), 0)
             };
 
             var gates = new[]
             {
-                new Tuple<Node.CrateGeneDelegate, ICircuit>((a, b) => new And(a, b), new And(null, null)),
-                new Tuple<Node.CrateGeneDelegate, ICircuit>((a, b) => new Or(a, b), new Or(null, null))
+                new Tuple<Node.CrateGeneDelegate, int>((a, b) => new And(a, b), 2),
+                new Tuple<Node.CrateGeneDelegate, int>((a, b) => new Or(a, b), 2)
             };
 
             var nodes = new List<Node>(6);
             for (var i = 0; i < 6; i++)
-                nodes.Add(CreateGene(i, gates, sources));
+                nodes.Add(CreateGene(i, sources, gates));
 
             var circuit = NodesToCircuit(nodes).Item1;
             Console.WriteLine("{0} = {1}", circuit, circuit.Output);
@@ -191,26 +189,24 @@ namespace GeneticAlgorithms.LogicCircuits
 
             var sources = new[]
             {
-                new Tuple<Node.CrateGeneDelegate, ICircuit>((a, b) => new Source('A', sourceContainer),
-                    new Source('A', null)),
-                new Tuple<Node.CrateGeneDelegate, ICircuit>((a, b) => new Source('B', sourceContainer),
-                    new Source('B', null))
+                new Tuple<Node.CrateGeneDelegate, int>((a, b) => new Source('A', sourceContainer), 0),
+                new Tuple<Node.CrateGeneDelegate, int>((a, b) => new Source('B', sourceContainer), 0)
             };
 
             var gates = new[]
             {
-                new Tuple<Node.CrateGeneDelegate, ICircuit>((a, b) => new And(a, b), new And(null, null)),
-                new Tuple<Node.CrateGeneDelegate, ICircuit>((a, b) => new Or(a, b), new Or(null, null))
+                new Tuple<Node.CrateGeneDelegate, int>((a, b) => new And(a, b), 2),
+                new Tuple<Node.CrateGeneDelegate, int>((a, b) => new Or(a, b), 2)
             };
 
             var nodes = new List<Node>(6);
             for (var i = 0; i < 6; i++)
-                nodes.Add(CreateGene(i, gates, sources));
+                nodes.Add(CreateGene(i, sources, gates));
 
             var circuit1 = NodesToCircuit(nodes).Item1;
             Console.WriteLine("{0} = {1}", circuit1, circuit1.Output);
 
-            Node FnCreateGene(int index) => CreateGene(index, gates, sources);
+            Node FnCreateGene(int index) => CreateGene(index, sources, gates);
             Mutate(nodes, FnCreateGene, x => 0, sources.Length);
 
             var circuit2 = NodesToCircuit(nodes).Item1;
@@ -243,15 +239,15 @@ namespace GeneticAlgorithms.LogicCircuits
         public void SetupTest()
         {
             _inputs = new Dictionary<char, bool?>();
-            _gates = new List<Tuple<Node.CrateGeneDelegate, ICircuit>>
+            _sources = new List<Tuple<Node.CrateGeneDelegate, int>>
             {
-                new Tuple<Node.CrateGeneDelegate, ICircuit>((i1, i2) => new And(i1, i2), new And(null, null)),
-                new Tuple<Node.CrateGeneDelegate, ICircuit>((i1, i2) => new Not(i1), new Not(null))
+                new Tuple<Node.CrateGeneDelegate, int>((a, b) => new Source('A', _inputs), 2),
+                new Tuple<Node.CrateGeneDelegate, int>((a, b) => new Source('B', _inputs), 2)
             };
-            _sources = new List<Tuple<Node.CrateGeneDelegate, ICircuit>>
+            _gates = new List<Tuple<Node.CrateGeneDelegate, int>>
             {
-                new Tuple<Node.CrateGeneDelegate, ICircuit>((a, b) => new Source('A', _inputs), new Source('A', null)),
-                new Tuple<Node.CrateGeneDelegate, ICircuit>((a, b) => new Source('B', _inputs), new Source('B', null))
+                new Tuple<Node.CrateGeneDelegate, int>((i1, i2) => new And(i1, i2), 2),
+                new Tuple<Node.CrateGeneDelegate, int>((i1, i2) => new Not(i1), 1)
             };
         }
 
@@ -298,9 +294,8 @@ namespace GeneticAlgorithms.LogicCircuits
                 new Tuple<bool[], bool>(new[] {true, true, true}, true)
             };
 
-            _sources.Add(new Tuple<Node.CrateGeneDelegate, ICircuit>((a, b) => new Source('C', _inputs),
-                new Source('C', null)));
-            _gates.Add(new Tuple<Node.CrateGeneDelegate, ICircuit>((i1, i2) => new Or(i1, i2), new Or(null, null)));
+            _sources.Add(new Tuple<Node.CrateGeneDelegate, int>((a, b) => new Source('C', _inputs), 0));
+            _gates.Add(new Tuple<Node.CrateGeneDelegate, int>((i1, i2) => new Or(i1, i2), 2));
 
             FindCircuit(rules, 12);
         }
@@ -329,12 +324,10 @@ namespace GeneticAlgorithms.LogicCircuits
 
             var bitNRules = rules.Select(rule =>
                 new Tuple<bool[], bool>(rule.Item1.Select(b => b != 0).ToArray(), rule.Item2[2 - bit] != 0));
-            _gates.Add(new Tuple<Node.CrateGeneDelegate, ICircuit>((i1, i2) => new Or(i1, i2), new Or(null, null)));
-            _gates.Add(new Tuple<Node.CrateGeneDelegate, ICircuit>((i1, i2) => new Xor(i1, i2), new Xor(null, null)));
-            _sources.Add(new Tuple<Node.CrateGeneDelegate, ICircuit>((a, b) => new Source('C', _inputs),
-                new Source('C', null)));
-            _sources.Add(new Tuple<Node.CrateGeneDelegate, ICircuit>((a, b) => new Source('D', _inputs),
-                new Source('D', null)));
+            _sources.Add(new Tuple<Node.CrateGeneDelegate, int>((a, b) => new Source('C', _inputs), 0));
+            _sources.Add(new Tuple<Node.CrateGeneDelegate, int>((a, b) => new Source('D', _inputs), 0));
+            _gates.Add(new Tuple<Node.CrateGeneDelegate, int>((i1, i2) => new Or(i1, i2), 2));
+            _gates.Add(new Tuple<Node.CrateGeneDelegate, int>((i1, i2) => new Xor(i1, i2), 2));
             return bitNRules.ToArray();
         }
 
@@ -375,7 +368,7 @@ namespace GeneticAlgorithms.LogicCircuits
                 Fitness(genes, rules, _inputs);
 
             Node FnCreateGene(int index) =>
-                CreateGene(index, _gates.ToArray(), _sources.ToArray());
+                CreateGene(index, _sources.ToArray(), _gates.ToArray());
 
             void FnMutate(List<Node> genes) =>
                 Mutate(genes, FnCreateGene, FnGetFitness, _sources.Count);
