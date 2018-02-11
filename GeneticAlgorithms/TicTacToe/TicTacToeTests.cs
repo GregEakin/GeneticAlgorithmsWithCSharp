@@ -217,7 +217,7 @@ namespace GeneticAlgorithms.TicTacToe
             if (!genes.Any())
                 return false;
             genes.RemoveAt(Rand.Random.Next(genes.Count));
-            if (genes.Any() && Rand.Random.Next(2) == 1)
+            if (genes.Any() && Rand.PercentChance(50))
                 genes.RemoveAt(Rand.Random.Next(genes.Count));
             return true;
         }

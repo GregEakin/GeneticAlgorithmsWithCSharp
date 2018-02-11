@@ -232,7 +232,7 @@ namespace GeneticAlgorithms.RegularExpressions
             if (genes.Count < 1)
                 return false;
             genes.RemoveAt(Rand.Random.Next(genes.Count));
-            if (genes.Count > 1 && Rand.Random.Next(2) == 1)
+            if (genes.Count > 1 && Rand.PercentChance(50))
                 genes.RemoveAt(Rand.Random.Next(genes.Count));
             return true;
         }

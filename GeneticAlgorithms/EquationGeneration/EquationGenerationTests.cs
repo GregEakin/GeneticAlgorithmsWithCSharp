@@ -130,7 +130,7 @@ namespace GeneticAlgorithms.EquationGeneration
                     return;
 
                 var numberCount = (1 + genes.Count) / 2;
-                var adding = numberCount < maxNumbers && Rand.Random.Next(0, 100) == 0;
+                var adding = numberCount < maxNumbers && Rand.PercentChance(1);
                 if (adding)
                 {
                     genes.Add(operations[Rand.Random.Next(operations.Length)]);
@@ -138,7 +138,7 @@ namespace GeneticAlgorithms.EquationGeneration
                     continue;
                 }
 
-                var removing = numberCount > minNumbers && Rand.Random.Next(0, 20) == 0;
+                var removing = numberCount > minNumbers && Rand.PercentChance(5);
                 if (removing)
                 {
                     var index = Rand.Random.Next(0, genes.Count - 1);

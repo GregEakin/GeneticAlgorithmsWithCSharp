@@ -64,7 +64,7 @@ namespace GeneticAlgorithms.LawnmowerProblem
                 if (fnGetFitness(genes).CompareTo(initialFitness) > 0)
                     return;
 
-                var adding = genes.Count == 0 || genes.Count <= maxGenes && Rand.Random.Next(0, 5) == 0;
+                var adding = genes.Count == 0 || genes.Count < maxGenes - 1 && Rand.PercentChance(20);
                 if (adding)
                 {
                     var gene1 = geneSet[Rand.Random.Next(geneSet.Length)]();
@@ -72,7 +72,7 @@ namespace GeneticAlgorithms.LawnmowerProblem
                     continue;
                 }
 
-                var removing = genes.Count > minGenes && Rand.Random.Next(0, 50) == 0;
+                var removing = genes.Count > minGenes && Rand.PercentChance(2);
                 if (removing)
                 {
                     var index1 = Rand.Random.Next(genes.Count);

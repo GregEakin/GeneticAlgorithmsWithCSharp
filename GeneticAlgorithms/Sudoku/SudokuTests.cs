@@ -97,7 +97,7 @@ namespace GeneticAlgorithms.Sudoku
                 if (selectedRule == null)
                     return;
 
-                if (IndexRow(selectedRule.OtherIndex) % 3 == 2 && Rand.Random.Next(0, 10) == 0)
+                if (IndexRow(selectedRule.OtherIndex) % 3 == 2 && Rand.PercentChance(10))
                 {
                     var sectionStart = SectionStart(selectedRule.Index);
                     var current = selectedRule.OtherIndex;

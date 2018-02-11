@@ -97,7 +97,7 @@ namespace GeneticAlgorithms.LinearEquation
 
         private static void Mutate(List<Fraction> genes, List<Fraction> sortedGeneSet, Window window, int[] geneIndexes)
         {
-            var indexes = Rand.Random.Next(10) == 0
+            var indexes = Rand.PercentChance(10)
                 ? geneIndexes.OrderBy(g => Rand.Random.Next()).Take(1 + Rand.Random.Next(geneIndexes.Length - 1)).ToArray()
                 : new[] {geneIndexes[Rand.Random.Next(geneIndexes.Length)]};
             window.Slide();

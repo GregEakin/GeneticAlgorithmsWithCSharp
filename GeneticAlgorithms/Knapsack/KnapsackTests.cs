@@ -102,7 +102,7 @@ namespace GeneticAlgorithms.Knapsack
             var remainingWeight = maxWeight - fitness.TotalWeight;
             var remainingVolume = maxVolume - fitness.TotalVolume;
 
-            var removing = genes.Count > 1 && Rand.Random.Next(10) == 0;
+            var removing = genes.Count > 1 && Rand.PercentChance(10);
             if (removing)
             {
                 var index1 = Rand.Random.Next(genes.Count);
@@ -114,7 +114,7 @@ namespace GeneticAlgorithms.Knapsack
             }
 
             var adding = (remainingWeight > 0 || remainingVolume > 0) &&
-                         (genes.Count == 0 || (genes.Count < items.Length && Rand.Random.Next(100) == 0));
+                         (genes.Count == 0 || (genes.Count < items.Length && Rand.PercentChance(1)));
             if (adding)
             {
                 var newGene = Add(genes.ToArray(), items, remainingWeight, remainingVolume);
@@ -131,7 +131,7 @@ namespace GeneticAlgorithms.Knapsack
             remainingWeight += item.Weight * iq.Quantity;
             remainingVolume += item.Volume * iq.Quantity;
 
-            var changeItem = genes.Count < items.Length && Rand.Random.Next(4) == 0;
+            var changeItem = genes.Count < items.Length && Rand.PercentChance(25);
             if (changeItem)
             {
                 var itemIndex = Array.IndexOf(items, iq.Item);

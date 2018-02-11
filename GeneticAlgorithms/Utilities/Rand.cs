@@ -18,12 +18,24 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace GeneticAlgorithms.Utilities
 {
     public static class Rand
     {
         public static Random Random { get; } = new Random();
+
+        public static bool PercentChance(int value)
+        {
+            if (value <= 0)
+                return false;
+
+            if (value >= 100)
+                return true;
+
+            return Rand.Random.NextDouble() < value / 100.0;
+        }
 
         public static List<TGene> RandomSampleList<TGene>(TGene[] geneSet, int length)
         {
