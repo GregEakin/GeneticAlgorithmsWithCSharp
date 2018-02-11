@@ -86,10 +86,7 @@ namespace GeneticAlgorithms.Knapsack
         private static ItemQuantity Add(ItemQuantity[] genes, Resource[] items, double maxWeight, double maxVolume)
         {
             var usedItems = genes.Select(iq => iq.Item).ToList();
-            var item = items[Rand.Random.Next(items.Length)];
-            while (usedItems.Contains(item))
-                item = items[Rand.Random.Next(items.Length)];
-
+            var item = Rand.SelectItemNotIn(items, usedItems);
             var maxQuantity = MaxQuantity(item, maxWeight, maxVolume);
             return maxQuantity > 0 ? new ItemQuantity(item, maxQuantity) : null;
         }
