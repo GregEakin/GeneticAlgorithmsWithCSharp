@@ -57,14 +57,9 @@ namespace GeneticAlgorithms.LogicCircuits
         [TestMethod]
         public void FitnessTest()
         {
-            var inputs = new Dictionary<char, bool?>();
-
-            var nodes = new List<Node>
-            {
-                new Node((a, b) => new Source('A', inputs)),
-                new Node((a, b) => new Source('B', inputs)),
-                new Node((a, b) => new Or(a, b), 0, 1)
-            };
+            var nodes = new List<Node>();
+            nodes.AddRange(_sources.Select(n => new Node(n.Item1)));
+            nodes.Add(new Node((a, b) => new Or(a, b), 0, 1));
 
             var rules = new[]
             {
@@ -74,11 +69,11 @@ namespace GeneticAlgorithms.LogicCircuits
                 new Tuple<bool[], bool>(new[] {true, true}, true)
             };
 
-            var fitness = Fitness(nodes, rules, inputs);
+            var fitness = Fitness(nodes, rules, _inputs);
             Assert.AreEqual(4, fitness);
-            Assert.AreEqual(2, inputs.Count);
-            Assert.AreEqual(rules[rules.Length - 1].Item1[0], inputs['A']);
-            Assert.AreEqual(rules[rules.Length - 1].Item1[1], inputs['B']);
+            Assert.AreEqual(2, _inputs.Count);
+            Assert.AreEqual(rules[rules.Length - 1].Item1[0], _inputs['A']);
+            Assert.AreEqual(rules[rules.Length - 1].Item1[1], _inputs['B']);
         }
 
         private static void Display(Chromosome<Node, int> candidate, Stopwatch watch)
@@ -87,15 +82,16 @@ namespace GeneticAlgorithms.LogicCircuits
             Console.WriteLine("{0}\t{1}\t{2} ms", circuit, candidate.Fitness, watch.ElapsedMilliseconds);
         }
 
-        private static Node CreateGene(int index, Tuple<Node.CrateGeneDelegate, int>[] sources,
-            Tuple<Node.CrateGeneDelegate, int>[] gates)
+        private static Node CreateGene(int index, IReadOnlyList<Tuple<Node.CrateGeneDelegate, int>> sources,
+            IReadOnlyList<Tuple<Node.CrateGeneDelegate, int>> gates)
         {
-            var gateType = index < sources.Length
-                ? sources[index]
-                : gates[Rand.Random.Next(gates.Length)];
+            if (index < sources.Count)
+                return new Node(sources[index].Item1);
 
+            var gateType = gates[Rand.Random.Next(gates.Count)];
             int? indexA = null;
             int? indexB = null;
+
             if (gateType.Item2 > 0)
             {
                 if (index == 0)
@@ -117,47 +113,48 @@ namespace GeneticAlgorithms.LogicCircuits
         [TestMethod]
         public void CreateGeneTest()
         {
-            var sourceContainer = new Dictionary<char, bool?> {{'A', false}, {'B', true}};
-
-            var sources = new[]
-            {
-                new Tuple<Node.CrateGeneDelegate, int>((a, b) => new Source('A', sourceContainer), 0),
-                new Tuple<Node.CrateGeneDelegate, int>((a, b) => new Source('B', sourceContainer), 0)
-            };
-
-            var gates = new[]
-            {
-                new Tuple<Node.CrateGeneDelegate, int>((a, b) => new And(a, b), 2),
-                new Tuple<Node.CrateGeneDelegate, int>((a, b) => new Or(a, b), 2)
-            };
+            _inputs.Add('A', false);
+            _inputs.Add('B', true);
 
             var nodes = new List<Node>(6);
             for (var i = 0; i < 6; i++)
-                nodes.Add(CreateGene(i, sources, gates));
+                nodes.Add(CreateGene(i, _sources, _gates));
 
             var circuit = NodesToCircuit(nodes).Item1;
             Console.WriteLine("{0} = {1}", circuit, circuit.Output);
 
             // The first set, are the sources 
-            for (var i = 0; i < sources.Length; i++)
+            for (var i = 0; i < _sources.Count; i++)
             {
-                Assert.IsNull(nodes[i].IndexA);
-                Assert.IsNull(nodes[i].IndexB);
-                var source = nodes[i].CreateGate(null, null);
+                var node = nodes[i];
+                Assert.IsNull(node.IndexA);
+                Assert.IsNull(node.IndexB);
+                var source = node.CreateGate(null, null);
                 Assert.IsInstanceOfType(source, typeof(Source));
                 Assert.AreEqual("AB"[i].ToString(), source.ToString());
             }
 
             // the next set are the gates
-            for (var i = sources.Length; i < nodes.Count; i++)
+            for (var i = _sources.Count; i < nodes.Count; i++)
             {
-                Assert.IsNotNull(nodes[i].IndexA);
-                Assert.IsNotNull(nodes[i].IndexB);
-                Assert.IsTrue(nodes[i].IndexA < i);
-                Assert.IsTrue(nodes[i].IndexB < i);
-                Assert.IsTrue(nodes[i].IndexA != nodes[i].IndexB);
-                var gate = nodes[i].CreateGate(null, null);
-                Assert.IsInstanceOfType(gate, typeof(GateWith2Inputs));
+                var node = nodes[i];
+                if (node.IndexB == null)
+                {
+                    Assert.IsNotNull(node.IndexA);
+                    Assert.IsNull(node.IndexB);
+                    Assert.IsTrue(node.IndexA < i);
+                    var gate1 = node.CreateGate(null, null);
+                    Assert.IsInstanceOfType(gate1, typeof(Not));
+                    continue;
+                }
+
+                Assert.IsNotNull(node.IndexA);
+                Assert.IsNotNull(node.IndexB);
+                Assert.IsTrue(node.IndexA < i);
+                Assert.IsTrue(node.IndexB < i);
+                Assert.IsTrue(node.IndexA != node.IndexB);
+                var gate2 = node.CreateGate(null, null);
+                Assert.IsInstanceOfType(gate2, typeof(GateWith2Inputs));
             }
         }
 
@@ -185,53 +182,54 @@ namespace GeneticAlgorithms.LogicCircuits
         [TestMethod]
         public void MutateGenesTest()
         {
-            var sourceContainer = new Dictionary<char, bool?> {{'A', false}, {'B', true}};
-
-            var sources = new[]
-            {
-                new Tuple<Node.CrateGeneDelegate, int>((a, b) => new Source('A', sourceContainer), 0),
-                new Tuple<Node.CrateGeneDelegate, int>((a, b) => new Source('B', sourceContainer), 0)
-            };
-
-            var gates = new[]
-            {
-                new Tuple<Node.CrateGeneDelegate, int>((a, b) => new And(a, b), 2),
-                new Tuple<Node.CrateGeneDelegate, int>((a, b) => new Or(a, b), 2)
-            };
+            _inputs.Add('A', false);
+            _inputs.Add('B', true);
 
             var nodes = new List<Node>(6);
             for (var i = 0; i < 6; i++)
-                nodes.Add(CreateGene(i, sources, gates));
+                nodes.Add(CreateGene(i, _sources, _gates));
 
             var circuit1 = NodesToCircuit(nodes).Item1;
             Console.WriteLine("{0} = {1}", circuit1, circuit1.Output);
 
-            Node FnCreateGene(int index) => CreateGene(index, sources, gates);
-            Mutate(nodes, FnCreateGene, x => 0, sources.Length);
+            Node FnCreateGene(int index) => CreateGene(index, _sources, _gates);
+            Mutate(nodes, FnCreateGene, x => 0, _sources.Count);
 
             var circuit2 = NodesToCircuit(nodes).Item1;
             Console.WriteLine("{0} = {1}", circuit2, circuit2.Output);
 
             // The first set, are the sources 
-            for (var i = 0; i < sources.Length; i++)
+            for (var i = 0; i < _sources.Count; i++)
             {
-                Assert.IsNull(nodes[i].IndexA);
-                Assert.IsNull(nodes[i].IndexB);
-                var source = nodes[i].CreateGate(null, null);
+                var node = nodes[i];
+                Assert.IsNull(node.IndexA);
+                Assert.IsNull(node.IndexB);
+                var source = node.CreateGate(null, null);
                 Assert.IsInstanceOfType(source, typeof(Source));
                 Assert.AreEqual("AB"[i].ToString(), source.ToString());
             }
 
             // the next set are the gates
-            for (var i = sources.Length; i < nodes.Count; i++)
+            for (var i = _sources.Count; i < nodes.Count; i++)
             {
-                Assert.IsNotNull(nodes[i].IndexA);
-                Assert.IsNotNull(nodes[i].IndexB);
-                Assert.IsTrue(nodes[i].IndexA < i);
-                Assert.IsTrue(nodes[i].IndexB < i);
-                Assert.IsTrue(nodes[i].IndexA != nodes[i].IndexB);
-                var gate = nodes[i].CreateGate(null, null);
-                Assert.IsInstanceOfType(gate, typeof(GateWith2Inputs));
+                var node = nodes[i];
+                if (node.IndexB == null)
+                {
+                    Assert.IsNotNull(node.IndexA);
+                    Assert.IsNull(node.IndexB);
+                    Assert.IsTrue(node.IndexA < i);
+                    var gate1 = node.CreateGate(null, null);
+                    Assert.IsInstanceOfType(gate1, typeof(Not));
+                    continue;
+                }
+
+                Assert.IsNotNull(node.IndexA);
+                Assert.IsNotNull(node.IndexB);
+                Assert.IsTrue(node.IndexA < i);
+                Assert.IsTrue(node.IndexB < i);
+                Assert.IsTrue(node.IndexA != node.IndexB);
+                var gate2 = node.CreateGate(null, null);
+                Assert.IsInstanceOfType(gate2, typeof(GateWith2Inputs));
             }
         }
 
@@ -241,8 +239,8 @@ namespace GeneticAlgorithms.LogicCircuits
             _inputs = new Dictionary<char, bool?>();
             _sources = new List<Tuple<Node.CrateGeneDelegate, int>>
             {
-                new Tuple<Node.CrateGeneDelegate, int>((a, b) => new Source('A', _inputs), 2),
-                new Tuple<Node.CrateGeneDelegate, int>((a, b) => new Source('B', _inputs), 2)
+                new Tuple<Node.CrateGeneDelegate, int>((a, b) => new Source('A', _inputs), 0),
+                new Tuple<Node.CrateGeneDelegate, int>((a, b) => new Source('B', _inputs), 0)
             };
             _gates = new List<Tuple<Node.CrateGeneDelegate, int>>
             {
@@ -368,7 +366,7 @@ namespace GeneticAlgorithms.LogicCircuits
                 Fitness(genes, rules, _inputs);
 
             Node FnCreateGene(int index) =>
-                CreateGene(index, _sources.ToArray(), _gates.ToArray());
+                CreateGene(index, _sources, _gates);
 
             void FnMutate(List<Node> genes) =>
                 Mutate(genes, FnCreateGene, FnGetFitness, _sources.Count);
