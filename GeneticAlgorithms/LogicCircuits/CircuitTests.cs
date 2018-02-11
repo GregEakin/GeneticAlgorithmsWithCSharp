@@ -35,7 +35,7 @@ namespace GeneticAlgorithms.LogicCircuits
 
         public delegate int FnGetFitnessDelegate(List<Node> genes);
 
-        public delegate Node FnCreateGene(int index);
+        public delegate Node CreateGeneDelegate(int index);
 
         private static int Fitness(List<Node> genes, Tuple<bool[], bool>[] rules, Dictionary<char, bool?> inputs)
         {
@@ -97,34 +97,21 @@ namespace GeneticAlgorithms.LogicCircuits
             int? indexA = null;
             int? indexB = null;
             if (gateType.Item2.InputCount > 0)
+            {
+                if (index == 0)
+                    throw new Exception("Not enough inputs for this gate.");
                 indexA = Rand.Random.Next(index);
+            }
+
             if (gateType.Item2.InputCount > 1)
             {
-                indexB = index > 1 && index >= sources.Length
-                    ? Rand.Random.Next(index)
-                    : 0;
-                if (indexB == indexA)
-                    indexB = Rand.Random.Next(index);
+                if (index == 1)
+                    throw new Exception("Not enough inputs for this gate.");
+                do
+                    indexB = Rand.Random.Next(index); while (indexB == indexA);
             }
 
             return new Node(gateType.Item1, indexA, indexB);
-        }
-
-        private static void Mutate(List<Node> childGenes, FnCreateGene fnCreateGene, FnGetFitnessDelegate fnGetFitness,
-            int sourceCount)
-        {
-            var count = Rand.Random.Next(1, 6);
-            var initialFitness = fnGetFitness(childGenes);
-            while (count-- > 0)
-            {
-                var indexesUsed = NodesToCircuit(childGenes).Item2.Skip(sourceCount).ToArray();
-                if (!indexesUsed.Any())
-                    return;
-                var index = indexesUsed[Rand.Random.Next(indexesUsed.Length)];
-                childGenes[index] = fnCreateGene(index);
-                if (fnGetFitness(childGenes).CompareTo(initialFitness) > 0)
-                    return;
-            }
         }
 
         [TestMethod]
@@ -151,7 +138,105 @@ namespace GeneticAlgorithms.LogicCircuits
                 nodes.Add(CreateGene(i, gates, sources));
 
             var circuit = NodesToCircuit(nodes).Item1;
-            Console.Write("{0} = {1}", circuit, circuit.Output);
+            Console.WriteLine("{0} = {1}", circuit, circuit.Output);
+
+            // The first set, are the sources 
+            for (var i = 0; i < sources.Length; i++)
+            {
+                Assert.IsNull(nodes[i].IndexA);
+                Assert.IsNull(nodes[i].IndexB);
+                var source = nodes[i].CreateGate(null, null);
+                Assert.IsInstanceOfType(source, typeof(Source));
+                Assert.AreEqual("AB"[i].ToString(), source.ToString());
+            }
+
+            // the next set are the gates
+            for (var i = sources.Length; i < nodes.Count; i++)
+            {
+                Assert.IsNotNull(nodes[i].IndexA);
+                Assert.IsNotNull(nodes[i].IndexB);
+                Assert.IsTrue(nodes[i].IndexA < i);
+                Assert.IsTrue(nodes[i].IndexB < i);
+                Assert.IsTrue(nodes[i].IndexA != nodes[i].IndexB);
+                var gate = nodes[i].CreateGate(null, null);
+                Assert.IsInstanceOfType(gate, typeof(GateWith2Inputs));
+            }
+        }
+
+        private static void Mutate(List<Node> childGenes, CreateGeneDelegate fnCreateGene,
+            FnGetFitnessDelegate fnGetFitness, int sourceCount)
+        {
+            if (childGenes.Count <= sourceCount)
+                throw new Exception("Not enough genes.");
+
+            var initialFitness = fnGetFitness(childGenes);
+            var count = Rand.Random.Next(1, 6);
+            while (count-- > 0)
+            {
+                //var gatesUsed = NodesToCircuit(childGenes).Item2.Where(s => s >= sourceCount).ToArray();
+                //if (!gatesUsed.Any())
+                //    return;
+                //var index = gatesUsed[Rand.Random.Next(gatesUsed.Length)];
+                var index = Rand.Random.Next(childGenes.Count - sourceCount) + sourceCount;
+                childGenes[index] = fnCreateGene(index);
+                if (fnGetFitness(childGenes).CompareTo(initialFitness) > 0)
+                    return;
+            }
+        }
+
+        [TestMethod]
+        public void MutateGenesTest()
+        {
+            var sourceContainer = new Dictionary<char, bool?> {{'A', false}, {'B', true}};
+
+            var sources = new[]
+            {
+                new Tuple<Node.CrateGeneDelegate, ICircuit>((a, b) => new Source('A', sourceContainer),
+                    new Source('A', null)),
+                new Tuple<Node.CrateGeneDelegate, ICircuit>((a, b) => new Source('B', sourceContainer),
+                    new Source('B', null))
+            };
+
+            var gates = new[]
+            {
+                new Tuple<Node.CrateGeneDelegate, ICircuit>((a, b) => new And(a, b), new And(null, null)),
+                new Tuple<Node.CrateGeneDelegate, ICircuit>((a, b) => new Or(a, b), new Or(null, null))
+            };
+
+            var nodes = new List<Node>(6);
+            for (var i = 0; i < 6; i++)
+                nodes.Add(CreateGene(i, gates, sources));
+
+            var circuit1 = NodesToCircuit(nodes).Item1;
+            Console.WriteLine("{0} = {1}", circuit1, circuit1.Output);
+
+            Node FnCreateGene(int index) => CreateGene(index, gates, sources);
+            Mutate(nodes, FnCreateGene, x => 0, sources.Length);
+
+            var circuit2 = NodesToCircuit(nodes).Item1;
+            Console.WriteLine("{0} = {1}", circuit2, circuit2.Output);
+
+            // The first set, are the sources 
+            for (var i = 0; i < sources.Length; i++)
+            {
+                Assert.IsNull(nodes[i].IndexA);
+                Assert.IsNull(nodes[i].IndexB);
+                var source = nodes[i].CreateGate(null, null);
+                Assert.IsInstanceOfType(source, typeof(Source));
+                Assert.AreEqual("AB"[i].ToString(), source.ToString());
+            }
+
+            // the next set are the gates
+            for (var i = sources.Length; i < nodes.Count; i++)
+            {
+                Assert.IsNotNull(nodes[i].IndexA);
+                Assert.IsNotNull(nodes[i].IndexB);
+                Assert.IsTrue(nodes[i].IndexA < i);
+                Assert.IsTrue(nodes[i].IndexB < i);
+                Assert.IsTrue(nodes[i].IndexA != nodes[i].IndexB);
+                var gate = nodes[i].CreateGate(null, null);
+                Assert.IsInstanceOfType(gate, typeof(GateWith2Inputs));
+            }
         }
 
         [TestInitialize]
