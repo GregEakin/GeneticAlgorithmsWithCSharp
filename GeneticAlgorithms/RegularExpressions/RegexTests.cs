@@ -212,7 +212,7 @@ namespace GeneticAlgorithms.RegularExpressions
 
         private static bool MutateAdd(List<string> genes, string[] geneSet)
         {
-            var index = genes.Count > 0 ? Rand.Random.Next(genes.Count) : 0;
+            var index = Rand.Random.Next(genes.Count + 1);
             genes.Insert(index, geneSet[Rand.Random.Next(geneSet.Length)]);
             return true;
         }
