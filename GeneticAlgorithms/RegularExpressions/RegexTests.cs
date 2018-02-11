@@ -292,10 +292,12 @@ namespace GeneticAlgorithms.RegularExpressions
             if (genes.Count < 3)
                 return false;
             var length = Rand.Random.Next(1, 3);
-            var start = Rand.Random.Next(genes.Count - length + 1);
-            var toMove = genes.Skip(start).Take(length).ToArray();
-            genes.RemoveRange(start, length);
+            var skip = Rand.Random.Next(genes.Count - length + 1);
+            var toMove = genes.Skip(skip).Take(length).ToArray();
+            genes.RemoveRange(skip, length);
             var index = Rand.Random.Next(genes.Count);
+            if (index >= skip)
+                index++;
             genes.InsertRange(index, toMove);
             return true;
         }
