@@ -30,7 +30,7 @@ namespace GeneticAlgorithms.ApproximatingPi
     [TestClass]
     public class PiTests
     {
-        private static double GetFitness(List<bool> genes, List<int> bitValues)
+        private static double GetFitness(IReadOnlyCollection<bool> genes, IReadOnlyCollection<int> bitValues)
         {
             var denominator = GetDenominator(genes, bitValues);
             if (denominator == 0)
@@ -54,7 +54,7 @@ namespace GeneticAlgorithms.ApproximatingPi
             Assert.AreEqual(3.1415923868256, fitness, 0.00000001);
         }
 
-        private static void Display(Chromosome<bool, double> candidate, Stopwatch watch, List<int> bitValues)
+        private static void Display(Chromosome<bool, double> candidate, Stopwatch watch, IReadOnlyCollection<int> bitValues)
         {
             var numerator = GetNumerator(candidate.Genes, bitValues);
             var denominator = GetDenominator(candidate.Genes, bitValues);
@@ -94,7 +94,7 @@ namespace GeneticAlgorithms.ApproximatingPi
             Assert.AreEqual(0x0C, value);
         }
 
-        private static int GetNumerator(IEnumerable<bool> genes, List<int> bitValues) =>
+        private static int GetNumerator(IEnumerable<bool> genes, IReadOnlyCollection<int> bitValues) =>
             1 + BitsToInt(genes.Take(bitValues.Count), bitValues);
 
         [TestMethod]
@@ -110,8 +110,8 @@ namespace GeneticAlgorithms.ApproximatingPi
             Assert.AreEqual(0x0D, value);
         }
 
-        private static int GetDenominator(IEnumerable<bool> genes, List<int> bitValues) =>
-            BitsToInt(genes.Skip(bitValues.Count), bitValues);
+        private static int GetDenominator(IEnumerable<bool> genes, IReadOnlyCollection<int> bitValues) =>
+            1 + BitsToInt(genes.Skip(bitValues.Count), bitValues);
 
         [TestMethod]
         public void GetDenominatorTest()
@@ -126,12 +126,10 @@ namespace GeneticAlgorithms.ApproximatingPi
             Assert.AreEqual(0x0C, value);
         }
 
-        private static void Mutate(List<bool> genes, int numBits)
+        private static void Mutate(IList<bool> genes, int numBits)
         {
-            var numeratorIndex = Rand.Random.Next(0, numBits);
-            var denominatorIndex = Rand.Random.Next(numBits, genes.Count);
-            genes[numeratorIndex] = !genes[numeratorIndex];
-            genes[denominatorIndex] = !genes[denominatorIndex];
+            var index = Rand.Random.Next(genes.Count);
+            genes[index] = !genes[index];
         }
 
         [TestMethod]
@@ -147,11 +145,8 @@ namespace GeneticAlgorithms.ApproximatingPi
             CollectionAssert.AreNotEqual(save, bits);
         }
 
-        private static bool ApproximatePi(List<int> bitValues = null, int? maxSeconds = null)
+        private static bool ApproximatePi(IReadOnlyCollection<int> bitValues, int? maxSeconds = null)
         {
-            if (bitValues == null)
-                bitValues = new List<int> {512, 256, 128, 64, 32, 16, 8, 4, 2, 1};
-
             var geneSet = new[] {false, true};
             var watch = Stopwatch.StartNew();
 
@@ -168,7 +163,7 @@ namespace GeneticAlgorithms.ApproximatingPi
 
             var length = 2 * bitValues.Count;
             var best = Genetic<bool, double>.GetBest(FnGetFitness, length, optimalFitness, geneSet, FnDispaly, FnMutate,
-                null, 250, 1, null, maxSeconds);
+                null, 250); //, 1, null, maxSeconds);
 
             return optimalFitness <= best.Fitness;
         }
