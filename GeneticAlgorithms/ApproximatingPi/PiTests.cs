@@ -36,7 +36,8 @@ namespace GeneticAlgorithms.ApproximatingPi
             if (denominator == 0)
                 return 0.0;
 
-            var ratio = (double) GetNumerator(genes, bitValues) / denominator;
+            var numerator = GetNumerator(genes, bitValues);
+            var ratio = (double) numerator / denominator;
             return Math.PI - Math.Abs(Math.PI - ratio);
         }
 
@@ -111,7 +112,7 @@ namespace GeneticAlgorithms.ApproximatingPi
         }
 
         private static int GetDenominator(IEnumerable<bool> genes, IReadOnlyCollection<int> bitValues) =>
-            1 + BitsToInt(genes.Skip(bitValues.Count), bitValues);
+            BitsToInt(genes.Skip(bitValues.Count), bitValues);
 
         [TestMethod]
         public void GetDenominatorTest()
@@ -163,7 +164,7 @@ namespace GeneticAlgorithms.ApproximatingPi
 
             var length = 2 * bitValues.Count;
             var best = Genetic<bool, double>.GetBest(FnGetFitness, length, optimalFitness, geneSet, FnDispaly, FnMutate,
-                null, 250); //, 1, null, maxSeconds);
+                null, 250, 1, null, maxSeconds);
 
             return optimalFitness <= best.Fitness;
         }
