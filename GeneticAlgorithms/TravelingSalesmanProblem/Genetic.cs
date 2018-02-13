@@ -37,12 +37,12 @@ namespace GeneticAlgorithms.TravelingSalesmanProblem
 
         public delegate Chromosome<TGene, TFitness> MutateChromosomeDelegate(Chromosome<TGene, TFitness> parent);
 
-        public delegate Chromosome<TGene, TFitness> FnDelegate(Chromosome<TGene, TFitness> a, int b,
+        public delegate Chromosome<TGene, TFitness> FnStrategiesDelegate(Chromosome<TGene, TFitness> a, int b,
             List<Chromosome<TGene, TFitness>> c);
 
         public delegate TGene[] CreateDelegate();
 
-        public delegate TGene[] CrossoverFun(TGene[] genes1, TGene[] genes2);
+        public delegate TGene[] CrossoverDelegate(TGene[] genes1, TGene[] genes2);
 
         private static Chromosome<TGene, TFitness> GenerateParent(int length, IReadOnlyList<TGene> geneSet,
             GetFitnessDelegate getGetFitness)
@@ -78,7 +78,7 @@ namespace GeneticAlgorithms.TravelingSalesmanProblem
 
         private static Chromosome<TGene, TFitness> Crossover(TGene[] parentGenes, int index,
             List<Chromosome<TGene, TFitness>> parents,
-            GetFitnessDelegate getFitness, CrossoverFun crossover, MutateChromosomeDelegate mutate,
+            GetFitnessDelegate getFitness, CrossoverDelegate crossover, MutateChromosomeDelegate mutate,
             GenerateParentDelegate generateParent)
         {
             var donorIndex = Rand.Random.Next(0, parents.Count);
@@ -99,7 +99,7 @@ namespace GeneticAlgorithms.TravelingSalesmanProblem
 
         public static Chromosome<TGene, TFitness> GetBest(GetFitnessDelegate getFitness, int targetLen,
             TFitness optimalFitness, TGene[] geneSet, DisplayDelegate display, MutateGeneDelegate customMutate = null,
-            CreateDelegate customCreate = null, int? maxAge = null, int poolSize = 1, CrossoverFun crossover = null)
+            CreateDelegate customCreate = null, int? maxAge = null, int poolSize = 1, CrossoverDelegate crossover = null)
         {
             Chromosome<TGene, TFitness> FnMutate(Chromosome<TGene, TFitness> parent) =>
                 customMutate == null
@@ -117,7 +117,7 @@ namespace GeneticAlgorithms.TravelingSalesmanProblem
             }
 
             var strategyLookup =
-                new Dictionary<Strategies, FnDelegate>
+                new Dictionary<Strategies, FnStrategiesDelegate>
                 {
                     {Strategies.Create, (p, i, o) => FnGenerateParent()},
                     {Strategies.Mutate, (p, i, o) => FnMutate(p)},
@@ -128,7 +128,7 @@ namespace GeneticAlgorithms.TravelingSalesmanProblem
                 };
 
             var usedStrategies =
-                new List<FnDelegate> {strategyLookup[Strategies.Mutate]};
+                new List<FnStrategiesDelegate> {strategyLookup[Strategies.Mutate]};
             if (crossover != null)
                 usedStrategies.Add(strategyLookup[Strategies.Crossover]);
 
@@ -150,7 +150,7 @@ namespace GeneticAlgorithms.TravelingSalesmanProblem
             throw new UnauthorizedAccessException();
         }
 
-        private static IEnumerable<Chromosome<TGene, TFitness>> GetImprovement(FnDelegate newChild,
+        private static IEnumerable<Chromosome<TGene, TFitness>> GetImprovement(FnStrategiesDelegate newChild,
             GenerateParentDelegate generateParent, int? maxAge, int poolSize)
         {
             var bestParent = generateParent();

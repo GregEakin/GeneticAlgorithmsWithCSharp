@@ -47,14 +47,14 @@ namespace GeneticAlgorithms.LogicCircuits
 
     public abstract class GateWith2Inputs : ICircuit
     {
-        public delegate bool FnTest(bool indexA, bool indexB);
+        public delegate bool FnTestDelegate(bool indexA, bool indexB);
 
         private readonly ICircuit _inputA;
         private readonly ICircuit _inputB;
         private readonly string _label;
-        private readonly FnTest _fnTest;
+        private readonly FnTestDelegate _fnTest;
 
-        protected GateWith2Inputs(ICircuit inputA, ICircuit inputB, string label, FnTest fnTest)
+        protected GateWith2Inputs(ICircuit inputA, ICircuit inputB, string label, FnTestDelegate fnTest)
         {
             _inputA = inputA;
             _inputB = inputB;

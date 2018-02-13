@@ -31,7 +31,7 @@ namespace GeneticAlgorithms.TicTacToe
     {
         public delegate bool FnMutateDelegate(List<Rule> genes);
 
-        public delegate Fitness FnGetFitness(List<Rule> genes);
+        public delegate Fitness FnGetFitnessDelegate(List<Rule> genes);
 
         private static Fitness GetFitness(IReadOnlyList<Rule> genes)
         {
@@ -257,7 +257,7 @@ namespace GeneticAlgorithms.TicTacToe
             return true;
         }
 
-        private static void Mutate(List<Rule> genes, FnGetFitness fnGetFitness, FnMutateDelegate[] mutationOperators,
+        private static void Mutate(List<Rule> genes, FnGetFitnessDelegate fnGetFitness, FnMutateDelegate[] mutationOperators,
             List<int> mutationRoundCounts)
         {
             var initialFitness = fnGetFitness(genes);

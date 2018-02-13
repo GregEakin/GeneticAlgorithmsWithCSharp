@@ -27,15 +27,15 @@ namespace GeneticAlgorithms.SortedNumbers
     public static class Genetic<TGene, TFitness>
         where TFitness : IComparable<TFitness>
     {
-        public delegate void DisplayFun(Chromosome<TGene, TFitness> child);
+        public delegate void DisplayDelegate(Chromosome<TGene, TFitness> child);
 
-        public delegate TFitness GetFitnessFun(IReadOnlyList<TGene> gene);
+        public delegate TFitness GetFitnessDelegate(IReadOnlyList<TGene> gene);
 
         public delegate Chromosome<TGene, TFitness> MutateChromosomeDelegate(Chromosome<TGene, TFitness> parent);
 
         public delegate Chromosome<TGene, TFitness> GenerateParentDelegate();
 
-        public static Chromosome<TGene, TFitness> GenerateParent(int length, IReadOnlyList<TGene> geneSet, GetFitnessFun getFitness)
+        public static Chromosome<TGene, TFitness> GenerateParent(int length, IReadOnlyList<TGene> geneSet, GetFitnessDelegate getFitness)
         {
             var genes = Rand.RandomSample(geneSet, length).ToArray();
             var fit = getFitness(genes);
@@ -43,7 +43,7 @@ namespace GeneticAlgorithms.SortedNumbers
         }
 
         public static Chromosome<TGene, TFitness> Mutate(Chromosome<TGene, TFitness> parent, IReadOnlyList<TGene> geneSet,
-            GetFitnessFun getFitness)
+            GetFitnessDelegate getFitness)
         {
             var childGenes = parent.Genes.ToArray();
             var index = Rand.Random.Next(parent.Genes.Length);
@@ -55,8 +55,8 @@ namespace GeneticAlgorithms.SortedNumbers
             return new Chromosome<TGene, TFitness>(childGenes, fitness);
         }
 
-        public static Chromosome<TGene, TFitness> GetBest(GetFitnessFun getFitness, int targetLen,
-            TFitness optimalFitness, TGene[] geneSet, DisplayFun display)
+        public static Chromosome<TGene, TFitness> GetBest(GetFitnessDelegate getFitness, int targetLen,
+            TFitness optimalFitness, TGene[] geneSet, DisplayDelegate display)
         {
             Chromosome<TGene, TFitness> FnMutate(Chromosome<TGene, TFitness> parent) =>
                 Mutate(parent, geneSet, getFitness);
