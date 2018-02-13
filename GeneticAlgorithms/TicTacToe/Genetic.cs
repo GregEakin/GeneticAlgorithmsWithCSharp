@@ -60,7 +60,7 @@ namespace GeneticAlgorithms.TicTacToe
 
         public delegate CompetitionResult CompeteDelegate(List<TGene> a, List<TGene> b);
 
-        private static Chromosome<TGene, TFitness> GenerateParent(int length, TGene[] geneSet, GetFitnessDelegate getFitness)
+        private static Chromosome<TGene, TFitness> GenerateParent(int length, IReadOnlyList<TGene> geneSet, GetFitnessDelegate getFitness)
         {
             var genes = Rand.RandomSample(geneSet, length);
             var fitness = getFitness(genes);
@@ -68,7 +68,7 @@ namespace GeneticAlgorithms.TicTacToe
             return chromosome;
         }
 
-        private static Chromosome<TGene, TFitness> Mutate(Chromosome<TGene, TFitness> parent, TGene[] geneSet,
+        private static Chromosome<TGene, TFitness> Mutate(Chromosome<TGene, TFitness> parent, IReadOnlyList<TGene> geneSet,
             GetFitnessDelegate getFitness)
         {
             var childGenes = parent.Genes.ToList();

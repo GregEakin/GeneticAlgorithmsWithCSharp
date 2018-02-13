@@ -45,7 +45,7 @@ namespace GeneticAlgorithms.ApproximatingPi
         public delegate Chromosome<TGene, TFitness> MutateDelegate(Chromosome<TGene, TFitness> x1, int x2,
             List<Chromosome<TGene, TFitness>> x3);
 
-        private static Chromosome<TGene, TFitness> GenerateParent(int length, TGene[] geneSet,
+        private static Chromosome<TGene, TFitness> GenerateParent(int length, IReadOnlyList<TGene> geneSet,
             GetFitnessDelegate getGetFitness)
         {
             var genes = Rand.RandomSample(geneSet, length);
@@ -55,7 +55,7 @@ namespace GeneticAlgorithms.ApproximatingPi
             return chromosome;
         }
 
-        private static Chromosome<TGene, TFitness> Mutate(Chromosome<TGene, TFitness> parent, TGene[] geneSet,
+        private static Chromosome<TGene, TFitness> Mutate(Chromosome<TGene, TFitness> parent, IReadOnlyList<TGene> geneSet,
             GetFitnessDelegate getFitness)
         {
             var childGenes = parent.Genes.ToList();

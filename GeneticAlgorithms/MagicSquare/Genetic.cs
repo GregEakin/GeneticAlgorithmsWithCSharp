@@ -39,7 +39,7 @@ namespace GeneticAlgorithms.MagicSquare
 
         public delegate Chromosome<TGene, TFitness> MutateChromosomeDelegate(Chromosome<TGene, TFitness> parent);
 
-        private static Chromosome<TGene, TFitness> GenerateParent(int length, TGene[] geneSet, GetFitnessDelegate getFitness)
+        private static Chromosome<TGene, TFitness> GenerateParent(int length, IReadOnlyList<TGene> geneSet, GetFitnessDelegate getFitness)
         {
             var genes = Rand.RandomSample(geneSet, length);
             var fitness = getFitness(genes);
@@ -47,7 +47,7 @@ namespace GeneticAlgorithms.MagicSquare
             return chromosome;
         }
 
-        private static Chromosome<TGene, TFitness> Mutate(Chromosome<TGene, TFitness> parent, TGene[] geneSet,
+        private static Chromosome<TGene, TFitness> Mutate(Chromosome<TGene, TFitness> parent, IReadOnlyList<TGene> geneSet,
             GetFitnessDelegate getFitness)
         {
             var childGenes = parent.Genes.ToList();

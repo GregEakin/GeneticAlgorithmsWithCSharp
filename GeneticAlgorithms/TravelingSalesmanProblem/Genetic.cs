@@ -44,7 +44,7 @@ namespace GeneticAlgorithms.TravelingSalesmanProblem
 
         public delegate TGene[] CrossoverFun(TGene[] genes1, TGene[] genes2);
 
-        private static Chromosome<TGene, TFitness> GenerateParent(int length, TGene[] geneSet,
+        private static Chromosome<TGene, TFitness> GenerateParent(int length, IReadOnlyList<TGene> geneSet,
             GetFitnessDelegate getGetFitness)
         {
             var genes = Rand.RandomSample(geneSet, length).ToArray();
@@ -54,7 +54,7 @@ namespace GeneticAlgorithms.TravelingSalesmanProblem
             return chromosome;
         }
 
-        private static Chromosome<TGene, TFitness> Mutate(Chromosome<TGene, TFitness> parent, TGene[] geneSet,
+        private static Chromosome<TGene, TFitness> Mutate(Chromosome<TGene, TFitness> parent, IReadOnlyList<TGene> geneSet,
             GetFitnessDelegate getFitness)
         {
             var childGenes = parent.Genes.ToArray();

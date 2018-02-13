@@ -54,7 +54,7 @@ namespace GeneticAlgorithms.LogicCircuits
         public delegate Chromosome<TGene, TFitness> StrategyDelegate(Chromosome<TGene, TFitness> p, int i,
             List<Chromosome<TGene, TFitness>> o);
 
-        private static Chromosome<TGene, TFitness> GenerateParent(int length, TGene[] geneSet, GetFitnessDelegate getFitness)
+        private static Chromosome<TGene, TFitness> GenerateParent(int length, IReadOnlyList<TGene> geneSet, GetFitnessDelegate getFitness)
         {
             var genes = Rand.RandomSample(geneSet, length);
             var fitness = getFitness(genes);
@@ -62,7 +62,7 @@ namespace GeneticAlgorithms.LogicCircuits
             return chromosome;
         }
 
-        private static Chromosome<TGene, TFitness> Mutate(Chromosome<TGene, TFitness> parent, TGene[] geneSet,
+        private static Chromosome<TGene, TFitness> Mutate(Chromosome<TGene, TFitness> parent, IReadOnlyList<TGene> geneSet,
             GetFitnessDelegate getFitness)
         {
             var childGenes = parent.Genes.ToList();

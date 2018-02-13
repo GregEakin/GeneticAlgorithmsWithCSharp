@@ -47,7 +47,7 @@ namespace GeneticAlgorithms.Knights
             return chromosome;
         }
 
-        private static Chromosome<TGene, TFitness> Mutate(Chromosome<TGene, TFitness> parent, TGene[] geneSet,
+        private static Chromosome<TGene, TFitness> Mutate(Chromosome<TGene, TFitness> parent, IReadOnlyList<TGene> geneSet,
             FitnessDelegate getFitness)
         {
             var childGenes = parent.Genes.ToArray();

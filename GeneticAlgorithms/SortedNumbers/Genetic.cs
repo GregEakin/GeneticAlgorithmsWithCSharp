@@ -35,14 +35,14 @@ namespace GeneticAlgorithms.SortedNumbers
 
         public delegate Chromosome<TGene, TFitness> GenerateParentDelegate();
 
-        public static Chromosome<TGene, TFitness> GenerateParent(int length, TGene[] geneSet, GetFitnessFun getFitness)
+        public static Chromosome<TGene, TFitness> GenerateParent(int length, IReadOnlyList<TGene> geneSet, GetFitnessFun getFitness)
         {
             var genes = Rand.RandomSample(geneSet, length).ToArray();
             var fit = getFitness(genes);
             return new Chromosome<TGene, TFitness>(genes, fit);
         }
 
-        public static Chromosome<TGene, TFitness> Mutate(Chromosome<TGene, TFitness> parent, TGene[] geneSet,
+        public static Chromosome<TGene, TFitness> Mutate(Chromosome<TGene, TFitness> parent, IReadOnlyList<TGene> geneSet,
             GetFitnessFun getFitness)
         {
             var childGenes = parent.Genes.ToArray();

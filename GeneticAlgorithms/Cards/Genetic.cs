@@ -37,14 +37,14 @@ namespace GeneticAlgorithms.Cards
 
         public delegate Chromosome<TGene, TFitness> MutateDelegate(Chromosome<TGene, TFitness> parent);
 
-        private static Chromosome<TGene, TFitness> GenerateParent(int length, TGene[] geneSet, FitnessDelegate fitnessDelegate)
+        private static Chromosome<TGene, TFitness> GenerateParent(int length, IReadOnlyList<TGene> geneSet, FitnessDelegate fitnessDelegate)
         {
             var genes = Rand.RandomSample(geneSet, length).ToArray();
             var fitness = fitnessDelegate(genes);
             return new Chromosome<TGene, TFitness>(genes, fitness);
         }
 
-        private static Chromosome<TGene, TFitness> Mutate(Chromosome<TGene, TFitness> parent, TGene[] geneSet,
+        private static Chromosome<TGene, TFitness> Mutate(Chromosome<TGene, TFitness> parent, IReadOnlyList<TGene> geneSet,
             FitnessDelegate getFitness)
         {
             var childGenes = parent.Genes.ToArray();
