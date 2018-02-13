@@ -129,7 +129,7 @@ namespace GeneticAlgorithms.Sudoku
         {
             var watch = Stopwatch.StartNew();
             var geneSet = Enumerable.Range(1, 9).ToArray();
-            var genes = Rand.RandomSampleList(geneSet, 81);
+            var genes = Rand.RandomSample(geneSet, 81);
             var validationRules = BuildValidationRules();
 
             var fitness1 = GetFitness(genes, validationRules);
@@ -178,7 +178,7 @@ namespace GeneticAlgorithms.Sudoku
                 GetFitness(genes, validationRules);
 
             List<int> FnCreate() =>
-                Rand.RandomSampleList(geneSet, 81);
+                Rand.RandomSample(geneSet, 81);
 
             void FnMutate(List<int> genes) =>
                 Mutate(genes, validationRules);

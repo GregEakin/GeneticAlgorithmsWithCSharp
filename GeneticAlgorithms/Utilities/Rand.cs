@@ -53,12 +53,12 @@ namespace GeneticAlgorithms.Utilities
             return Random.NextDouble() < value / 100.0;
         }
 
-        public static List<TGene> RandomSampleList<TGene>(TGene[] geneSet, int length)
+        public static List<TGene> RandomSample<TGene>(IReadOnlyList<TGene> geneSet, int length)
         {
             var genes = new List<TGene>(length);
             while (genes.Count < length)
             {
-                var sampleSize = Math.Min(geneSet.Length, length - genes.Count);
+                var sampleSize = Math.Min(geneSet.Count, length - genes.Count);
                 var array = geneSet.OrderBy(x => Random.Next()).Take(sampleSize);
                 genes.AddRange(array);
             }
@@ -66,25 +66,15 @@ namespace GeneticAlgorithms.Utilities
             return genes;
         }
 
-        public static TGene[] RandomSampleArray<TGene>(TGene[] geneSet, int length)
-        {
-            var genes = new List<TGene>(length);
-            while (genes.Count < length)
-            {
-                var sampleSize = Math.Min(geneSet.Length, length - genes.Count);
-                var array = geneSet.OrderBy(x => Random.Next()).Take(sampleSize);
-                genes.AddRange(array);
-            }
+        public static TGene[] RandomSampleArray<TGene>(IReadOnlyList<TGene> geneSet, int length) => 
+            RandomSample(geneSet, length).ToArray();
 
-            return genes.ToArray();
-        }
-
-        public static string RandomSampleString(char[] input, int length)
+        public static string RandomSampleString(IReadOnlyList<char> input, int length)
         {
             var result = string.Empty;
             while (result.Length < length)
             {
-                var sampleSize = Math.Min(input.Length, length - result.Length);
+                var sampleSize = Math.Min(input.Count, length - result.Length);
                 var array = input.OrderBy(x => Random.Next()).Take(sampleSize);
                 result += new string(array.ToArray());
             }

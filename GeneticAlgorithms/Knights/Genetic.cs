@@ -41,7 +41,7 @@ namespace GeneticAlgorithms.Knights
 
         private static Chromosome<TGene, TFitness> GenerateParent(int length, TGene[] geneSet, FitnessDelegate getFitness)
         {
-            var genes = Rand.RandomSampleArray(geneSet, length);
+            var genes = Rand.RandomSample(geneSet, length).ToArray();
             var fitness = getFitness(genes);
             var chromosome = new Chromosome<TGene, TFitness>(genes, fitness);
             return chromosome;
@@ -52,7 +52,7 @@ namespace GeneticAlgorithms.Knights
         {
             var childGenes = parent.Genes.ToArray();
             var index = Rand.Random.Next(childGenes.Length);
-            var randomSample = Rand.RandomSampleArray(geneSet, 2);
+            var randomSample = Rand.RandomSample(geneSet, 2);
             var newGene = randomSample[0];
             var alternate = randomSample[1];
             childGenes[index] = newGene.Equals(childGenes[index]) ? alternate : newGene;

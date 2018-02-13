@@ -47,7 +47,7 @@ namespace GeneticAlgorithms.TravelingSalesmanProblem
         private static Chromosome<TGene, TFitness> GenerateParent(int length, TGene[] geneSet,
             GetFitnessDelegate getGetFitness)
         {
-            var genes = Rand.RandomSampleArray(geneSet, length);
+            var genes = Rand.RandomSample(geneSet, length).ToArray();
             var fitness = getGetFitness(genes);
             var chromosome =
                 new Chromosome<TGene, TFitness>(genes, fitness, Strategies.Create);
@@ -59,7 +59,7 @@ namespace GeneticAlgorithms.TravelingSalesmanProblem
         {
             var childGenes = parent.Genes.ToArray();
             var index = Rand.Random.Next(childGenes.Length);
-            var randomSample = Rand.RandomSampleArray(geneSet, 2);
+            var randomSample = Rand.RandomSample(geneSet, 2);
             var newGene = randomSample[0];
             var alternate = randomSample[1];
             childGenes[index] = newGene.Equals(childGenes[index]) ? alternate : newGene;

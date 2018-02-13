@@ -48,7 +48,7 @@ namespace GeneticAlgorithms.ApproximatingPi
         private static Chromosome<TGene, TFitness> GenerateParent(int length, TGene[] geneSet,
             GetFitnessDelegate getGetFitness)
         {
-            var genes = Rand.RandomSampleList(geneSet, length);
+            var genes = Rand.RandomSample(geneSet, length);
             var fitness = getGetFitness(genes);
             var chromosome =
                 new Chromosome<TGene, TFitness>(genes, fitness, Strategies.Create);
@@ -60,7 +60,7 @@ namespace GeneticAlgorithms.ApproximatingPi
         {
             var childGenes = parent.Genes.ToList();
             var index = Rand.Random.Next(childGenes.Count);
-            var randomSample = Rand.RandomSampleList(geneSet, 2);
+            var randomSample = Rand.RandomSample(geneSet, 2);
             var newGene = randomSample[0];
             var alternate = randomSample[1];
             childGenes[index] = newGene.Equals(childGenes[index]) ? alternate : newGene;
