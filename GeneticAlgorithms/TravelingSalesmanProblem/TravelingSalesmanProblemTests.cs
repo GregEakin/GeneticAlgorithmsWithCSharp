@@ -30,7 +30,7 @@ namespace GeneticAlgorithms.TravelingSalesmanProblem
     [TestClass]
     public class TravelingSalesmanProblemTests
     {
-        public delegate Fitness FitnessDelegate(int[] genes);
+        public delegate Fitness FitnessDelegate(IReadOnlyList<int> genes);
 
         private static Fitness GetFitness(IReadOnlyList<int> genes, Dictionary<int, double[]> idToLocatonLookup)
         {
@@ -125,25 +125,25 @@ namespace GeneticAlgorithms.TravelingSalesmanProblem
                 {1, new[] {0.0, 4.0}},
                 {2, new[] {3.0, 0.0}},
             };
-            Fitness FnGetFitness(int[] genes1) => GetFitness(genes1, idToLocation);
+            Fitness FnGetFitness(IReadOnlyList<int> genes1) => GetFitness(genes1, idToLocation);
 
             Mutate(genes, FnGetFitness);
             CollectionAssert.AreNotEqual(new[] {0, 1, 2}, genes);
         }
 
-        private static int[] Crossover(int[] parentGenes, int[] donorGenes, FitnessDelegate fnGetFitness)
+        private static int[] Crossover(IReadOnlyList<int> parentGenes, IReadOnlyList<int> donorGenes, FitnessDelegate fnGetFitness)
         {
-            var pairs = new Dictionary<Pair, int> {{new Pair(donorGenes[0], donorGenes[donorGenes.Length - 1]), 0}};
+            var pairs = new Dictionary<Pair, int> {{new Pair(donorGenes[0], donorGenes[donorGenes.Count - 1]), 0}};
 
-            for (var i = 0; i < donorGenes.Length - 1; i++)
+            for (var i = 0; i < donorGenes.Count - 1; i++)
                 pairs[new Pair(donorGenes[i], donorGenes[i + 1])] = 0;
 
             var tempGenes = parentGenes.ToList();
-            if (pairs.ContainsKey(new Pair(parentGenes[0], parentGenes[parentGenes.Length - 1])))
+            if (pairs.ContainsKey(new Pair(parentGenes[0], parentGenes[parentGenes.Count - 1])))
             {
                 // find a discontinuity
                 var found = false;
-                for (var i = 0; i < parentGenes.Length - 1; i++)
+                for (var i = 0; i < parentGenes.Count - 1; i++)
                 {
                     if (pairs.ContainsKey(new Pair(parentGenes[i], parentGenes[i + 1])))
                         continue;
@@ -206,7 +206,7 @@ namespace GeneticAlgorithms.TravelingSalesmanProblem
                 {1, new[] {0.0, 4.0}},
                 {2, new[] {3.0, 0.0}},
             };
-            Fitness FnGetFitness(int[] genes1) => GetFitness(genes1, idToLocation);
+            Fitness FnGetFitness(IReadOnlyList<int> genes1) => GetFitness(genes1, idToLocation);
 
             var child = Crossover(father, mother, FnGetFitness);
             CollectionAssert.AreNotEqual(father, child);
@@ -287,7 +287,7 @@ namespace GeneticAlgorithms.TravelingSalesmanProblem
 
             void FnMutate(int[] genes) => Mutate(genes, FnGetFitness);
 
-            int[] FnCrossover(int[] parent, int[] donor) => Crossover(parent, donor, FnGetFitness);
+            int[] FnCrossover(IReadOnlyList<int> parent, IReadOnlyList<int> donor) => Crossover(parent, donor, FnGetFitness);
 
             var optimalFitness = FnGetFitness(optimalSequence);
             var best = Genetic<int, Fitness>.GetBest(FnGetFitness, 0, optimalFitness, null, FnDisplay, FnMutate,

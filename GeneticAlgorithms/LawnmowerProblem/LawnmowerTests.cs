@@ -97,7 +97,7 @@ namespace GeneticAlgorithms.LawnmowerProblem
             return genes;
         }
 
-        private static List<INode> Crossover(List<INode> mother, List<INode> father)
+        private static List<INode> Crossover(IReadOnlyList<INode> mother, IReadOnlyList<INode> father)
         {
             if (mother.Count <= 2)
                 return mother.ToList();

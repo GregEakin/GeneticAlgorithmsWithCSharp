@@ -42,7 +42,7 @@ namespace GeneticAlgorithms.TravelingSalesmanProblem
 
         public delegate TGene[] CreateDelegate();
 
-        public delegate TGene[] CrossoverDelegate(TGene[] genes1, TGene[] genes2);
+        public delegate TGene[] CrossoverDelegate(IReadOnlyList<TGene> genes1, IReadOnlyList<TGene> genes2);
 
         private static Chromosome<TGene, TFitness> GenerateParent(int length, IReadOnlyList<TGene> geneSet,
             GetFitnessDelegate getGetFitness)
@@ -54,7 +54,8 @@ namespace GeneticAlgorithms.TravelingSalesmanProblem
             return chromosome;
         }
 
-        private static Chromosome<TGene, TFitness> Mutate(Chromosome<TGene, TFitness> parent, IReadOnlyList<TGene> geneSet,
+        private static Chromosome<TGene, TFitness> Mutate(Chromosome<TGene, TFitness> parent,
+            IReadOnlyList<TGene> geneSet,
             GetFitnessDelegate getFitness)
         {
             var childGenes = parent.Genes.ToArray();
@@ -76,10 +77,9 @@ namespace GeneticAlgorithms.TravelingSalesmanProblem
             return new Chromosome<TGene, TFitness>(childGenes, fitness, Strategies.Mutate);
         }
 
-        private static Chromosome<TGene, TFitness> Crossover(TGene[] parentGenes, int index,
-            List<Chromosome<TGene, TFitness>> parents,
-            GetFitnessDelegate getFitness, CrossoverDelegate crossover, MutateChromosomeDelegate mutate,
-            GenerateParentDelegate generateParent)
+        private static Chromosome<TGene, TFitness> Crossover(IReadOnlyList<TGene> parentGenes, int index,
+            IList<Chromosome<TGene, TFitness>> parents, GetFitnessDelegate getFitness, CrossoverDelegate crossover,
+            MutateChromosomeDelegate mutate, GenerateParentDelegate generateParent)
         {
             var donorIndex = Rand.Random.Next(0, parents.Count);
             if (donorIndex == index)
@@ -99,7 +99,8 @@ namespace GeneticAlgorithms.TravelingSalesmanProblem
 
         public static Chromosome<TGene, TFitness> GetBest(GetFitnessDelegate getFitness, int targetLen,
             TFitness optimalFitness, TGene[] geneSet, DisplayDelegate display, MutateGeneDelegate customMutate = null,
-            CreateDelegate customCreate = null, int? maxAge = null, int poolSize = 1, CrossoverDelegate crossover = null)
+            CreateDelegate customCreate = null, int? maxAge = null, int poolSize = 1,
+            CrossoverDelegate crossover = null)
         {
             Chromosome<TGene, TFitness> FnMutate(Chromosome<TGene, TFitness> parent) =>
                 customMutate == null

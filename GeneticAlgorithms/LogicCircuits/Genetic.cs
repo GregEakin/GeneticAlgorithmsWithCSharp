@@ -43,7 +43,7 @@ namespace GeneticAlgorithms.LogicCircuits
 
         public delegate List<TGene> CreateDelegate();
 
-        public delegate List<TGene> CrossoverDelegate(List<TGene> genes1, List<TGene> genes2);
+        public delegate List<TGene> CrossoverDelegate(IReadOnlyList<TGene> genes1, IReadOnlyList<TGene> genes2);
 
         public delegate Chromosome<TGene, TFitness> GenerateParentDelegate();
 
@@ -85,7 +85,7 @@ namespace GeneticAlgorithms.LogicCircuits
         }
 
         private static Chromosome<TGene, TFitness> Crossover(List<TGene> parentGenes, int index,
-            List<Chromosome<TGene, TFitness>> parents,
+            IList<Chromosome<TGene, TFitness>> parents,
             GetFitnessDelegate getFitness, CrossoverDelegate crossover, MutateChromosomeDelegate mutate,
             GenerateParentDelegate generateParent)
         {

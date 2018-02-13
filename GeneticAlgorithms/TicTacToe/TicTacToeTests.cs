@@ -346,7 +346,7 @@ namespace GeneticAlgorithms.TicTacToe
             void FnMutate(List<Rule> genes) =>
                 Mutate(genes, FnGetFitness, mutationOperators, mutationRoundCounts);
 
-            List<Rule> FnCrossover(List<Rule> parent, List<Rule> doner)
+            List<Rule> FnCrossover(IReadOnlyList<Rule> parent, IReadOnlyList<Rule> doner)
             {
                 var child = parent.Take(parent.Count / 2).Concat(doner.Skip(doner.Count / 2)).ToList();
                 FnMutate(child);
@@ -393,7 +393,7 @@ namespace GeneticAlgorithms.TicTacToe
             void FnMutate(List<Rule> genes) =>
                 Mutate(genes, x => new Fitness(0, 0, 0, 0), mutationOperators, mutationRoundCounts);
 
-            List<Rule> FnCrossover(List<Rule> parent, List<Rule> doner)
+            List<Rule> FnCrossover(IReadOnlyList<Rule> parent, IReadOnlyList<Rule> doner)
             {
                 var child = parent.Take(parent.Count / 2).Concat(doner.Skip(doner.Count / 2)).ToList();
                 FnMutate(child);
