@@ -402,7 +402,7 @@ namespace GeneticAlgorithms.LogicCircuits
             Assert.IsTrue(circuit.Count <= expectedLength);
         }
 
-        private static Tuple<ICircuit, ISet<int>> NodesToCircuit(List<Node> genes)
+        private static Tuple<ICircuit, ISet<int>> NodesToCircuit(IReadOnlyList<Node> genes)
         {
             var circuit = new List<ICircuit>();
             var usedIndexes = new List<ISet<int>>();

@@ -69,7 +69,7 @@ namespace GeneticAlgorithms.RegularExpressions
             Assert.AreEqual("1[2]", repaired);
         }
 
-        private static string RepairRegex(List<string> genes)
+        private static string RepairRegex(IEnumerable<string> genes)
         {
             var result = new List<string>();
             var finals = new List<string>();

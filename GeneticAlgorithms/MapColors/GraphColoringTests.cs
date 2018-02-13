@@ -131,7 +131,7 @@ namespace GeneticAlgorithms.MapColors
         private static void Display(Chromosome<char, int> candidate, Stopwatch watch)
         {
             Console.WriteLine("{0}\t{1}\t{2} ms",
-                new string(candidate.Genes),
+                string.Join("", candidate.Genes),
                 candidate.Fitness, watch.ElapsedMilliseconds);
         }
 

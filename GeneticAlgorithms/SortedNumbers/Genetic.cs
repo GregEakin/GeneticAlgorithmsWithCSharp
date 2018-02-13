@@ -46,7 +46,7 @@ namespace GeneticAlgorithms.SortedNumbers
             GetFitnessDelegate getFitness)
         {
             var childGenes = parent.Genes.ToArray();
-            var index = Rand.Random.Next(parent.Genes.Length);
+            var index = Rand.Random.Next(parent.Genes.Count);
             var randomSample = Rand.RandomSample(geneSet, 2);
             var newGene = randomSample[0];
             var alternate = randomSample[1];

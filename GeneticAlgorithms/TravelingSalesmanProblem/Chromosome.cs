@@ -17,11 +17,13 @@
  * permissions and limitations under the License.
  */
 
+using System.Collections.Generic;
+
 namespace GeneticAlgorithms.TravelingSalesmanProblem
 {
     public class Chromosome<TGene, TFitness>
     {
-        public TGene[] Genes { get; }
+        public IReadOnlyList<TGene> Genes { get; }
 
         public TFitness Fitness { get; }
 
@@ -29,7 +31,7 @@ namespace GeneticAlgorithms.TravelingSalesmanProblem
 
         public int Age { get; set; }
 
-        public Chromosome(TGene[] genes, TFitness fitness, Strategies strategy)
+        public Chromosome(IReadOnlyList<TGene> genes, TFitness fitness, Strategies strategy)
         {
             Genes = genes;
             Fitness = fitness;

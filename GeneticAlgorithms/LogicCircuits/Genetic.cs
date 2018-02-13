@@ -84,7 +84,7 @@ namespace GeneticAlgorithms.LogicCircuits
             return new Chromosome<TGene, TFitness>(childGenes, fitness, Strategies.Mutate);
         }
 
-        private static Chromosome<TGene, TFitness> Crossover(List<TGene> parentGenes, int index,
+        private static Chromosome<TGene, TFitness> Crossover(IReadOnlyList<TGene> parentGenes, int index,
             IList<Chromosome<TGene, TFitness>> parents,
             GetFitnessDelegate getFitness, CrossoverDelegate crossover, MutateChromosomeDelegate mutate,
             GenerateParentDelegate generateParent)

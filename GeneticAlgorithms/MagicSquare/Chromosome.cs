@@ -23,13 +23,13 @@ namespace GeneticAlgorithms.MagicSquare
 {
     public class Chromosome<TGene, TFitness>
     {
-        public List<TGene> Genes { get; }
+        public IReadOnlyList<TGene> Genes { get; }
 
         public TFitness Fitness { get; }
 
         public int Age { get; set; }
 
-        public Chromosome(List<TGene> genes, TFitness fitness)
+        public Chromosome(IReadOnlyList<TGene> genes, TFitness fitness)
         {
             Genes = genes;
             Fitness = fitness;

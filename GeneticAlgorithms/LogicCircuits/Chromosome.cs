@@ -23,7 +23,7 @@ namespace GeneticAlgorithms.LogicCircuits
 {
     public class Chromosome<TGene, TFitness>
     {
-        public List<TGene> Genes { get; }
+        public IReadOnlyList<TGene> Genes { get; }
 
         public TFitness Fitness { get; }
 
@@ -31,7 +31,7 @@ namespace GeneticAlgorithms.LogicCircuits
 
         public int Age { get; set; }
 
-        public Chromosome(List<TGene> genes, TFitness fitness, Strategies strategy)
+        public Chromosome(IReadOnlyList<TGene> genes, TFitness fitness, Strategies strategy)
         {
             Genes = genes;
             Fitness = fitness;
