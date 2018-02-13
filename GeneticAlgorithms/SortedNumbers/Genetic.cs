@@ -29,7 +29,7 @@ namespace GeneticAlgorithms.SortedNumbers
     {
         public delegate void DisplayFun(Chromosome<TGene, TFitness> child);
 
-        public delegate TFitness GetFitnessFun(TGene[] gene);
+        public delegate TFitness GetFitnessFun(IReadOnlyList<TGene> gene);
 
         public delegate Chromosome<TGene, TFitness> MutateChromosomeDelegate(Chromosome<TGene, TFitness> parent);
 

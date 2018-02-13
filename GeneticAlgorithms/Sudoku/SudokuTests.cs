@@ -174,7 +174,7 @@ namespace GeneticAlgorithms.Sudoku
 
             var validationRules = BuildValidationRules();
 
-            int FnGetFitness(List<int> genes) =>
+            int FnGetFitness(IReadOnlyList<int> genes) =>
                 GetFitness(genes, validationRules);
 
             List<int> FnCreate() =>

@@ -34,11 +34,11 @@ namespace GeneticAlgorithms.LawnmowerProblem
 
         public delegate INode FnCreateGeneDelegate();
 
-        public delegate Fitness FnGetFitnessDelegate(List<INode> genes);
+        public delegate Fitness FnGetFitnessDelegate(IReadOnlyList<INode> genes);
 
-        public delegate Tuple<Field, Mower, Program> FnEvaluateDelegate(List<INode> genes);
+        public delegate Tuple<Field, Mower, Program> FnEvaluateDelegate(IReadOnlyList<INode> genes);
 
-        private static Fitness GetFitness(List<INode> genes, FnEvaluateDelegate fnEvaluate)
+        private static Fitness GetFitness(IReadOnlyList<INode> genes, FnEvaluateDelegate fnEvaluate)
         {
             var tuple = fnEvaluate(genes);
             return new Fitness(tuple.Item1.CountMowed(), genes.Count, tuple.Item2.StepCount);
@@ -119,7 +119,7 @@ namespace GeneticAlgorithms.LawnmowerProblem
             var parent = new List<INode> {new Mow(), new Mow(), new Mow(), new Mow()};
             var geneSet = new FnCreateGeneDelegate[] {() => new Turn()};
 
-            Tuple<Field, Mower, Program> FnEvaluate(List<INode> instructions)
+            Tuple<Field, Mower, Program> FnEvaluate(IReadOnlyList<INode> instructions)
             {
                 var field = new ToroidField(10, 10, FieldContents.Grass);
                 var location = new Location(5, 5);
@@ -131,7 +131,7 @@ namespace GeneticAlgorithms.LawnmowerProblem
                 return new Tuple<Field, Mower, Program>(field, mower, program);
             }
 
-            Fitness FnFitness(List<INode> genes) =>
+            Fitness FnFitness(IReadOnlyList<INode> genes) =>
                 GetFitness(genes, FnEvaluate);
 
             var copy = parent.ToList();
@@ -319,7 +319,7 @@ namespace GeneticAlgorithms.LawnmowerProblem
             List<INode> FnCreate() =>
                 Create(geneSet, 1, height);
 
-            Tuple<Field, Mower, Program> FnEvaluate(List<INode> instructions)
+            Tuple<Field, Mower, Program> FnEvaluate(IReadOnlyList<INode> instructions)
             {
                 var program = new Program(instructions);
                 var mower = new Mower(mowerStartLocation, mowerStartDirection);
@@ -329,7 +329,7 @@ namespace GeneticAlgorithms.LawnmowerProblem
                 return new Tuple<Field, Mower, Program>(field, mower, program);
             }
 
-            Fitness FnGetFitness(List<INode> genes) =>
+            Fitness FnGetFitness(IReadOnlyList<INode> genes) =>
                 GetFitness(genes, FnEvaluate);
 
             var watch = Stopwatch.StartNew();

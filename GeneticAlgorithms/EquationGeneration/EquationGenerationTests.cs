@@ -30,11 +30,11 @@ namespace GeneticAlgorithms.EquationGeneration
     [TestClass]
     public class EquationGenerationTests
     {
-        private delegate int FnFitnessDelegate(List<string> genes);
+        private delegate int FnFitnessDelegate(IReadOnlyList<string> genes);
 
         private delegate int OperationDelegate(int lhs, int rhs);
 
-        private static int Evaluate(List<string> genes, Dictionary<string, OperationDelegate> prioritizedOperations)
+        private static int Evaluate(IReadOnlyList<string> genes, Dictionary<string, OperationDelegate> prioritizedOperations)
         {
             var equation = genes.ToList();
             foreach (var operationSet in prioritizedOperations)
@@ -80,7 +80,7 @@ namespace GeneticAlgorithms.EquationGeneration
         private static int Multiply(int a, int b) =>
             a * b;
 
-        private static int GetFitness(List<string> genes, int expectedTotal, FnFitnessDelegate fnEvaluate)
+        private static int GetFitness(IReadOnlyList<string> genes, int expectedTotal, FnFitnessDelegate fnEvaluate)
         {
             try
             {
@@ -208,10 +208,10 @@ namespace GeneticAlgorithms.EquationGeneration
             void FnDisplay(Chromosome<string, int> candidate) =>
                 Display(candidate, watch);
 
-            int FnEvaluate(List<string> genes) =>
+            int FnEvaluate(IReadOnlyList<string> genes) =>
                 Evaluate(genes, prioritizedOperations);
 
-            int FnGetFitness(List<string> genes) =>
+            int FnGetFitness(IReadOnlyList<string> genes) =>
                 GetFitness(genes, expectedTotal, FnEvaluate);
 
             List<string> FnCreate() =>

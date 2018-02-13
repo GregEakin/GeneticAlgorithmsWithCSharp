@@ -27,7 +27,7 @@ namespace GeneticAlgorithms.TravelingSalesmanProblem
     public static class Genetic<TGene, TFitness>
         where TFitness : IComparable<TFitness>
     {
-        public delegate TFitness GetFitnessDelegate(TGene[] gene);
+        public delegate TFitness GetFitnessDelegate(IReadOnlyList<TGene> gene);
 
         public delegate void DisplayDelegate(Chromosome<TGene, TFitness> child);
 

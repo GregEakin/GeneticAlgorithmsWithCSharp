@@ -169,7 +169,7 @@ namespace GeneticAlgorithms.LawnmowerProblem
         public List<INode> Main { get; }
         public List<INode> Funcs { get; } = new List<INode>();
 
-        public Program(List<INode> genes)
+        public Program(IEnumerable<INode> genes)
         {
             Main = genes.ToList();
             for (var index = Main.Count - 1; index >= 0; index--)

@@ -30,7 +30,7 @@ namespace GeneticAlgorithms.Queens
     [TestClass]
     public class QueenTests
     {
-        private static Fitness Fitness(int[] genes, int size)
+        private static Fitness Fitness(IReadOnlyList<int> genes, int size)
         {
             var board = new Board(genes, size);
             var rowsWithQueens = new HashSet<int>();
@@ -130,7 +130,7 @@ namespace GeneticAlgorithms.Queens
         [TestMethod]
         public void GenerateParentTest()
         {
-            int FitnessFun(int[] guess) => 86;
+            int FitnessFun(IReadOnlyList<int> guess) => 86;
 
             var geneSet = new[] {1, 3, 5, 7, 9};
             var parent = Genetic<int, int>.GenerateParent(10, geneSet, FitnessFun);
@@ -142,7 +142,7 @@ namespace GeneticAlgorithms.Queens
         [TestMethod]
         public void MutateTest()
         {
-            int FitnessFun(int[] guess) => 86;
+            int FitnessFun(IReadOnlyList<int> guess) => 86;
             var geneSet = new[] {0, 1, 2, 3, 4, 5, 6, 7};
             var genes = new[] {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
             var parent = new Chromosome<int, int>(genes, 0);
@@ -169,7 +169,7 @@ namespace GeneticAlgorithms.Queens
             var watch = Stopwatch.StartNew();
 
             void DisplayFun(Chromosome<int, Fitness> candidate) => Display(candidate, watch, geneSet.Length);
-            Fitness FitnessFun(int[] genes) => Fitness(genes, size);
+            Fitness FitnessFun(IReadOnlyList<int> genes) => Fitness(genes, size);
 
             var optimalFitness = new Fitness(0);
             var best = Genetic<int, Fitness>.GetBest(FitnessFun, 2 * size, optimalFitness, geneSet, DisplayFun);

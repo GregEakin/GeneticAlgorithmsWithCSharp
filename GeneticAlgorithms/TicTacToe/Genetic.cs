@@ -43,7 +43,7 @@ namespace GeneticAlgorithms.TicTacToe
 
         public delegate int SortKeyDelegate(List<TGene> a, int b, int c, int d);
 
-        public delegate TFitness GetFitnessDelegate(List<TGene> gene);
+        public delegate TFitness GetFitnessDelegate(IReadOnlyList<TGene> gene);
 
         public delegate List<TGene> CreateDelegate();
 

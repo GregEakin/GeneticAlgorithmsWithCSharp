@@ -154,7 +154,7 @@ namespace GeneticAlgorithms.ApproximatingPi
             void FnDispaly(Chromosome<bool, double> candidate) =>
                 Display(candidate, watch, bitValues);
 
-            double FnGetFitness(List<bool> genes) =>
+            double FnGetFitness(IReadOnlyList<bool> genes) =>
                 GetFitness(genes, bitValues);
 
             var optimalFitness = Math.Round(355.0 / 113.0, 5); // = 3.14159;
@@ -176,7 +176,7 @@ namespace GeneticAlgorithms.ApproximatingPi
             var length = 10;
             var maxSeconds = 2;
 
-            double FnGetFitness(List<int> genes)
+            double FnGetFitness(IReadOnlyList<int> genes)
             {
                 var watch = Stopwatch.StartNew();
                 var count = 0.0;

@@ -33,7 +33,7 @@ namespace GeneticAlgorithms.TicTacToe
 
         public delegate Fitness FnGetFitness(List<Rule> genes);
 
-        private static Fitness GetFitness(List<Rule> genes)
+        private static Fitness GetFitness(IReadOnlyList<Rule> genes)
         {
             var localCopy = genes.ToList();
             var fitness = GetFitnessForAllGames(localCopy);
@@ -329,7 +329,7 @@ namespace GeneticAlgorithms.TicTacToe
             void FnDisplay(Chromosome<Rule, Fitness> candidate, int? length) =>
                 Display(candidate, watch);
 
-            Fitness FnGetFitness(List<Rule> genes) =>
+            Fitness FnGetFitness(IReadOnlyList<Rule> genes) =>
                 GetFitness(genes);
 
             var mutationRoundCounts = new List<int> {1};

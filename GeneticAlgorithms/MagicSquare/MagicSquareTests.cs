@@ -29,7 +29,7 @@ namespace GeneticAlgorithms.MagicSquare
     [TestClass]
     public class MagicSquareTests
     {
-        private static Fitness GetFitness(List<int> genes, int diagonalSize, int expectedSum)
+        private static Fitness GetFitness(IReadOnlyList<int> genes, int diagonalSize, int expectedSum)
         {
             var sums = GetSums(genes, diagonalSize);
             var sumOfDifferences = sums.Item1.Concat(sums.Item2).Concat(new[] {sums.Item3, sums.Item4})
@@ -50,7 +50,7 @@ namespace GeneticAlgorithms.MagicSquare
             Console.WriteLine(" - - - - - - - - - - - {0}, {1} ms", candidate.Fitness, watch.ElapsedMilliseconds);
         }
 
-        private static Tuple<int[], int[], int, int> GetSums(List<int> genes, int diagonalSize)
+        private static Tuple<int[], int[], int, int> GetSums(IReadOnlyList<int> genes, int diagonalSize)
         {
             var rows = new int[diagonalSize];
             var columns = new int[diagonalSize];
@@ -121,7 +121,7 @@ namespace GeneticAlgorithms.MagicSquare
             var expectedSum = diagonalSize * (nSquared + 1) / 2;
             var geneIndexes = Enumerable.Range(0, geneSet.Length).ToArray();
 
-            Fitness FnGetFitness(List<int> genes) => GetFitness(genes, diagonalSize, expectedSum);
+            Fitness FnGetFitness(IReadOnlyList<int> genes) => GetFitness(genes, diagonalSize, expectedSum);
             void FnDisplay(Chromosome<int, Fitness> candidate) => Display(candidate, watch, diagonalSize);
             void FnMutate(List<int> genes) => Mutate(genes, geneIndexes);
             List<int> FnCreate() => geneSet.OrderBy(i => Rand.Random.Next(geneSet.Length)).ToList();

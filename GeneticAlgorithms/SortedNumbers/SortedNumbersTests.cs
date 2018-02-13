@@ -19,6 +19,7 @@
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 
@@ -27,11 +28,11 @@ namespace GeneticAlgorithms.SortedNumbers
     [TestClass]
     public class SortedNumbersTests
     {
-        private static Fitness GetFitness(int[] genes)
+        private static Fitness GetFitness(IReadOnlyList<int> genes)
         {
             var count = 1;
             var gap = 0;
-            for (var i = 1; i < genes.Length; i++)
+            for (var i = 1; i < genes.Count; i++)
             {
                 if (genes[i - 1] < genes[i])
                     count++;
@@ -61,7 +62,7 @@ namespace GeneticAlgorithms.SortedNumbers
             var watch = Stopwatch.StartNew();
 
             void FnDisplay(Chromosome<int, Fitness> candidate) => Display(candidate, watch);
-            Fitness FnGetFitness(int[] genes) => GetFitness(genes);
+            Fitness FnGetFitness(IReadOnlyList<int> genes) => GetFitness(genes);
 
             var optimalFitness = new Fitness(totalNumbers, 0);
             var best = Genetic<int, Fitness>.GetBest(FnGetFitness, totalNumbers, optimalFitness, geneSet, FnDisplay);

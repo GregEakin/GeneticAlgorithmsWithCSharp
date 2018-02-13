@@ -31,7 +31,7 @@ namespace GeneticAlgorithms.MagicSquare
 
         public delegate void DisplayDelegate(Chromosome<TGene, TFitness> child);
 
-        public delegate TFitness GetFitnessDelegate(List<TGene> gene);
+        public delegate TFitness GetFitnessDelegate(IReadOnlyList<TGene> gene);
 
         public delegate List<TGene> CreateDelegate();
 

@@ -32,10 +32,10 @@ namespace GeneticAlgorithms.TravelingSalesmanProblem
     {
         public delegate Fitness FitnessDelegate(int[] genes);
 
-        private static Fitness GetFitness(int[] genes, Dictionary<int, double[]> idToLocatonLookup)
+        private static Fitness GetFitness(IReadOnlyList<int> genes, Dictionary<int, double[]> idToLocatonLookup)
         {
-            var fitness = GetDistance(idToLocatonLookup[genes[0]], idToLocatonLookup[genes[genes.Length - 1]]);
-            for (var i = 0; i < genes.Length - 1; i++)
+            var fitness = GetDistance(idToLocatonLookup[genes[0]], idToLocatonLookup[genes[genes.Count - 1]]);
+            for (var i = 0; i < genes.Count - 1; i++)
             {
                 var start = idToLocatonLookup[genes[i]];
                 var end = idToLocatonLookup[genes[i + 1]];
@@ -283,7 +283,7 @@ namespace GeneticAlgorithms.TravelingSalesmanProblem
 
             void FnDisplay(Chromosome<int, Fitness> candidate) => Display(candidate, watch);
 
-            Fitness FnGetFitness(int[] genes) => GetFitness(genes, idToLocationLookup);
+            Fitness FnGetFitness(IReadOnlyList<int> genes) => GetFitness(genes, idToLocationLookup);
 
             void FnMutate(int[] genes) => Mutate(genes, FnGetFitness);
 

@@ -57,7 +57,7 @@ namespace GeneticAlgorithms.MapColors
 
         public override string ToString() => $"{Node} -> {Adjacent}";
 
-        public bool Valid(char[] genes, Dictionary<string, int> nodeIndexLookup)
+        public bool Valid(IReadOnlyList<char> genes, Dictionary<string, int> nodeIndexLookup)
         {
             var index = nodeIndexLookup[Node];
             var adjacentNodeIndex = nodeIndexLookup[Adjacent];

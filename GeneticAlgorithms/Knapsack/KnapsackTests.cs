@@ -195,7 +195,7 @@ namespace GeneticAlgorithms.Knapsack
             var sortedItems = items.OrderBy(i => i.Value).ToArray();
 
             void FnDisplay(Chromosome<ItemQuantity, Fitness> candidate) => Display(candidate, watch);
-            Fitness FnGetFitness(List<ItemQuantity> genes) => GetFitness(genes);
+            Fitness FnGetFitness(IReadOnlyList<ItemQuantity> genes) => GetFitness(genes);
             List<ItemQuantity> FnCreate() => Create(items, maxWeight, maxVolume);
             void FnMutate(List<ItemQuantity> genes) => Mutate(genes, sortedItems, maxWeight, maxVolume, window);
 

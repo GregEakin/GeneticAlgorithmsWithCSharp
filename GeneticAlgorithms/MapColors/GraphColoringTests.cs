@@ -122,7 +122,7 @@ namespace GeneticAlgorithms.MapColors
             Assert.AreEqual(3, rules.Length);
         }
 
-        private static int GetFitness(char[] genes, ISet<Rule> rules, Dictionary<string, int> stateIndexLookup)
+        private static int GetFitness(IReadOnlyList<char> genes, ISet<Rule> rules, Dictionary<string, int> stateIndexLookup)
         {
             var rulesThatPass = rules.Count(r => r.Valid(genes, stateIndexLookup));
             return rulesThatPass;
@@ -167,7 +167,7 @@ namespace GeneticAlgorithms.MapColors
 
             void FnDisplay(Chromosome<char, int> candidate) => Display(candidate, watch);
 
-            int FnGetFitness(char[] genes) => GetFitness(genes, rules, nodeIndexLookup);
+            int FnGetFitness(IReadOnlyList<char> genes) => GetFitness(genes, rules, nodeIndexLookup);
 
             var best = Genetic<char, int>.GetBest(FnGetFitness, nodes.Count, optimalValue, geneSet, FnDisplay);
             Assert.IsTrue(optimalValue.CompareTo(best.Fitness) <= 0);

@@ -34,7 +34,7 @@ namespace GeneticAlgorithms.LinearEquation
 
         public delegate IReadOnlyList<Fraction> FnGenesToImputsDelegate(IReadOnlyList<Fraction> genes);
 
-        private static Fitness GetFitness(List<Fraction> genes, FnEquationDelegate[] equations)
+        private static Fitness GetFitness(IReadOnlyList<Fraction> genes, FnEquationDelegate[] equations)
         {
             try
             {
@@ -248,7 +248,7 @@ namespace GeneticAlgorithms.LinearEquation
             var sortedGeneSet = geneSet.OrderBy(gene => gene).ToList();
 
             void FnDispaly(Chromosome<Fraction, Fitness> candidate) => Display(candidate, watch, fnGenesToImputs);
-            Fitness FnGetFitness(List<Fraction> genes) => GetFitness(genes, equations);
+            Fitness FnGetFitness(IReadOnlyList<Fraction> genes) => GetFitness(genes, equations);
             void FnMutate(List<Fraction> genes) => Mutate(genes, sortedGeneSet, window, geneIndexes);
 
             var optimalFitness = new Fitness(new Fraction(0));
