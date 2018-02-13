@@ -66,12 +66,12 @@ namespace GeneticAlgorithms.Knapsack
             return Math.Min(weight, volume);
         }
 
-        private static List<ItemQuantity> Create(Resource[] items, double maxWeight, double maxVolume)
+        private static List<ItemQuantity> Create(IReadOnlyCollection<Resource> items, double maxWeight, double maxVolume)
         {
             var genes = new List<ItemQuantity>();
             var remainingWeight = maxWeight;
             var remainingVolume = maxVolume;
-            foreach (var unused in Enumerable.Range(1, Rand.Random.Next(items.Length)))
+            foreach (var unused in Enumerable.Range(1, Rand.Random.Next(items.Count)))
             {
                 var newGene = Add(genes.ToArray(), items, remainingWeight, remainingVolume);
                 if (newGene == null) continue;
@@ -83,7 +83,7 @@ namespace GeneticAlgorithms.Knapsack
             return genes;
         }
 
-        private static ItemQuantity Add(ItemQuantity[] genes, Resource[] items, double maxWeight, double maxVolume)
+        private static ItemQuantity Add(IEnumerable<ItemQuantity> genes, IEnumerable<Resource> items, double maxWeight, double maxVolume)
         {
             var usedItems = genes.Select(iq => iq.Item).ToList();
             var item = Rand.SelectItemNotIn(items, usedItems);
@@ -91,7 +91,7 @@ namespace GeneticAlgorithms.Knapsack
             return maxQuantity > 0 ? new ItemQuantity(item, maxQuantity) : null;
         }
 
-        private static void Mutate(List<ItemQuantity> genes, Resource[] items, double maxWeight, double maxVolume,
+        private static void Mutate(List<ItemQuantity> genes, IList<Resource> items, double maxWeight, double maxVolume,
             Window window)
         {
             window.Slide();
@@ -111,7 +111,7 @@ namespace GeneticAlgorithms.Knapsack
             }
 
             var adding = (remainingWeight > 0 || remainingVolume > 0) &&
-                         (genes.Count == 0 || (genes.Count < items.Length && Rand.PercentChance(1)));
+                         (genes.Count == 0 || (genes.Count < items.Count && Rand.PercentChance(1)));
             if (adding)
             {
                 var newGene = Add(genes.ToArray(), items, remainingWeight, remainingVolume);
@@ -128,12 +128,12 @@ namespace GeneticAlgorithms.Knapsack
             remainingWeight += item.Weight * iq.Quantity;
             remainingVolume += item.Volume * iq.Quantity;
 
-            var changeItem = genes.Count < items.Length && Rand.PercentChance(25);
+            var changeItem = genes.Count < items.Count && Rand.PercentChance(25);
             if (changeItem)
             {
-                var itemIndex = Array.IndexOf(items, iq.Item);
+                var itemIndex = items.IndexOf(iq.Item);
                 var start = Math.Max(1, itemIndex - window.Size);
-                var stop = Math.Min(items.Length - 1, itemIndex + window.Size);
+                var stop = Math.Min(items.Count - 1, itemIndex + window.Size);
                 item = items[Rand.Random.Next(start, stop)];
             }
 
@@ -192,7 +192,7 @@ namespace GeneticAlgorithms.Knapsack
         {
             var watch = Stopwatch.StartNew();
             var window = new Window(1, Math.Max(1, items.Length / 3), items.Length / 2);
-            var sortedItems = items.OrderBy(i => i.Value).ToArray();
+            var sortedItems = items.OrderBy(i => i.Value);
 
             void FnDisplay(Chromosome<ItemQuantity, Fitness> candidate) => Display(candidate, watch);
             Fitness FnGetFitness(IReadOnlyList<ItemQuantity> genes) => GetFitness(genes);

@@ -88,7 +88,7 @@ namespace GeneticAlgorithms.LawnmowerProblem
             }
         }
 
-        private static List<INode> Create(FnCreateGeneDelegate[] geneSet, int minGenes, int maxGenes)
+        private static List<INode> Create(IReadOnlyList<FnCreateGeneDelegate> geneSet, int minGenes, int maxGenes)
         {
             var numGenes = Rand.Random.Next(minGenes, maxGenes + 1);
             var genes = new List<INode>(numGenes);

@@ -104,7 +104,7 @@ namespace GeneticAlgorithms.EquationGeneration
                 watch.ElapsedMilliseconds);
         }
 
-        private static List<string> Create(List<string> numbers, string[] operators, int minNumbers, int maxNumbers)
+        private static List<string> Create(IReadOnlyCollection<string> numbers, IReadOnlyList<string> operators, int minNumbers, int maxNumbers)
         {
             var genes = numbers.OrderBy(n => Rand.Random.Next()).Take(1).ToList();
             var count = Rand.Random.Next(minNumbers, 1 + maxNumbers);
