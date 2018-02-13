@@ -44,7 +44,7 @@ namespace GeneticAlgorithms.Password
         private static void GuessPassword(string target)
         {
             var watch = Stopwatch.StartNew();
-            int FnGetFitness(string guess) => GetFitness(target, guess);
+            int FnGetFitness(string genes) => GetFitness(genes, target);
             void FnDisplay(Chromosome candidate) => Display(candidate, watch);
 
             var optimalFitness = target.Length;

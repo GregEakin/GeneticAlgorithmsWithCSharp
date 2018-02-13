@@ -25,15 +25,10 @@ namespace GeneticAlgorithms.Utilities
     {
         public static Random Random { get; } = new Random();
 
-        public static T SelectItemNotIn<T>(IReadOnlyList<T> list, IReadOnlyList<T> except)
+        public static T SelectItemNotIn<T>(IEnumerable<T> list, IReadOnlyList<T> except)
         {
             var subList = list.Where(i => !except.Contains(i)).ToList();
             return SelectItem(subList);
-            //T item;
-            //do
-            //    item = SelectItem(list);
-            //while (except.Contains(item));
-            //return item;
         }
 
         public static T SelectItem<T>(IReadOnlyList<T> list)
@@ -66,10 +61,7 @@ namespace GeneticAlgorithms.Utilities
             return genes;
         }
 
-        public static TGene[] RandomSampleArray<TGene>(IReadOnlyList<TGene> geneSet, int length) => 
-            RandomSample(geneSet, length).ToArray();
-
-        public static string RandomSampleString(IReadOnlyList<char> input, int length)
+        public static string RandomSample(IReadOnlyList<char> input, int length)
         {
             var result = string.Empty;
             while (result.Length < length)

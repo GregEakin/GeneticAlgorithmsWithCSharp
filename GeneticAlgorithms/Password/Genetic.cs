@@ -34,18 +34,18 @@ namespace GeneticAlgorithms.Password
             while (genes.Length < length)
             {
                 var sampleSize = Math.Min(length - genes.Length, geneSet.Length);
-                genes += Rand.RandomSampleString(geneSet, sampleSize);
+                genes += Rand.RandomSample(geneSet, sampleSize);
             }
 
             var fitness = getFitness(genes);
             return new Chromosome(genes, fitness);
         }
 
-        private static Chromosome Mutate(char[] geneSet, Chromosome parent, GetFitnessDelegate getFitness)
+        private static Chromosome Mutate(Chromosome parent, char[] geneSet, GetFitnessDelegate getFitness)
         {
-            var index = Rand.Random.Next(parent.Genes.Length);
             var childGenes = parent.Genes.ToCharArray();
-            var randomSample = Rand.RandomSampleString(geneSet, 2);
+            var index = Rand.Random.Next(parent.Genes.Length);
+            var randomSample = Rand.RandomSample(geneSet, 2);
             var newGene = randomSample[0];
             var alternate = randomSample[1];
             childGenes[index] = newGene == childGenes[index] ? alternate : newGene;
@@ -65,7 +65,7 @@ namespace GeneticAlgorithms.Password
 
             while (true)
             {
-                var child = Mutate(geneSet, bestParent, getFitness);
+                var child = Mutate(bestParent, geneSet, getFitness);
                 if (bestParent.Fitness >= child.Fitness)
                     continue;
                 display(child);
