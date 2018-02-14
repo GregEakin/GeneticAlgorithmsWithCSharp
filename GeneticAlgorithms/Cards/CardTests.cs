@@ -29,11 +29,11 @@ namespace GeneticAlgorithms.Cards
     [TestClass]
     public class CardTests
     {
-        private static Fitness GetFitness(int[] genes)
+        private static Fitness GetFitness(IReadOnlyCollection<int> genes)
         {
             var group1Sum = genes.Take(5).Sum();
             var group2Product = genes.Skip(5).Aggregate(1, (acc, val) => acc * val);
-            var duplicateCount = genes.Length - new HashSet<int>(genes).Count;
+            var duplicateCount = genes.Count - new HashSet<int>(genes).Count;
             return new Fitness(group1Sum, group2Product, duplicateCount);
         }
 
@@ -45,14 +45,14 @@ namespace GeneticAlgorithms.Cards
                 candidate.Fitness, watch.ElapsedMilliseconds);
         }
 
-        private static void Mutate(int[] genes, int[] geneSet)
+        private static void Mutate(IList<int> genes, IReadOnlyList<int> geneSet)
         {
-            if (genes.Length == new HashSet<int>(genes).Count)
+            if (genes.Count == new HashSet<int>(genes).Count)
             {
                 var count = Rand.Random.Next(1, 4);
                 while (count-- > 0)
                 {
-                    var randomSample = Rand.RandomSample(Enumerable.Range(0, genes.Length).ToArray(), 2);
+                    var randomSample = Rand.RandomSample(Enumerable.Range(0, genes.Count).ToList(), 2);
                     var indexA = randomSample[0];
                     var indexB = randomSample[1];
                     var temp = genes[indexA];
@@ -62,8 +62,8 @@ namespace GeneticAlgorithms.Cards
             }
             else
             {
-                var indexA = Rand.Random.Next(genes.Length);
-                var indexB = Rand.Random.Next(geneSet.Length);
+                var indexA = Rand.Random.Next(genes.Count);
+                var indexB = Rand.Random.Next(geneSet.Count);
                 genes[indexA] = geneSet[indexB];
             }
         }
@@ -96,8 +96,8 @@ namespace GeneticAlgorithms.Cards
             var watch = Stopwatch.StartNew();
 
             void FnDisplay(Chromosome<int, Fitness> candidate) => Display(candidate, watch);
-            Fitness FnGetFitness(int[] genes) => GetFitness(genes);
-            void FnMutate(int[] genes) => Mutate(genes, geneSet);
+            Fitness FnGetFitness(IReadOnlyList<int> genes) => GetFitness(genes);
+            void FnMutate(IList<int> genes) => Mutate(genes, geneSet);
 
             var optimalFitness = new Fitness(36, 360, 0);
             var best = Genetic<int, Fitness>.GetBest(FnGetFitness, 10, optimalFitness, geneSet, FnDisplay, FnMutate);

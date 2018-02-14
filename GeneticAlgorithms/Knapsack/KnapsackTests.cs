@@ -91,11 +91,11 @@ namespace GeneticAlgorithms.Knapsack
             return maxQuantity > 0 ? new ItemQuantity(item, maxQuantity) : null;
         }
 
-        private static void Mutate(List<ItemQuantity> genes, IList<Resource> items, double maxWeight, double maxVolume,
+        private static void Mutate(IList<ItemQuantity> genes, IList<Resource> items, double maxWeight, double maxVolume,
             Window window)
         {
             window.Slide();
-            var fitness = GetFitness(genes.ToArray());
+            var fitness = GetFitness(genes);
             var remainingWeight = maxWeight - fitness.TotalWeight;
             var remainingVolume = maxVolume - fitness.TotalVolume;
 
@@ -114,7 +114,7 @@ namespace GeneticAlgorithms.Knapsack
                          (genes.Count == 0 || (genes.Count < items.Count && Rand.PercentChance(1)));
             if (adding)
             {
-                var newGene = Add(genes.ToArray(), items, remainingWeight, remainingVolume);
+                var newGene = Add(genes, items, remainingWeight, remainingVolume);
                 if (newGene != null)
                 {
                     genes.Add(newGene);
@@ -187,12 +187,12 @@ namespace GeneticAlgorithms.Knapsack
             Benchmark.Run(Exnsd16Test);
         }
 
-        private static void FillKnapsack(Resource[] items, double maxWeight,
+        private static void FillKnapsack(IReadOnlyCollection<Resource> items, double maxWeight,
             double maxVolume, Fitness optimalFitness)
         {
             var watch = Stopwatch.StartNew();
-            var window = new Window(1, Math.Max(1, items.Length / 3), items.Length / 2);
-            var sortedItems = items.OrderBy(i => i.Value);
+            var window = new Window(1, Math.Max(1, items.Count / 3), items.Count / 2);
+            var sortedItems = items.OrderBy(i => i.Value).ToList();
 
             void FnDisplay(Chromosome<ItemQuantity, Fitness> candidate) => Display(candidate, watch);
             Fitness FnGetFitness(IReadOnlyList<ItemQuantity> genes) => GetFitness(genes);

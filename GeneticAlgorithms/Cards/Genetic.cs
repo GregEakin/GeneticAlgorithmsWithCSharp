@@ -29,9 +29,9 @@ namespace GeneticAlgorithms.Cards
     {
         public delegate void DisplayDelegate(Chromosome<TGene, TFitness> child);
 
-        public delegate void MutateGeneDelegate(TGene[] genes);
+        public delegate void MutateGeneDelegate(IList<TGene> genes);
 
-        public delegate TFitness FitnessDelegate(TGene[] gene);
+        public delegate TFitness FitnessDelegate(IReadOnlyList<TGene> gene);
 
         public delegate Chromosome<TGene, TFitness> GenerateParentDelegate();
 

@@ -95,10 +95,10 @@ namespace GeneticAlgorithms.LinearEquation
                 Console.WriteLine("{0}, {1}", gene, (double) gene);
         }
 
-        private static void Mutate(List<Fraction> genes, List<Fraction> sortedGeneSet, Window window, int[] geneIndexes)
+        private static void Mutate(IList<Fraction> genes, IList<Fraction> sortedGeneSet, Window window, IReadOnlyList<int> geneIndexes)
         {
             var indexes = Rand.PercentChance(10)
-                ? geneIndexes.OrderBy(g => Rand.Random.Next()).Take(1 + Rand.Random.Next(geneIndexes.Length - 1)).ToArray()
+                ? geneIndexes.OrderBy(g => Rand.Random.Next()).Take(1 + Rand.Random.Next(geneIndexes.Count - 1)).ToArray()
                 : new[] {Rand.SelectItem(geneIndexes)};
             window.Slide();
             foreach (var index in indexes)

@@ -411,8 +411,7 @@ namespace GeneticAlgorithms.RegularExpressions
         }
 
         private static void Mutate(List<string> genes, FnGetFitnessDelegate fnGetFitness,
-            List<FnMutateDelegate> mutationOperators,
-            List<int> mutationRoundCounts)
+            IReadOnlyCollection<FnMutateDelegate> mutationOperators, List<int> mutationRoundCounts)
         {
             var initialFitness = fnGetFitness(genes);
             var count = Rand.SelectItem(mutationRoundCounts);

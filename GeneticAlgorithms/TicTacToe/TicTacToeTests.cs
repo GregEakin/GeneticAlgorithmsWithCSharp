@@ -199,8 +199,7 @@ namespace GeneticAlgorithms.TicTacToe
 
         public static void Display(Chromosome<Rule, Fitness> candidate, Stopwatch watch)
         {
-            var localCopy = candidate.Genes;
-            localCopy.Reverse();
+            var localCopy = candidate.Genes.Reverse();
             Console.WriteLine("\t{0}\n{1}\n{2} ms", string.Join("\n\t", localCopy.Select(g => g.ToString())),
                 candidate.Fitness, watch.ElapsedMilliseconds);
         }

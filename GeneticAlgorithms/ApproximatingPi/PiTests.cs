@@ -127,7 +127,7 @@ namespace GeneticAlgorithms.ApproximatingPi
             Assert.AreEqual(0x0C, value);
         }
 
-        private static void Mutate(IList<bool> genes, int numBits)
+        private static void Mutate(IList<bool> genes)
         {
             var index = Rand.Random.Next(genes.Count);
             genes[index] = !genes[index];
@@ -141,8 +141,8 @@ namespace GeneticAlgorithms.ApproximatingPi
                 false, false, false, false,
                 true, true, false, false
             };
-            var save = bits.ToArray();
-            Mutate(bits, bits.Count / 2);
+            var save = bits.ToList();
+            Mutate(bits);
             CollectionAssert.AreNotEqual(save, bits);
         }
 
@@ -160,7 +160,7 @@ namespace GeneticAlgorithms.ApproximatingPi
             var optimalFitness = Math.Round(355.0 / 113.0, 5); // = 3.14159;
 
             void FnMutate(List<bool> genes) =>
-                Mutate(genes, bitValues.Count);
+                Mutate(genes);
 
             var length = 2 * bitValues.Count;
             var best = Genetic<bool, double>.GetBest(FnGetFitness, length, optimalFitness, geneSet, FnDispaly, FnMutate,

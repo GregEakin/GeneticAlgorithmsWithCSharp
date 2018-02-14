@@ -118,7 +118,7 @@ namespace GeneticAlgorithms.EquationGeneration
             return genes;
         }
 
-        private static void Mutate(List<string> genes, List<string> numbers, string[] operations, int minNumbers,
+        private static void Mutate(List<string> genes, IReadOnlyList<string> numbers, IReadOnlyList<string> operations, int minNumbers,
             int maxNumbers, FnFitnessDelegate fnGetFitness)
         {
             var count = Rand.Random.Next(1, 10);

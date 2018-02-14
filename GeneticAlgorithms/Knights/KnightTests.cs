@@ -45,12 +45,12 @@ namespace GeneticAlgorithms.Knights
             Console.WriteLine(board);
 
             Console.WriteLine("{0}\n\t{1}\t{2} ms",
-                string.Join<Position>(" ", candidate.Genes),
+                string.Join(" ", candidate.Genes),
                 candidate.Fitness,
                 watch.ElapsedMilliseconds);
         }
 
-        private static void Mutate(Position[] genes, int width, int height, Position[] allPositions,
+        private static void Mutate(IList<Position> genes, int width, int height, Position[] allPositions,
             Position[] nonEdgePositions)
         {
             var loops = Rand.Random.Next(10) == 0 ? 2 : 1;
@@ -58,11 +58,11 @@ namespace GeneticAlgorithms.Knights
             {
                 var positionToKnightIndexes =
                     allPositions.ToDictionary(k => k, v => new List<int>());
-                for (var i = 0; i < genes.Length; i++)
+                for (var i = 0; i < genes.Count; i++)
                     foreach (var position in GetAttacks(genes[i], width, height))
                         positionToKnightIndexes[position].Add(i);
 
-                var knightIndexes = new HashSet<int>(Enumerable.Range(0, genes.Length));
+                var knightIndexes = new HashSet<int>(Enumerable.Range(0, genes.Count));
                 var unattacked = new List<Position>();
                 foreach (var kvp in positionToKnightIndexes)
                 {
@@ -85,7 +85,7 @@ namespace GeneticAlgorithms.Knights
                     : nonEdgePositions;
 
                 var geneIndex = knightIndexes.Count == 0
-                    ? Rand.Random.Next(genes.Length)
+                    ? Rand.Random.Next(genes.Count)
                     : knightIndexes.ElementAt(Rand.Random.Next(knightIndexes.Count));
 
                 var position1 = Rand.SelectItem(potentialKnightPositions);

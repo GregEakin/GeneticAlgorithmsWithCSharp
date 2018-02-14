@@ -54,7 +54,7 @@ namespace GeneticAlgorithms.LawnmowerProblem
             Console.WriteLine();
         }
 
-        private static void Mutate(List<INode> genes, FnCreateGeneDelegate[] geneSet, int minGenes, int maxGenes,
+        private static void Mutate(List<INode> genes, IReadOnlyList<FnCreateGeneDelegate> geneSet, int minGenes, int maxGenes,
             FnGetFitnessDelegate fnGetFitness, int maxRounds)
         {
             var count = Rand.Random.Next(1, maxRounds + 1);

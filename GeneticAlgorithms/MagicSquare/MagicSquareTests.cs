@@ -72,7 +72,7 @@ namespace GeneticAlgorithms.MagicSquare
             return new Tuple<int[], int[], int, int>(rows, columns, northeastDiagonalSum, southeastDiagonalSum);
         }
 
-        private static void Mutate(List<int> genes, int[] indexes)
+        private static void Mutate(IList<int> genes, IReadOnlyList<int> indexes)
         {
             var randomSample = Rand.RandomSample(indexes, 2);
             var indexA = randomSample[0];
