@@ -66,7 +66,7 @@ namespace GeneticAlgorithms.TicTacToe
                 if (move == null) // could not find a move
                     return lossResult;
 
-                var index = (int)move;
+                var index = (int) move;
                 board[index] = new Square(index, piece);
 
                 var mostRecentMoveOnly = new[] {board[index]};
@@ -122,7 +122,7 @@ namespace GeneticAlgorithms.TicTacToe
                     continue;
                 }
 
-                var index = (int)move;
+                var index = (int) move;
                 board[index] = new Square(index, ContentType.Mine);
 
                 if (DidWeWin(board))
@@ -181,7 +181,8 @@ namespace GeneticAlgorithms.TicTacToe
             return false;
         }
 
-        public static int? GetMove(IEnumerable<Rule> ruleSet, Dictionary<int, Square> board, Square[] empties, int startingRuleIndex = 0)
+        public static int? GetMove(IEnumerable<Rule> ruleSet, Dictionary<int, Square> board, Square[] empties,
+            int startingRuleIndex = 0)
         {
             foreach (var gene in ruleSet.Skip(startingRuleIndex))
             {
@@ -256,7 +257,8 @@ namespace GeneticAlgorithms.TicTacToe
             return true;
         }
 
-        private static void Mutate(List<Rule> genes, FnGetFitnessDelegate fnGetFitness, FnMutateDelegate[] mutationOperators,
+        private static void Mutate(List<Rule> genes, FnGetFitnessDelegate fnGetFitness,
+            FnMutateDelegate[] mutationOperators,
             List<int> mutationRoundCounts)
         {
             var initialFitness = fnGetFitness(genes);
@@ -374,7 +376,7 @@ namespace GeneticAlgorithms.TicTacToe
             {
                 Console.WriteLine("-- generation {0} --", generation);
                 Display(
-                    new Chromosome<Rule, Fitness>(genes, new Fitness(wins, ties, losses, genes.Count), Strategies.None),
+                    new Chromosome<Rule, Fitness>(genes, new Fitness(wins, ties, losses, genes.Count), Strategy.None),
                     watch);
             }
 

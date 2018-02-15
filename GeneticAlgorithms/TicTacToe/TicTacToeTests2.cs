@@ -43,8 +43,7 @@ namespace GeneticAlgorithms.TicTacToe
         {
             var geneSet = TicTacToeTests.CreateGeneSet().ToList();
             var fitness = new Fitness(1, 2, 3, 4);
-            var candidate =
-                new Chromosome<Rule, Fitness>(geneSet, fitness, Strategies.None);
+            var candidate = new Chromosome<Rule, Fitness>(geneSet, fitness, Strategy.None);
             var watch = Stopwatch.StartNew();
             TicTacToeTests.Display(candidate, watch);
         }

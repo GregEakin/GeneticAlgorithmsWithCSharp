@@ -76,7 +76,7 @@ namespace GeneticAlgorithms.TravelingSalesmanProblem
                 {2, new[] {3.0, 0.0}},
             };
             var fitness = GetFitness(genes, idToLocation);
-            var candidate = new Chromosome<int, Fitness>(genes, fitness, Strategies.Create);
+            var candidate = new Chromosome<int, Fitness>(genes, fitness, Strategy.Create);
             var watch = Stopwatch.StartNew();
             Display(candidate, watch);
         }
@@ -97,13 +97,13 @@ namespace GeneticAlgorithms.TravelingSalesmanProblem
             Assert.AreEqual(Math.Sqrt(2), GetDistance(locationA, locationB));
         }
 
-        private static void Mutate(int[] genes, FitnessDelegate fnGetFitness)
+        private static void Mutate(List<int> genes, FitnessDelegate fnGetFitness)
         {
-            var count = Rand.Random.Next(2, genes.Length);
+            var count = Rand.Random.Next(2, genes.Count);
             var initialFitness = fnGetFitness(genes);
             while (count-- > 0)
             {
-                var sample = Rand.RandomSample(Enumerable.Range(0, genes.Length).ToArray(), 2);
+                var sample = Rand.RandomSample(Enumerable.Range(0, genes.Count).ToArray(), 2);
                 var indexA = sample[0];
                 var indexB = sample[1];
                 var temp = genes[indexA];
@@ -118,7 +118,7 @@ namespace GeneticAlgorithms.TravelingSalesmanProblem
         [TestMethod]
         public void MutateTest()
         {
-            var genes = new[] {0, 1, 2};
+            var genes = new List<int> {0, 1, 2};
             var idToLocation = new Dictionary<int, double[]>
             {
                 {0, new[] {0.0, 0.0}},
@@ -131,7 +131,7 @@ namespace GeneticAlgorithms.TravelingSalesmanProblem
             CollectionAssert.AreNotEqual(new[] {0, 1, 2}, genes);
         }
 
-        private static int[] Crossover(IReadOnlyList<int> parentGenes, IReadOnlyList<int> donorGenes, FitnessDelegate fnGetFitness)
+        private static List<int> Crossover(IReadOnlyList<int> parentGenes, IReadOnlyList<int> donorGenes, FitnessDelegate fnGetFitness)
         {
             var pairs = new Dictionary<Pair, int> {{new Pair(donorGenes[0], donorGenes[donorGenes.Count - 1]), 0}};
 
@@ -187,12 +187,12 @@ namespace GeneticAlgorithms.TravelingSalesmanProblem
                 var temp = runs[indexA];
                 runs[indexA] = runs[indexB];
                 runs[indexB] = temp;
-                var childGenes = runs.SelectMany(i => i).ToArray();
+                var childGenes = runs.SelectMany(i => i).ToList();
                 if (fnGetFitness(childGenes).CompareTo(initialFitness) > 0)
                     return childGenes;
             }
 
-            return runs.SelectMany(i => i).ToArray();
+            return runs.SelectMany(i => i).ToList();
         }
 
         [TestMethod]
@@ -279,15 +279,15 @@ namespace GeneticAlgorithms.TravelingSalesmanProblem
             var geneSet = idToLocationLookup.Keys.ToArray();
             var watch = Stopwatch.StartNew();
 
-            int[] FnCreate() => Rand.RandomSample(geneSet, geneSet.Length).ToArray();
+            List<int> FnCreate() => Rand.RandomSample(geneSet, geneSet.Length).ToList();
 
             void FnDisplay(Chromosome<int, Fitness> candidate) => Display(candidate, watch);
 
             Fitness FnGetFitness(IReadOnlyList<int> genes) => GetFitness(genes, idToLocationLookup);
 
-            void FnMutate(int[] genes) => Mutate(genes, FnGetFitness);
+            void FnMutate(List<int> genes) => Mutate(genes, FnGetFitness);
 
-            int[] FnCrossover(IReadOnlyList<int> parent, IReadOnlyList<int> donor) => Crossover(parent, donor, FnGetFitness);
+            List<int> FnCrossover(IReadOnlyList<int> parent, IReadOnlyList<int> donor) => Crossover(parent, donor, FnGetFitness);
 
             var optimalFitness = FnGetFitness(optimalSequence);
             var best = Genetic<int, Fitness>.GetBest(FnGetFitness, 0, optimalFitness, null, FnDisplay, FnMutate,

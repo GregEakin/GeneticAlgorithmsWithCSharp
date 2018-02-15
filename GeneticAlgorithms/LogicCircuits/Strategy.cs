@@ -1,4 +1,4 @@
-﻿/* File: Strategies.cs
+﻿/* File: Strategy.cs
  *     from chapter 16 of _Genetic Algorithms with Python_
  *     writen by Clinton Sheppard
  *
@@ -19,7 +19,7 @@
 
 namespace GeneticAlgorithms.LogicCircuits
 {
-    public enum Strategies
+    public enum Strategy
     {
         Create = 0,
         Mutate = 1,

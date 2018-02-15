@@ -31,7 +31,7 @@ namespace GeneticAlgorithms.Knights
     {
         public delegate Position RandomPosition();
 
-        private static int Fitness(Position[] genes, int width, int height)
+        private static int Fitness(IEnumerable<Position> genes, int width, int height)
         {
             var attacks = from kn in genes
                 from pos in GetAttacks(kn, width, height)
@@ -93,10 +93,10 @@ namespace GeneticAlgorithms.Knights
             }
         }
 
-        private static Position[] Create(RandomPosition randomPositionFun, int expectedKnights)
+        private static List<Position> Create(RandomPosition randomPositionFun, int expectedKnights)
         {
             var genes = Enumerable.Range(0, expectedKnights).Select(k => randomPositionFun());
-            return genes.ToArray();
+            return genes.ToList();
         }
 
         private static Position[] GetAttacks(Position location, int width, int height)
@@ -152,7 +152,7 @@ namespace GeneticAlgorithms.Knights
             var watch = Stopwatch.StartNew();
 
             void FnDisplay(Chromosome<Position, int> candidate) => Display(candidate, watch, width, height);
-            int FnFitness(Position[] genes) => Fitness(genes, width, height);
+            int FnFitness(IEnumerable<Position> genes) => Fitness(genes, width, height);
 
             var allPositions = (from x in Enumerable.Range(0, width)
                 from y in Enumerable.Range(0, height)
@@ -166,7 +166,7 @@ namespace GeneticAlgorithms.Knights
 
             Position FnGetRandomPosition() => Rand.SelectItem(nonEdgePositions);
             void FnMutate(Position[] genes) => Mutate(genes, width, height, allPositions, nonEdgePositions);
-            Position[] FnCreate() => Create(FnGetRandomPosition, expectedKnights);
+            List<Position> FnCreate() => Create(FnGetRandomPosition, expectedKnights);
 
             var optimalFitness = width * height;
             var best = Genetic<Position, int>.GetBest(FnFitness, 0, optimalFitness, null, FnDisplay, FnMutate,

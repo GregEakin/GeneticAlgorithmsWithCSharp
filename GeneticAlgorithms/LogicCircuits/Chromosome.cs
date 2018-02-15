@@ -27,11 +27,11 @@ namespace GeneticAlgorithms.LogicCircuits
 
         public TFitness Fitness { get; }
 
-        public Strategies Strategy { get; }
+        public Strategy Strategy { get; }
 
         public int Age { get; set; }
 
-        public Chromosome(IReadOnlyList<TGene> genes, TFitness fitness, Strategies strategy)
+        public Chromosome(IReadOnlyList<TGene> genes, TFitness fitness, Strategy strategy)
         {
             Genes = genes;
             Fitness = fitness;

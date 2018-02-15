@@ -31,15 +31,16 @@ namespace GeneticAlgorithms.Knights
 
         public delegate void DisplayDelegate(Chromosome<TGene, TFitness> child);
 
-        public delegate TGene[] CreateDelegate();
+        public delegate List<TGene> CreateDelegate();
 
-        public delegate TFitness FitnessDelegate(TGene[] gene);
+        public delegate TFitness FitnessDelegate(IReadOnlyList<TGene> gene);
 
-        public delegate Chromosome<TGene, TFitness> GenerateParentDelegate();
+        private delegate Chromosome<TGene, TFitness> GenerateParentDelegate();
 
-        public delegate Chromosome<TGene, TFitness> MutateChromosomeDelegate(Chromosome<TGene, TFitness> parent);
+        private delegate Chromosome<TGene, TFitness> MutateChromosomeDelegate(Chromosome<TGene, TFitness> parent);
 
-        private static Chromosome<TGene, TFitness> GenerateParent(int length, TGene[] geneSet, FitnessDelegate getFitness)
+        private static Chromosome<TGene, TFitness> GenerateParent(int length, IReadOnlyList<TGene> geneSet,
+            FitnessDelegate getFitness)
         {
             var genes = Rand.RandomSample(geneSet, length).ToArray();
             var fitness = getFitness(genes);
@@ -47,7 +48,8 @@ namespace GeneticAlgorithms.Knights
             return chromosome;
         }
 
-        private static Chromosome<TGene, TFitness> Mutate(Chromosome<TGene, TFitness> parent, IReadOnlyList<TGene> geneSet,
+        private static Chromosome<TGene, TFitness> Mutate(Chromosome<TGene, TFitness> parent,
+            IReadOnlyList<TGene> geneSet,
             FitnessDelegate getFitness)
         {
             var childGenes = parent.Genes.ToArray();
@@ -69,8 +71,9 @@ namespace GeneticAlgorithms.Knights
             return new Chromosome<TGene, TFitness>(childGenes, fitness);
         }
 
-        public static Chromosome<TGene, TFitness> GetBest(FitnessDelegate getFitness, int targetLen, TFitness optimalFitness,
-            TGene[] geneSet, DisplayDelegate display, MutateGeneDelegate customMutate = null, CreateDelegate customCreate = null)
+        public static Chromosome<TGene, TFitness> GetBest(FitnessDelegate getFitness, int targetLen,
+            TFitness optimalFitness, IReadOnlyList<TGene> geneSet, DisplayDelegate display,
+            MutateGeneDelegate customMutate = null, CreateDelegate customCreate = null)
         {
             Chromosome<TGene, TFitness> FnMutate(Chromosome<TGene, TFitness> parent) => customMutate == null
                 ? Mutate(parent, geneSet, getFitness)

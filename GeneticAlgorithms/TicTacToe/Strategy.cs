@@ -1,4 +1,4 @@
-﻿/* File: Strategies.cs
+﻿/* File: Strategy.cs
  *     from chapter 18 of _Genetic Algorithms with Python_
  *     writen by Clinton Sheppard
  *
@@ -19,7 +19,7 @@
 
 namespace GeneticAlgorithms.TicTacToe
 {
-    public enum Strategies
+    public enum Strategy
     {
         None = -1,
         Create = 0,

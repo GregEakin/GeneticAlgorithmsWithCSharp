@@ -53,7 +53,7 @@
     <Compile Include="ApproximatingPi\Genetic.cs" />
     <Compile Include="ApproximatingPi\PiTests.cs" />
     <Compile Include="ApproximatingPi\SearchTimeoutException.cs" />
-    <Compile Include="ApproximatingPi\Strategies.cs" />
+    <Compile Include="ApproximatingPi\Strategy.cs" />
     <Compile Include="Cards\Benchmark.cs" />
     <Compile Include="Cards\CardTests.cs" />
     <Compile Include="Cards\Chromosome.cs" />
@@ -77,7 +77,7 @@
     <Compile Include="LogicCircuits\Genetic.cs" />
     <Compile Include="LogicCircuits\Node.cs" />
     <Compile Include="LogicCircuits\SearchTimeoutException.cs" />
-    <Compile Include="LogicCircuits\Strategies.cs" />
+    <Compile Include="LogicCircuits\Strategy.cs" />
     <Compile Include="MagicSquare\Benchmark.cs" />
     <Compile Include="Password\Benchmark.cs" />
     <Compile Include="Password\GuessPassordTests.cs" />
@@ -133,7 +133,7 @@
     <Compile Include="TicTacToe\RuleTests.cs" />
     <Compile Include="TicTacToe\SearchTimeoutException.cs" />
     <Compile Include="TicTacToe\Square.cs" />
-    <Compile Include="TicTacToe\Strategies.cs" />
+    <Compile Include="TicTacToe\Strategy.cs" />
     <Compile Include="TicTacToe\TicTacToeTests.cs" />
     <Compile Include="TicTacToe\TicTacToeTests2.cs" />
     <Compile Include="TravelingSalesmanProblem\Benchmark.cs" />
@@ -141,7 +141,7 @@
     <Compile Include="TravelingSalesmanProblem\Fitness.cs" />
     <Compile Include="TravelingSalesmanProblem\Genetic.cs" />
     <Compile Include="TravelingSalesmanProblem\Pair.cs" />
-    <Compile Include="TravelingSalesmanProblem\Strategies.cs" />
+    <Compile Include="TravelingSalesmanProblem\Strategy.cs" />
     <Compile Include="TravelingSalesmanProblem\TravelingSalesmanProblemTests.cs" />
     <Compile Include="Utilities\ExpectedException.cs" />
     <Compile Include="Utilities\Rand.cs" />

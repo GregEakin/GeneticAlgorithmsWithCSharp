@@ -55,7 +55,8 @@ namespace GeneticAlgorithms.ApproximatingPi
             Assert.AreEqual(3.1415923868256, fitness, 0.00000001);
         }
 
-        private static void Display(Chromosome<bool, double> candidate, Stopwatch watch, IReadOnlyCollection<int> bitValues)
+        private static void Display(Chromosome<bool, double> candidate, Stopwatch watch,
+            IReadOnlyCollection<int> bitValues)
         {
             var numerator = GetNumerator(candidate.Genes, bitValues);
             var denominator = GetDenominator(candidate.Genes, bitValues);
@@ -72,8 +73,7 @@ namespace GeneticAlgorithms.ApproximatingPi
                 false, false, false, true, true, true, false, false, false, true,
             };
             var bitValues = new List<int> {512, 256, 128, 64, 32, 16, 8, 4, 2, 1};
-            var candidate =
-                new Chromosome<bool, double>(genes, 3.1415923868256, Strategies.Create);
+            var candidate = new Chromosome<bool, double>(genes, 3.1415923868256, Strategy.Create);
             var watch = Stopwatch.StartNew();
             Display(candidate, watch, bitValues);
         }

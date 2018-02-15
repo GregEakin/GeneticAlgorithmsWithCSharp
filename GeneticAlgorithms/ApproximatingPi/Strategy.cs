@@ -1,5 +1,5 @@
-﻿/* File: Strategies.cs
- *     from chapter 12 of _Genetic Algorithms with Python_
+﻿/* File: Strategy.cs
+ *     from chapter 13 of _Genetic Algorithms with Python_
  *     writen by Clinton Sheppard
  *
  * Author: Greg Eakin <gregory.eakin@gmail.com>
@@ -17,9 +17,9 @@
  * permissions and limitations under the License.
  */
 
-namespace GeneticAlgorithms.TravelingSalesmanProblem
+namespace GeneticAlgorithms.ApproximatingPi
 {
-    public enum Strategies
+    public enum Strategy
     {
         Create = 0,
         Mutate = 1,

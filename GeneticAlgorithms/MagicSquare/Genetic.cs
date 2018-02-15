@@ -35,11 +35,12 @@ namespace GeneticAlgorithms.MagicSquare
 
         public delegate List<TGene> CreateDelegate();
 
-        public delegate Chromosome<TGene, TFitness> GenerateParentDelegate();
+        private delegate Chromosome<TGene, TFitness> GenerateParentDelegate();
 
-        public delegate Chromosome<TGene, TFitness> MutateChromosomeDelegate(Chromosome<TGene, TFitness> parent);
+        private delegate Chromosome<TGene, TFitness> MutateChromosomeDelegate(Chromosome<TGene, TFitness> parent);
 
-        private static Chromosome<TGene, TFitness> GenerateParent(int length, IReadOnlyList<TGene> geneSet, GetFitnessDelegate getFitness)
+        private static Chromosome<TGene, TFitness> GenerateParent(int length, IReadOnlyList<TGene> geneSet,
+            GetFitnessDelegate getFitness)
         {
             var genes = Rand.RandomSample(geneSet, length);
             var fitness = getFitness(genes);
@@ -47,7 +48,8 @@ namespace GeneticAlgorithms.MagicSquare
             return chromosome;
         }
 
-        private static Chromosome<TGene, TFitness> Mutate(Chromosome<TGene, TFitness> parent, IReadOnlyList<TGene> geneSet,
+        private static Chromosome<TGene, TFitness> Mutate(Chromosome<TGene, TFitness> parent,
+            IReadOnlyList<TGene> geneSet,
             GetFitnessDelegate getFitness)
         {
             var childGenes = parent.Genes.ToList();
@@ -69,11 +71,11 @@ namespace GeneticAlgorithms.MagicSquare
             return new Chromosome<TGene, TFitness>(childGenes, fitness);
         }
 
-        public static Chromosome<TGene, TFitness> GetBest(GetFitnessDelegate getFitness, int targetLen, TFitness optimalFitness,
-            TGene[] geneSet, DisplayDelegate display, MutateGeneDelegate customMutate = null, CreateDelegate customCreate = null,
-            int? maxAge = null)
+        public static Chromosome<TGene, TFitness> GetBest(GetFitnessDelegate getFitness, int targetLen,
+            TFitness optimalFitness, IReadOnlyList<TGene> geneSet, DisplayDelegate display,
+            MutateGeneDelegate customMutate = null, CreateDelegate customCreate = null, int? maxAge = null)
         {
-            Chromosome<TGene, TFitness> FnMutate(Chromosome<TGene, TFitness> parent) => 
+            Chromosome<TGene, TFitness> FnMutate(Chromosome<TGene, TFitness> parent) =>
                 customMutate == null
                     ? Mutate(parent, geneSet, getFitness)
                     : MutateCustom(parent, customMutate, getFitness);
@@ -104,7 +106,7 @@ namespace GeneticAlgorithms.MagicSquare
             var parent = bestParent;
             yield return bestParent;
 
-            var historicalFitnesses = new List<TFitness> { bestParent.Fitness };
+            var historicalFitnesses = new List<TFitness> {bestParent.Fitness};
             while (true)
             {
                 var child = newChild(parent);
@@ -120,7 +122,7 @@ namespace GeneticAlgorithms.MagicSquare
                     var index = historicalFitnesses.BinarySearch(child.Fitness);
                     if (index < 0) index = ~index;
                     var difference = historicalFitnesses.Count - index;
-                    var proportionSimilar = (double)difference / historicalFitnesses.Count;
+                    var proportionSimilar = (double) difference / historicalFitnesses.Count;
                     var exp = Math.Exp(-proportionSimilar);
                     if (Rand.Random.NextDouble() < exp)
                     {

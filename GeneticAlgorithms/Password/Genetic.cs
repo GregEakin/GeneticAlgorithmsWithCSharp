@@ -19,6 +19,7 @@
 
 using GeneticAlgorithms.Utilities;
 using System;
+using System.Collections.Generic;
 
 namespace GeneticAlgorithms.Password
 {
@@ -28,12 +29,12 @@ namespace GeneticAlgorithms.Password
 
         public delegate int GetFitnessDelegate(string guess);
 
-        private static Chromosome GenerateParent(char[] geneSet, int length, GetFitnessDelegate getFitness)
+        private static Chromosome GenerateParent(IReadOnlyList<char> geneSet, int length, GetFitnessDelegate getFitness)
         {
             var genes = string.Empty;
             while (genes.Length < length)
             {
-                var sampleSize = Math.Min(length - genes.Length, geneSet.Length);
+                var sampleSize = Math.Min(length - genes.Length, geneSet.Count);
                 genes += Rand.RandomSample(geneSet, sampleSize);
             }
 
@@ -41,7 +42,7 @@ namespace GeneticAlgorithms.Password
             return new Chromosome(genes, fitness);
         }
 
-        private static Chromosome Mutate(Chromosome parent, char[] geneSet, GetFitnessDelegate getFitness)
+        private static Chromosome Mutate(Chromosome parent, IReadOnlyList<char> geneSet, GetFitnessDelegate getFitness)
         {
             var childGenes = parent.Genes.ToCharArray();
             var index = Rand.Random.Next(parent.Genes.Length);
@@ -54,8 +55,8 @@ namespace GeneticAlgorithms.Password
             return new Chromosome(genes, fitness);
         }
 
-        public static Chromosome GetBest(GetFitnessDelegate getFitness, int targetLen, int optimalFitness, char[] geneSet,
-            DisplayDelegate display)
+        public static Chromosome GetBest(GetFitnessDelegate getFitness, int targetLen, int optimalFitness,
+            IReadOnlyList<char> geneSet, DisplayDelegate display)
         {
             var bestParent = GenerateParent(geneSet, targetLen, getFitness);
             display(bestParent);

@@ -33,15 +33,15 @@ namespace GeneticAlgorithms.TicTacToe
 
         public delegate void DisplayDelegate(Chromosome<TGene, TFitness> child, int? length = null);
 
-        public delegate void DisplayDelegate2(List<TGene> a, int b, int c, int d, int e);
+        public delegate void TournamentDisplayDelegate(List<TGene> best, int win, int tie, int loss, int generation);
 
-        public delegate bool OptimalDelegate(Chromosome<TGene, TFitness> b);
+        public delegate bool OptimalDelegate(Chromosome<TGene, TFitness> best);
 
-        public delegate bool ImprovementDelegate(Chromosome<TGene, TFitness> c, Chromosome<TGene, TFitness> d);
+        public delegate bool ImprovementDelegate(Chromosome<TGene, TFitness> best, Chromosome<TGene, TFitness> child);
 
-        public delegate int NextFeatureValueDelegate(Chromosome<TGene, TFitness> i);
+        public delegate int NextFeatureValueDelegate(Chromosome<TGene, TFitness> best);
 
-        public delegate int SortKeyDelegate(List<TGene> a, int b, int c, int d);
+        public delegate int SortKeyDelegate(List<TGene> item, int win, int tie, int loss);
 
         public delegate TFitness GetFitnessDelegate(IReadOnlyList<TGene> gene);
 
@@ -49,26 +49,28 @@ namespace GeneticAlgorithms.TicTacToe
 
         public delegate List<TGene> CrossoverDelegate(IReadOnlyList<TGene> genes1, IReadOnlyList<TGene> genes2);
 
-        public delegate Chromosome<TGene, TFitness> GenerateParentDelegate();
+        private delegate Chromosome<TGene, TFitness> GenerateParentDelegate();
 
-        public delegate Chromosome<TGene, TFitness> OptimizationDelegate(int x);
+        public delegate Chromosome<TGene, TFitness> OptimizationDelegate(int featureValue);
 
-        public delegate Chromosome<TGene, TFitness> MutateChromosomeDelegate(Chromosome<TGene, TFitness> parent);
+        private delegate Chromosome<TGene, TFitness> MutateChromosomeDelegate(Chromosome<TGene, TFitness> parent);
 
-        public delegate Chromosome<TGene, TFitness> StrategyDelegate(Chromosome<TGene, TFitness> p, int i,
-            List<Chromosome<TGene, TFitness>> o);
+        private delegate Chromosome<TGene, TFitness> StrategyDelegate(Chromosome<TGene, TFitness> parentGenes,
+            int index, List<Chromosome<TGene, TFitness>> parents);
 
-        public delegate CompetitionResult CompeteDelegate(List<TGene> a, List<TGene> b);
+        public delegate CompetitionResult CompeteDelegate(List<TGene> playerA, List<TGene> playerB);
 
-        private static Chromosome<TGene, TFitness> GenerateParent(int length, IReadOnlyList<TGene> geneSet, GetFitnessDelegate getFitness)
+        private static Chromosome<TGene, TFitness> GenerateParent(int length, IReadOnlyList<TGene> geneSet,
+            GetFitnessDelegate getFitness)
         {
             var genes = Rand.RandomSample(geneSet, length);
             var fitness = getFitness(genes);
-            var chromosome = new Chromosome<TGene, TFitness>(genes, fitness, Strategies.Create);
+            var chromosome = new Chromosome<TGene, TFitness>(genes, fitness, Strategy.Create);
             return chromosome;
         }
 
-        private static Chromosome<TGene, TFitness> Mutate(Chromosome<TGene, TFitness> parent, IReadOnlyList<TGene> geneSet,
+        private static Chromosome<TGene, TFitness> Mutate(Chromosome<TGene, TFitness> parent,
+            IReadOnlyList<TGene> geneSet,
             GetFitnessDelegate getFitness)
         {
             var childGenes = parent.Genes.ToList();
@@ -78,7 +80,7 @@ namespace GeneticAlgorithms.TicTacToe
             var alternate = randomSample[1];
             childGenes[index] = newGene.Equals(childGenes[index]) ? alternate : newGene;
             var fitness = getFitness(childGenes);
-            return new Chromosome<TGene, TFitness>(childGenes, fitness, Strategies.Mutate);
+            return new Chromosome<TGene, TFitness>(childGenes, fitness, Strategy.Mutate);
         }
 
         private static Chromosome<TGene, TFitness> MutateCustom(Chromosome<TGene, TFitness> parent,
@@ -87,13 +89,12 @@ namespace GeneticAlgorithms.TicTacToe
             var childGenes = parent.Genes.ToList();
             customMutate(childGenes);
             var fitness = getFitness(childGenes);
-            return new Chromosome<TGene, TFitness>(childGenes, fitness, Strategies.Mutate);
+            return new Chromosome<TGene, TFitness>(childGenes, fitness, Strategy.Mutate);
         }
 
         private static Chromosome<TGene, TFitness> Crossover(IReadOnlyList<TGene> parentGenes, int index,
-            IList<Chromosome<TGene, TFitness>> parents,
-            GetFitnessDelegate getFitness, CrossoverDelegate crossover, MutateChromosomeDelegate mutate,
-            GenerateParentDelegate generateParent)
+            IList<Chromosome<TGene, TFitness>> parents, GetFitnessDelegate getFitness, CrossoverDelegate crossover,
+            MutateChromosomeDelegate mutate, GenerateParentDelegate generateParent)
         {
             var donorIndex = Rand.Random.Next(0, parents.Count);
             if (donorIndex == index)
@@ -107,14 +108,13 @@ namespace GeneticAlgorithms.TicTacToe
             }
 
             var fitness = getFitness(childGenes);
-            return new Chromosome<TGene, TFitness>(childGenes, fitness,
-                Strategies.Crossover);
+            return new Chromosome<TGene, TFitness>(childGenes, fitness, Strategy.Crossover);
         }
 
         public static Chromosome<TGene, TFitness> GetBest(GetFitnessDelegate getFitness, int targetLen,
-            TFitness optimalFitness, TGene[] geneSet, DisplayDelegate display, MutateGeneDelegate customMutate = null,
-            CreateDelegate customCreate = null, int? maxAge = null, int poolSize = 1, CrossoverDelegate crossover = null,
-            int? maxSeconds = null)
+            TFitness optimalFitness, IReadOnlyList<TGene> geneSet, DisplayDelegate display,
+            MutateGeneDelegate customMutate = null, CreateDelegate customCreate = null, int? maxAge = null,
+            int poolSize = 1, CrossoverDelegate crossover = null, int? maxSeconds = null)
         {
             Chromosome<TGene, TFitness> FnMutate(Chromosome<TGene, TFitness> parent) =>
                 customMutate == null
@@ -127,24 +127,24 @@ namespace GeneticAlgorithms.TicTacToe
                     return GenerateParent(targetLen, geneSet, getFitness);
 
                 var genes = customCreate();
-                return new Chromosome<TGene, TFitness>(genes, getFitness(genes), Strategies.Create);
+                return new Chromosome<TGene, TFitness>(genes, getFitness(genes), Strategy.Create);
             }
 
             var strategyLookup =
-                new Dictionary<Strategies, StrategyDelegate>
+                new Dictionary<Strategy, StrategyDelegate>
                 {
-                    {Strategies.Create, (p, i, o) => FnGenerateParent()},
-                    {Strategies.Mutate, (p, i, o) => FnMutate(p)},
+                    {Strategy.Create, (parentGenes, index, parents) => FnGenerateParent()},
+                    {Strategy.Mutate, (parentGenes, index, parents) => FnMutate(parentGenes)},
                     {
-                        Strategies.Crossover,
-                        (p, i, o) => Crossover(p.Genes, i, o, getFitness, crossover, FnMutate, FnGenerateParent)
+                        Strategy.Crossover, (parentGenes, index, parents) => Crossover(parentGenes.Genes, index,
+                            parents, getFitness, crossover, FnMutate, FnGenerateParent)
                     }
                 };
 
-            var usedStrategies = new List<StrategyDelegate> {strategyLookup[Strategies.Mutate]};
+            var usedStrategies = new List<StrategyDelegate> {strategyLookup[Strategy.Mutate]};
 
             if (crossover != null)
-                usedStrategies.Add(strategyLookup[Strategies.Crossover]);
+                usedStrategies.Add(strategyLookup[Strategy.Crossover]);
 
             Chromosome<TGene, TFitness> FnNewChild(Chromosome<TGene, TFitness> parent, int index,
                 List<Chromosome<TGene, TFitness>> parents) =>
@@ -282,8 +282,9 @@ namespace GeneticAlgorithms.TicTacToe
             return best;
         }
 
-        internal static List<TGene> Tournament(CreateDelegate fnGenerateParent, CrossoverDelegate fnCrossover,
-            CompeteDelegate fnCompete, DisplayDelegate2 fnDisplay, SortKeyDelegate fnSortKey, int numParents = 10,
+        public static List<TGene> Tournament(CreateDelegate fnGenerateParent, CrossoverDelegate fnCrossover,
+            CompeteDelegate fnCompete, TournamentDisplayDelegate fnDisplay, SortKeyDelegate fnSortKey,
+            int numParents = 10,
             int maxGenerations = 100)
         {
             var pool = Enumerable.Range(0, 1 + numParents * numParents)
