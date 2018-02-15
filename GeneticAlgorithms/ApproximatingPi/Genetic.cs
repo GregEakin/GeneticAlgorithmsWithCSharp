@@ -55,8 +55,7 @@ namespace GeneticAlgorithms.ApproximatingPi
         }
 
         private static Chromosome<TGene, TFitness> Mutate(Chromosome<TGene, TFitness> parent,
-            IReadOnlyList<TGene> geneSet,
-            GetFitnessDelegate getFitness)
+            IReadOnlyList<TGene> geneSet, GetFitnessDelegate getFitness)
         {
             var childGenes = parent.Genes.ToList();
             var index = Rand.Random.Next(childGenes.Count);

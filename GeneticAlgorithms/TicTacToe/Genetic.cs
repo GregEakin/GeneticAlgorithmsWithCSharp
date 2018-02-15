@@ -70,8 +70,7 @@ namespace GeneticAlgorithms.TicTacToe
         }
 
         private static Chromosome<TGene, TFitness> Mutate(Chromosome<TGene, TFitness> parent,
-            IReadOnlyList<TGene> geneSet,
-            GetFitnessDelegate getFitness)
+            IReadOnlyList<TGene> geneSet, GetFitnessDelegate getFitness)
         {
             var childGenes = parent.Genes.ToList();
             var index = Rand.Random.Next(childGenes.Count);
@@ -284,8 +283,7 @@ namespace GeneticAlgorithms.TicTacToe
 
         public static List<TGene> Tournament(CreateDelegate fnGenerateParent, CrossoverDelegate fnCrossover,
             CompeteDelegate fnCompete, TournamentDisplayDelegate fnDisplay, SortKeyDelegate fnSortKey,
-            int numParents = 10,
-            int maxGenerations = 100)
+            int numParents = 10, int maxGenerations = 100)
         {
             var pool = Enumerable.Range(0, 1 + numParents * numParents)
                 .Select(x => new Tuple<List<TGene>, int[]>(fnGenerateParent(), new[] {0, 0, 0})).ToList();
