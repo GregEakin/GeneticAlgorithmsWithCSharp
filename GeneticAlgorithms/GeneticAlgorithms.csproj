@@ -112,6 +112,7 @@
     <Compile Include="Queens\QueenTests.cs" />
     <Compile Include="RegularExpressions\Fitness.cs" />
     <Compile Include="RegularExpressions\FitnessTests.cs" />
+    <Compile Include="RegularExpressions\MutateMoveTests .cs" />
     <Compile Include="RegularExpressions\RegexTests.cs" />
     <Compile Include="RegularExpressions\SimpleTests.cs" />
     <Compile Include="SortedNumbers\Benchmark.cs" />
