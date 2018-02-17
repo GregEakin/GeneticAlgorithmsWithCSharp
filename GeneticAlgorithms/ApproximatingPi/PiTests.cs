@@ -129,8 +129,10 @@ namespace GeneticAlgorithms.ApproximatingPi
 
         private static void Mutate(IList<bool> genes)
         {
-            var index = Rand.Random.Next(genes.Count);
-            genes[index] = !genes[index];
+            var numeratorIndex = Rand.Random.Next(0, genes.Count / 2);
+            var denominatorIndex = Rand.Random.Next(genes.Count / 2, genes.Count);
+            genes[numeratorIndex] = !genes[numeratorIndex];
+            genes[denominatorIndex] = !genes[denominatorIndex];
         }
 
         [TestMethod]
