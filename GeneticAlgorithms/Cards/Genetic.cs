@@ -97,9 +97,13 @@ namespace GeneticAlgorithms.Cards
                 var child = newChild(bestParent);
                 if (bestParent.Fitness.CompareTo(child.Fitness) > 0)
                     continue;
-                bestParent = child;
                 if (bestParent.Fitness.CompareTo(child.Fitness) == 0)
+                {
+                    bestParent = child;
                     continue;
+                }
+
+                bestParent = child;
                 yield return child;
             }
 
