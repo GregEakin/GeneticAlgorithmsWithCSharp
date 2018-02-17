@@ -188,7 +188,7 @@ namespace GeneticAlgorithms.ApproximatingPi
             var pIndex = 1;
             while (true)
             {
-                if (maxSeconds > 0 && watch.ElapsedMilliseconds > maxSeconds * 1000)
+                if (maxSeconds != null && watch.ElapsedMilliseconds > maxSeconds * 1000)
                     throw new SearchTimeoutException(bestParent);
 
                 pIndex = pIndex > 0 ? pIndex - 1 : lastParentIndex;
