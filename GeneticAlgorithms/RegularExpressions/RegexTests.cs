@@ -221,10 +221,10 @@ namespace GeneticAlgorithms.RegularExpressions
         public void MutateAddTest()
         {
             var genes = "1*0?10*".ToCharArray().Select(c => c.ToString()).ToList();
-            var geneSet = "abcdefg".ToCharArray().Select(c => c.ToString()).Concat(AllMetas).ToArray();
+            var geneSet = new[] {"a"};
             Assert.IsTrue(MutateAdd(genes, geneSet));
             Assert.AreEqual(8, genes.Count);
-            Assert.AreNotEqual("1*0?10*", string.Join(string.Empty, genes.Select(p => p)));
+            Assert.AreEqual(1, genes.Count(g => g == "a"));
         }
 
         private static bool MutateRemove(List<string> genes)
@@ -243,7 +243,6 @@ namespace GeneticAlgorithms.RegularExpressions
             var genes = "1*0?10*".ToCharArray().Select(c => c.ToString()).ToList();
             Assert.IsTrue(MutateRemove(genes));
             Assert.IsTrue(genes.Count == 6 || genes.Count == 5);
-            Assert.AreNotEqual("1*0?10*", string.Join(string.Empty, genes.Select(p => p)));
         }
 
         private static bool MutateReplace(List<string> genes, string[] geneSet)
@@ -269,9 +268,9 @@ namespace GeneticAlgorithms.RegularExpressions
         {
             if (genes.Count < 2)
                 return false;
-            var indexA = Rand.Random.Next(genes.Count);
-            int indexB;
-            do indexB = Rand.Random.Next(genes.Count); while (indexA == indexB);
+            var indexes = Rand.RandomSample(Enumerable.Range(0, genes.Count).ToList(), 2);
+            var indexA = indexes[0];
+            var indexB = indexes[1];
             var temp = genes[indexA];
             genes[indexA] = genes[indexB];
             genes[indexB] = temp;
@@ -281,10 +280,11 @@ namespace GeneticAlgorithms.RegularExpressions
         [TestMethod]
         public void MutateSwapTest()
         {
-            var genes = "1*0?10*".ToCharArray().Select(c => c.ToString()).ToList();
+            var genes = "1*3?20%".ToCharArray().Select(c => c.ToString()).ToList();
+            var genesCopy = genes.ToList();
             Assert.IsTrue(MutateSwap(genes));
-            Assert.AreEqual(7, genes.Count);
-            Assert.AreNotEqual("1*0?10*", string.Join(string.Empty, genes.Select(p => p)));
+            CollectionAssert.AreEquivalent(genesCopy, genes, string.Join("", genes));
+            CollectionAssert.AreNotEqual(genesCopy, genes, string.Join("", genes));
         }
 
         private static bool MutateMove(List<string> genes)
@@ -305,10 +305,11 @@ namespace GeneticAlgorithms.RegularExpressions
         [TestMethod]
         public void MutateMoveTest()
         {
-            var genes = "1*0?10*".ToCharArray().Select(c => c.ToString()).ToList();
-            Assert.IsTrue(MutateMove(genes));
+            var genes = "1*3?20%".ToCharArray().Select(c => c.ToString()).ToList();
+            var genesCopy = genes.ToList();
             Assert.AreEqual(7, genes.Count);
-            Assert.AreNotEqual("1*0?10*", string.Join(string.Empty, genes.Select(p => p)));
+            CollectionAssert.AreEquivalent(genesCopy, genes, string.Join("", genes));
+            CollectionAssert.AreNotEqual(genesCopy, genes, string.Join("", genes));
         }
 
         private static bool MutateToCharacterSet(List<string> genes)
