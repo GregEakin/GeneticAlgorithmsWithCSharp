@@ -42,7 +42,7 @@ namespace GeneticAlgorithms.ApproximatingPi
 
         private delegate Chromosome<TGene, TFitness> MutateChromosomeDelegate(Chromosome<TGene, TFitness> parent);
 
-        private delegate Chromosome<TGene, TFitness> MutateDelegate(Chromosome<TGene, TFitness> parentGenes, int index,
+        private delegate Chromosome<TGene, TFitness> StrategyDelegate(Chromosome<TGene, TFitness> parentGenes, int index,
             List<Chromosome<TGene, TFitness>> parents);
 
         private static Chromosome<TGene, TFitness> GenerateParent(int length, IReadOnlyList<TGene> geneSet,
@@ -115,7 +115,7 @@ namespace GeneticAlgorithms.ApproximatingPi
             }
 
             var strategyLookup =
-                new Dictionary<Strategy, MutateDelegate>
+                new Dictionary<Strategy, StrategyDelegate>
                 {
                     {Strategy.Create, (parentGenes, index, parents) => FnGenerateParent()},
                     {Strategy.Mutate, (parentGenes, index, parents) => FnMutate(parentGenes)},
@@ -126,7 +126,7 @@ namespace GeneticAlgorithms.ApproximatingPi
                 };
 
             var usedStrategies =
-                new List<MutateDelegate> {strategyLookup[Strategy.Mutate]};
+                new List<StrategyDelegate> {strategyLookup[Strategy.Mutate]};
 
             if (crossover != null)
                 usedStrategies.Add(strategyLookup[Strategy.Crossover]);
@@ -158,7 +158,7 @@ namespace GeneticAlgorithms.ApproximatingPi
         }
 
         private static IEnumerable<Chromosome<TGene, TFitness>> GetImprovement(
-            MutateDelegate newChild, GenerateParentDelegate generateParent, int? maxAge, int poolSize, int? maxSeconds)
+            StrategyDelegate newChild, GenerateParentDelegate generateParent, int? maxAge, int poolSize, int? maxSeconds)
         {
             var watch = Stopwatch.StartNew();
             var bestParent = generateParent();

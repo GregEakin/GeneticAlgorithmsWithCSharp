@@ -108,10 +108,10 @@ namespace GeneticAlgorithms.Knights
                 var child = newChild(bestParent);
                 if (bestParent.Fitness.CompareTo(child.Fitness) > 0)
                     continue;
-
                 bestParent = child;
-                if (bestParent.Fitness.CompareTo(child.Fitness) <= 0)
-                    yield return child;
+                if (bestParent.Fitness.CompareTo(child.Fitness) == 0)
+                    continue;
+                yield return child;
             }
 
             // ReSharper disable once IteratorNeverReturns

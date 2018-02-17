@@ -35,7 +35,7 @@ namespace GeneticAlgorithms.Cards
 
         private delegate Chromosome<TGene, TFitness> GenerateParentDelegate();
 
-        private delegate Chromosome<TGene, TFitness> MutateDelegate(Chromosome<TGene, TFitness> parent);
+        private delegate Chromosome<TGene, TFitness> StrategyDelegate(Chromosome<TGene, TFitness> parent);
 
         private static Chromosome<TGene, TFitness> GenerateParent(int length, IReadOnlyList<TGene> geneSet,
             FitnessDelegate fitnessDelegate)
@@ -87,7 +87,7 @@ namespace GeneticAlgorithms.Cards
             throw new UnauthorizedAccessException();
         }
 
-        private static IEnumerable<Chromosome<TGene, TFitness>> GetImprovement(MutateDelegate newChild,
+        private static IEnumerable<Chromosome<TGene, TFitness>> GetImprovement(StrategyDelegate newChild,
             GenerateParentDelegate generateParent)
         {
             var bestParent = generateParent();
@@ -98,8 +98,9 @@ namespace GeneticAlgorithms.Cards
                 if (bestParent.Fitness.CompareTo(child.Fitness) > 0)
                     continue;
                 bestParent = child;
-                if (bestParent.Fitness.CompareTo(child.Fitness) <= 0)
-                    yield return child;
+                if (bestParent.Fitness.CompareTo(child.Fitness) == 0)
+                    continue;
+                yield return child;
             }
 
             // ReSharper disable once IteratorNeverReturns
