@@ -68,8 +68,7 @@ namespace GeneticAlgorithms.LawnmowerProblem
                 if (adding)
                 {
                     var gene1 = Rand.SelectItem(geneSet)();
-                    var index1 = Rand.Random.Next(genes.Count + 1);
-                    genes.Insert(index1, gene1);
+                    genes.Add(gene1);
                     continue;
                 }
 
@@ -127,7 +126,7 @@ namespace GeneticAlgorithms.LawnmowerProblem
                 var mower = new Mower(location, dir);
                 var program = new Program(instructions);
 
-                program.Evaluate(mower, field);
+                program.Evaluate(mower, field, 0);
                 return new Tuple<Field, Mower, Program>(field, mower, program);
             }
 
@@ -325,7 +324,14 @@ namespace GeneticAlgorithms.LawnmowerProblem
                 var mower = new Mower(mowerStartLocation, mowerStartDirection);
                 var field = fnCreateField();
 
-                program.Evaluate(mower, field);
+                try
+                {
+                    program.Evaluate(mower, field, 0);
+                }
+                catch (Exception)
+                {
+                    // pass
+                }
                 return new Tuple<Field, Mower, Program>(field, mower, program);
             }
 

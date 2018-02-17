@@ -25,12 +25,12 @@ namespace GeneticAlgorithms.LawnmowerProblem
 {
     public interface INode
     {
-        void Execute(Mower mower, Field field);
+        void Execute(Mower mower, Field field, int count);
     }
 
     public class Mow : INode
     {
-        public void Execute(Mower mower, Field field)
+        public void Execute(Mower mower, Field field, int count)
         {
             mower.Mow(field);
         }
@@ -43,7 +43,7 @@ namespace GeneticAlgorithms.LawnmowerProblem
 
     public class Turn : INode
     {
-        public void Execute(Mower mower, Field field)
+        public void Execute(Mower mower, Field field, int count)
         {
             mower.TurnLeft();
         }
@@ -65,7 +65,7 @@ namespace GeneticAlgorithms.LawnmowerProblem
             Right = right;
         }
 
-        public void Execute(Mower mower, Field field)
+        public void Execute(Mower mower, Field field, int count)
         {
             mower.Jump(field, Forward, Right);
         }
@@ -94,11 +94,14 @@ namespace GeneticAlgorithms.LawnmowerProblem
         {
         }
 
-        public void Execute(Mower mower, Field field)
+        public void Execute(Mower mower, Field field, int count)
         {
+            if (count > 10)
+                throw new Exception("Too many calls.");
+
             for (var i = 0; i < Times; i++)
                 foreach (var op in Ops)
-                    op.Execute(mower, field);
+                    op.Execute(mower, field, count + 1);
         }
 
         public override string ToString()
@@ -127,10 +130,13 @@ namespace GeneticAlgorithms.LawnmowerProblem
         {
         }
 
-        public void Execute(Mower mower, Field field)
+        public void Execute(Mower mower, Field field, int count)
         {
+            if (count > 10)
+                throw new Exception("Too many calls.");
+
             foreach (var op in Ops)
-                op.Execute(mower, field);
+                op.Execute(mower, field, count + 1);
         }
 
         public override string ToString()
@@ -151,11 +157,14 @@ namespace GeneticAlgorithms.LawnmowerProblem
             Funcs = funcs;
         }
 
-        public void Execute(Mower mower, Field field)
+        public void Execute(Mower mower, Field field, int count)
         {
+            if (count > 10)
+                throw new Exception("Too many calls.");
+
             var funcId = FuncId ?? 0;
             if (Funcs.Count > funcId)
-                Funcs[funcId].Execute(mower, field);
+                Funcs[funcId].Execute(mower, field, count + 1);
         }
 
         public override string ToString()
@@ -239,10 +248,10 @@ namespace GeneticAlgorithms.LawnmowerProblem
             }
         }
 
-        public void Evaluate(Mower mower, Field field)
+        public void Evaluate(Mower mower, Field field, int count)
         {
             foreach (var instruction in Main)
-                instruction.Execute(mower, field);
+                instruction.Execute(mower, field, count + 1);
         }
 
         public void Print()
