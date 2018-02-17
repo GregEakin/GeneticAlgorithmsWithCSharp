@@ -242,7 +242,7 @@ namespace GeneticAlgorithms.TicTacToe
 
                 child.Age = 0;
                 parents[pIndex] = child;
-                if (bestParent.Fitness.CompareTo(child.Fitness) > 0)
+                if (bestParent.Fitness.CompareTo(child.Fitness) >= 0)
                     continue;
 
                 bestParent = child;

@@ -143,7 +143,7 @@ namespace GeneticAlgorithms.MagicSquare
 
                 child.Age = 0;
                 parent = child;
-                if (bestParent.Fitness.CompareTo(child.Fitness) > 0)
+                if (bestParent.Fitness.CompareTo(child.Fitness) >= 0)
                     continue;
 
                 bestParent = child;
