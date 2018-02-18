@@ -33,7 +33,7 @@ namespace GeneticAlgorithms.TicTacToe
 
         public delegate Fitness FnGetFitnessDelegate(List<Rule> genes);
 
-        private static Fitness GetFitness(IReadOnlyList<Rule> genes)
+        private static Fitness GetFitness(IReadOnlyCollection<Rule> genes)
         {
             var localCopy = genes.ToList();
             var fitness = GetFitnessForAllGames(localCopy);
@@ -200,8 +200,7 @@ namespace GeneticAlgorithms.TicTacToe
 
         public static void Display(Chromosome<Rule, Fitness> candidate, Stopwatch watch)
         {
-            var localCopy = candidate.Genes.Reverse();
-            Console.WriteLine("\t{0}\n{1}\n{2} ms", string.Join("\n\t", localCopy.Select(g => g.ToString())),
+            Console.WriteLine("\t{0}\n{1}\n{2} ms", string.Join("\n\t", candidate.Genes.Select(g => g.ToString())),
                 candidate.Fitness, watch.ElapsedMilliseconds);
         }
 
@@ -217,7 +216,7 @@ namespace GeneticAlgorithms.TicTacToe
             if (!genes.Any())
                 return false;
             genes.RemoveAt(Rand.Random.Next(genes.Count));
-            if (genes.Any() && Rand.PercentChance(50))
+            if (genes.Count > 1 && Rand.PercentChance(50))
                 genes.RemoveAt(Rand.Random.Next(genes.Count));
             return true;
         }
@@ -245,10 +244,10 @@ namespace GeneticAlgorithms.TicTacToe
         public static bool MutateMove(List<Rule> genes)
         {
             if (genes.Count < 3)
-                return MutateSwapAdjacent(genes);
+                return false;
             var length = Rand.Random.Next(1, 3);
             var skip = Rand.Random.Next(genes.Count - length + 1);
-            var toMove = genes.Skip(skip).Take(length).ToArray();
+            var toMove = genes.Skip(skip).Take(length).ToList();
             genes.RemoveRange(skip, length);
             var index = Rand.Random.Next(genes.Count);
             if (index >= skip)
@@ -258,17 +257,16 @@ namespace GeneticAlgorithms.TicTacToe
         }
 
         private static void Mutate(List<Rule> genes, FnGetFitnessDelegate fnGetFitness,
-            FnMutateDelegate[] mutationOperators,
-            List<int> mutationRoundCounts)
+            IReadOnlyList<FnMutateDelegate> mutationOperators, List<int> mutationRoundCounts)
         {
             var initialFitness = fnGetFitness(genes);
             var count = Rand.SelectItem(mutationRoundCounts);
             for (var i = 1; i < count + 2; i++)
             {
-                foreach (var func in mutationOperators.OrderBy(o => Rand.Random.Next()))
+                foreach (var mutate in mutationOperators.OrderBy(o => Rand.Random.Next()))
                 {
-                    var worked = func(genes);
-                    if (worked)
+                    var mutated = mutate(genes);
+                    if (mutated)
                         break;
                 }
 
@@ -311,7 +309,7 @@ namespace GeneticAlgorithms.TicTacToe
                 new RuleMetadata((expectedContent, count) => new RowOppositeFilter(expectedContent), options),
                 new RuleMetadata((expectedContent, count) => new ColumnOppositeFilter(expectedContent), options),
                 new RuleMetadata((expectedContent, count) => new DiagonalOppositeFilter(expectedContent), options),
-                new RuleMetadata((expectedContent, count) => new Noop()),
+                //new RuleMetadata((expectedContent, count) => new Noop()),
             };
 
             var genes = geneSet.SelectMany(g => g.CreateRules()).ToArray();
