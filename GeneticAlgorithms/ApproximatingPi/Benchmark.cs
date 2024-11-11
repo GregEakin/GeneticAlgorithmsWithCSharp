@@ -1,6 +1,6 @@
 ﻿/* File: Benchmark.cs
  *     from chapter 13 of _Genetic Algorithms with Python_
- *     writen by Clinton Sheppard
+ *     written by Clinton Sheppard
  *
  * Author: Greg Eakin <gregory.eakin@gmail.com>
  * Copyright (c) 2018 Greg Eakin
@@ -17,35 +17,30 @@
  * permissions and limitations under the License.
  */
 
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
-using System.Linq;
 
-namespace GeneticAlgorithms.ApproximatingPi
+namespace GeneticAlgorithms.ApproximatingPi;
+
+public static class Benchmark
 {
-    public static class Benchmark
+    public static void Run(Action function)
     {
-        public static void Run(Action function)
+        var timings = new List<double>();
+        var stdout = Console.Out;
+        for (var i = 0; i < 100; i++)
         {
-            var timings = new List<double>();
-            var stdout = Console.Out;
-            for (var i = 0; i < 100; i++)
-            {
-                Console.SetOut(TextWriter.Null);
-                var watch = Stopwatch.StartNew();
-                function();
-                var seconds = watch.ElapsedMilliseconds / 1000.0;
-                timings.Add(seconds);
-                Console.SetOut(stdout);
-                if (i >= 10 && i % 10 < 9)
-                    continue;
+            Console.SetOut(TextWriter.Null);
+            var watch = Stopwatch.StartNew();
+            function();
+            var seconds = watch.ElapsedMilliseconds / 1000.0;
+            timings.Add(seconds);
+            Console.SetOut(stdout);
+            if (i >= 10 && i % 10 < 9)
+                continue;
 
-                var mean = timings.Average();
-                var sd = i > 1 ? Math.Sqrt(timings.Average(v => Math.Pow(v - mean, 2))) : 0.0;
-                Console.WriteLine("{0} {1:F2} {2:F2}", i + 1, mean, sd);
-            }
+            var mean = timings.Average();
+            var sd = i > 1 ? Math.Sqrt(timings.Average(v => Math.Pow(v - mean, 2))) : 0.0;
+            Console.WriteLine("{0} {1:F2} {2:F2}", i + 1, mean, sd);
         }
     }
 }

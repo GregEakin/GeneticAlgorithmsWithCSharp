@@ -1,6 +1,6 @@
 ﻿/* File: Chromosome.cs
  *     from chapter 3 of _Genetic Algorithms with Python_
- *     writen by Clinton Sheppard
+ *     written by Clinton Sheppard
  *
  * Author: Greg Eakin <gregory.eakin@gmail.com>
  * Copyright (c) 2018 Greg Eakin
@@ -17,62 +17,57 @@
  * permissions and limitations under the License.
  */
 
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 
-namespace GeneticAlgorithms.SortedNumbers
+namespace GeneticAlgorithms.SortedNumbers;
+
+[TestClass]
+public class SortedNumbersTests
 {
-    [TestClass]
-    public class SortedNumbersTests
+    private static Fitness GetFitness(IReadOnlyList<int> genes)
     {
-        private static Fitness GetFitness(IReadOnlyList<int> genes)
+        var count = 1;
+        var gap = 0;
+        for (var i = 1; i < genes.Count; i++)
         {
-            var count = 1;
-            var gap = 0;
-            for (var i = 1; i < genes.Count; i++)
-            {
-                if (genes[i - 1] < genes[i])
-                    count++;
-                else
-                    gap += genes[i - 1] - genes[i];
-            }
-
-            return new Fitness(count, gap);
+            if (genes[i - 1] < genes[i])
+                count++;
+            else
+                gap += genes[i - 1] - genes[i];
         }
 
-        private static void Display(Chromosome<int, Fitness> candidate, Stopwatch watch)
-        {
-            Console.WriteLine("{0}\t=> {1}\t{2}",
-                string.Join(", ", candidate.Genes),
-                candidate.Fitness, watch.ElapsedMilliseconds);
-        }
+        return new Fitness(count, gap);
+    }
 
-        [TestMethod]
-        public void SortTenNumbersTest()
-        {
-            SortNumbers(10);
-        }
+    private static void Display(Chromosome<int, Fitness> candidate, Stopwatch watch)
+    {
+        Console.WriteLine("{0}\t=> {1}\t{2}",
+            string.Join(", ", candidate.Genes),
+            candidate.Fitness, watch.ElapsedMilliseconds);
+    }
 
-        private static void SortNumbers(int totalNumbers)
-        {
-            var geneSet = Enumerable.Range(0, 100).ToArray();
-            var watch = Stopwatch.StartNew();
+    [TestMethod]
+    public void SortTenNumbersTest()
+    {
+        SortNumbers(10);
+    }
 
-            void FnDisplay(Chromosome<int, Fitness> candidate) => Display(candidate, watch);
-            Fitness FnGetFitness(IReadOnlyList<int> genes) => GetFitness(genes);
+    private static void SortNumbers(int totalNumbers)
+    {
+        var geneSet = Enumerable.Range(0, 100).ToArray();
+        var watch = Stopwatch.StartNew();
 
-            var optimalFitness = new Fitness(totalNumbers, 0);
-            var best = Genetic<int, Fitness>.GetBest(FnGetFitness, totalNumbers, optimalFitness, geneSet, FnDisplay);
-            Assert.IsTrue(optimalFitness.CompareTo(best.Fitness) <= 0);
-        }
+        void FnDisplay(Chromosome<int, Fitness> candidate) => Display(candidate, watch);
+        Fitness FnGetFitness(IReadOnlyList<int> genes) => GetFitness(genes);
 
-        [TestMethod]
-        public void BenchmarkTest()
-        {
-            Benchmark.Run(() => SortNumbers(40));
-        }
+        var optimalFitness = new Fitness(totalNumbers, 0);
+        var best = Genetic<int, Fitness>.GetBest(FnGetFitness, totalNumbers, optimalFitness, geneSet, FnDisplay);
+        Assert.IsTrue(optimalFitness.CompareTo(best.Fitness) <= 0);
+    }
+
+    [TestMethod]
+    public void BenchmarkTest()
+    {
+        Benchmark.Run(() => SortNumbers(40));
     }
 }

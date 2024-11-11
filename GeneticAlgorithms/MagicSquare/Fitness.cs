@@ -1,6 +1,6 @@
 ﻿/* File: Benchmark.cs
  *     from chapter 8 of _Genetic Algorithms with Python_
- *     writen by Clinton Sheppard
+ *     written by Clinton Sheppard
  *
  * Author: Greg Eakin <gregory.eakin@gmail.com>
  * Copyright (c) 2018 Greg Eakin
@@ -17,42 +17,39 @@
  * permissions and limitations under the License.
  */
 
-using System;
+namespace GeneticAlgorithms.MagicSquare;
 
-namespace GeneticAlgorithms.MagicSquare
+public class Fitness : IComparable, IComparable<Fitness>
 {
-    public class Fitness : IComparable, IComparable<Fitness>
+    private int SumOfDifferences { get; }
+
+    public Fitness(int sumOfDifferences)
     {
-        private int SumOfDifferences { get; }
+        SumOfDifferences = sumOfDifferences;
+    }
 
-        public Fitness(int sumOfDifferences)
+    public int CompareTo(object obj)
+    {
+        switch (obj)
         {
-            SumOfDifferences = sumOfDifferences;
+            case null:
+                return 1;
+            case Fitness that:
+                return CompareTo(that);
+            default:
+                throw new ArgumentException("Object is not a Fitness");
         }
+    }
 
-        public int CompareTo(object obj)
-        {
-            switch (obj)
-            {
-                case null:
-                    return 1;
-                case Fitness that:
-                    return CompareTo(that);
-                default:
-                    throw new ArgumentException("Object is not a Fitness");
-            }
-        }
+    public int CompareTo(Fitness that)
+    {
+        if (ReferenceEquals(this, that)) return 0;
+        if (that is null) return 1;
+        return -SumOfDifferences.CompareTo(that.SumOfDifferences);
+    }
 
-        public int CompareTo(Fitness that)
-        {
-            if (ReferenceEquals(this, that)) return 0;
-            if (that is null) return 1;
-            return -SumOfDifferences.CompareTo(that.SumOfDifferences);
-        }
-
-        public override string ToString()
-        {
-            return SumOfDifferences.ToString();
-        }
+    public override string ToString()
+    {
+        return SumOfDifferences.ToString();
     }
 }

@@ -1,6 +1,6 @@
 ﻿/* File: Fitness.cs
  *     from chapter 10 of _Genetic Algorithms with Python_
- *     writen by Clinton Sheppard
+ *     written by Clinton Sheppard
  *
  * Author: Greg Eakin <gregory.eakin@gmail.com>
  * Copyright (c) 2018 Greg Eakin
@@ -17,43 +17,39 @@
  * permissions and limitations under the License.
  */
 
-using System;
-using System.Collections.Generic;
+namespace GeneticAlgorithms.LinearEquation;
 
-namespace GeneticAlgorithms.LinearEquation
+public class Fitness : IComparable, IComparable<Fitness>
 {
-    public class Fitness : IComparable, IComparable<Fitness>
+    public Fraction TotalDifference { get; }
+
+    public Fitness(Fraction totalDifference)
     {
-        public Fraction TotalDifference { get; }
+        TotalDifference = totalDifference;
+    }
 
-        public Fitness(Fraction totalDifference)
+    public int CompareTo(object obj)
+    {
+        switch (obj)
         {
-            TotalDifference = totalDifference;
+            case null:
+                return 1;
+            case Fitness that:
+                return CompareTo(that);
+            default:
+                throw new ArgumentException("Object is not a Fitness");
         }
+    }
 
-        public int CompareTo(object obj)
-        {
-            switch (obj)
-            {
-                case null:
-                    return 1;
-                case Fitness that:
-                    return CompareTo(that);
-                default:
-                    throw new ArgumentException("Object is not a Fitness");
-            }
-        }
+    public int CompareTo(Fitness that)
+    {
+        if (ReferenceEquals(this, that)) return 0;
+        if (that is null) return 1;
+        return -Comparer<Fraction>.Default.Compare(TotalDifference, that.TotalDifference);
+    }
 
-        public int CompareTo(Fitness that)
-        {
-            if (ReferenceEquals(this, that)) return 0;
-            if (that is null) return 1;
-            return -Comparer<Fraction>.Default.Compare(TotalDifference, that.TotalDifference);
-        }
-
-        public override string ToString()
-        {
-            return $"diff: {(float)TotalDifference:F2}";
-        }
+    public override string ToString()
+    {
+        return $"diff: {(float)TotalDifference:F2}";
     }
 }

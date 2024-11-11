@@ -15,63 +15,58 @@
  * permissions and limitations under the License.
  */
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
+namespace GeneticAlgorithms.Utilities;
 
-namespace GeneticAlgorithms.Utilities
+public static class Rand
 {
-    public static class Rand
+    public static Random Random { get; } = new();
+
+    public static T SelectItemNotIn<T>(IEnumerable<T> list, IReadOnlyList<T> except)
     {
-        public static Random Random { get; } = new Random();
+        var subList = list.Where(i => !except.Contains(i)).ToList();
+        return SelectItem(subList);
+    }
 
-        public static T SelectItemNotIn<T>(IEnumerable<T> list, IReadOnlyList<T> except)
+    public static T SelectItem<T>(IReadOnlyList<T> list)
+    {
+        var index = Random.Next(list.Count);
+        return list[index];
+    }
+
+    public static bool PercentChance(int value)
+    {
+        if (value <= 0)
+            return false;
+
+        if (value >= 100)
+            return true;
+
+        return Random.NextDouble() < value / 100.0;
+    }
+
+    public static List<TGene> RandomSample<TGene>(IReadOnlyList<TGene> geneSet, int length)
+    {
+        var genes = new List<TGene>(length);
+        while (genes.Count < length)
         {
-            var subList = list.Where(i => !except.Contains(i)).ToList();
-            return SelectItem(subList);
+            var sampleSize = Math.Min(geneSet.Count, length - genes.Count);
+            var array = geneSet.OrderBy(_ => Random.Next()).Take(sampleSize);
+            genes.AddRange(array);
         }
 
-        public static T SelectItem<T>(IReadOnlyList<T> list)
+        return genes;
+    }
+
+    public static string RandomSample(IReadOnlyList<char> input, int length)
+    {
+        var result = string.Empty;
+        while (result.Length < length)
         {
-            var index = Random.Next(list.Count);
-            return list[index];
+            var sampleSize = Math.Min(input.Count, length - result.Length);
+            var array = input.OrderBy(_ => Random.Next()).Take(sampleSize);
+            result += new string(array.ToArray());
         }
 
-        public static bool PercentChance(int value)
-        {
-            if (value <= 0)
-                return false;
-
-            if (value >= 100)
-                return true;
-
-            return Random.NextDouble() < value / 100.0;
-        }
-
-        public static List<TGene> RandomSample<TGene>(IReadOnlyList<TGene> geneSet, int length)
-        {
-            var genes = new List<TGene>(length);
-            while (genes.Count < length)
-            {
-                var sampleSize = Math.Min(geneSet.Count, length - genes.Count);
-                var array = geneSet.OrderBy(x => Random.Next()).Take(sampleSize);
-                genes.AddRange(array);
-            }
-
-            return genes;
-        }
-
-        public static string RandomSample(IReadOnlyList<char> input, int length)
-        {
-            var result = string.Empty;
-            while (result.Length < length)
-            {
-                var sampleSize = Math.Min(input.Count, length - result.Length);
-                var array = input.OrderBy(x => Random.Next()).Take(sampleSize);
-                result += new string(array.ToArray());
-            }
-
-            return result;
-        }
+        return result;
     }
 }

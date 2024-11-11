@@ -1,6 +1,6 @@
 ﻿/* File: Square.cs
  *     from chapter 18 of _Genetic Algorithms with Python_
- *     writen by Clinton Sheppard
+ *     written by Clinton Sheppard
  *
  * Author: Greg Eakin <gregory.eakin@gmail.com>
  * Copyright (c) 2018 Greg Eakin
@@ -17,134 +17,130 @@
  * permissions and limitations under the License.
  */
 
-using System;
-using System.Collections.Generic;
+namespace GeneticAlgorithms.TicTacToe;
 
-namespace GeneticAlgorithms.TicTacToe
+public class Square
 {
-    public class Square
+    //# board layout is a magic square
+    //# each row, column, and diagonal sums to 15
+    //#   8  3  4
+    //#   1  5  9
+    //#   6  7  2
+
+    public static readonly int[] Indexes = [8, 3, 4, 1, 5, 9, 6, 7, 2];
+
+    public ContentType Content { get; }
+    public int Index { get; }
+    public List<int[]> Diagonals { get; } = [];
+    public bool Center { get; }
+    public bool Corner { get; }
+    public bool Side { get; }
+    public bool TopRow { get; }
+    public bool MiddleRow { get; }
+    public bool BottomRow { get; }
+    public bool LeftColumn { get; }
+    public bool MiddleColumn { get; }
+    public bool RightColumn { get; }
+    public int[] Row { get; }
+    public int[] Column { get; }
+    public int? DiagonalOpposite { get; }
+    public int? RowOpposite { get; }
+    public int? ColumnOpposite { get; }
+
+    public Square(int index, ContentType content = ContentType.Empty)
     {
-        //# board layout is a magic square
-        //# each row, column, and diagonal sums to 15
-        //#   8  3  4
-        //#   1  5  9
-        //#   6  7  2
+        Index = index;
+        Content = content;
 
-        public static readonly int[] Indexes = { 8, 3, 4, 1, 5, 9, 6, 7, 2 };
-
-        public ContentType Content { get; }
-        public int Index { get; }
-        public List<int[]> Diagonals { get; } = new List<int[]>();
-        public bool Center { get; }
-        public bool Corner { get; }
-        public bool Side { get; }
-        public bool TopRow { get; }
-        public bool MiddleRow { get; }
-        public bool BottomRow { get; }
-        public bool LeftColumn { get; }
-        public bool MiddleColumn { get; }
-        public bool RightColumn { get; }
-        public int[] Row { get; }
-        public int[] Column { get; }
-        public int? DiagonalOpposite { get; }
-        public int? RowOpposite { get; }
-        public int? ColumnOpposite { get; }
-
-        public Square(int index, ContentType content = ContentType.Empty)
+        switch (index)
         {
-            Index = index;
-            Content = content;
-
-            switch (index)
-            {
-                case 8:
-                    Corner = true;
-                    TopRow = true;
-                    Row = new[] {8, 3, 4};
-                    LeftColumn = true;
-                    Column = new[] {8, 1, 6};
-                    RowOpposite = 4;
-                    ColumnOpposite = 6;
-                    DiagonalOpposite = 2;
-                    Diagonals.Add(new[] { 8, 5, 2 });
-                    break;
-                case 3:
-                    Side = true;
-                    TopRow = true;
-                    Row = new[] {8, 3, 4};
-                    MiddleColumn = true;
-                    Column = new[] {3, 5, 7};
-                    ColumnOpposite = 7;
-                    break;
-                case 4:
-                    Corner = true;
-                    TopRow = true;
-                    Row = new[] {8, 3, 4};
-                    RightColumn = true;
-                    Column = new[] {4, 9, 2};
-                    RowOpposite = 8;
-                    ColumnOpposite = 2;
-                    DiagonalOpposite = 6;
-                    Diagonals.Add(new[] { 6, 5, 4 });
-                    break;
-                case 1:
-                    Side = true;
-                    MiddleRow = true;
-                    Row = new[] {1, 5, 9};
-                    LeftColumn = true;
-                    Column = new[] {8, 1, 6};
-                    RowOpposite = 9;
-                    break;
-                case 5:
-                    Center = true;
-                    MiddleRow = true;
-                    Row = new[] {1, 5, 9};
-                    MiddleColumn = true;
-                    Column = new[] {3, 5, 7};
-                    Diagonals.Add(new[] { 8, 5, 2 });
-                    Diagonals.Add(new[] { 6, 5, 4 });
-                    break;
-                case 9:
-                    Side = true;
-                    MiddleRow = true;
-                    Row = new[] {1, 5, 9};
-                    RightColumn = true;
-                    Column = new[] {4, 9, 2};
-                    RowOpposite = 1;
-                    break;
-                case 6:
-                    Corner = true;
-                    BottomRow = true;
-                    Row = new[] {6, 7, 2};
-                    LeftColumn = true;
-                    Column = new[] {8, 1, 6};
-                    RowOpposite = 2;
-                    ColumnOpposite = 8;
-                    DiagonalOpposite = 4;
-                    Diagonals.Add(new[] { 6, 5, 4 });
-                    break;
-                case 7:
-                    Side = true;
-                    MiddleColumn = true;
-                    Column = new[] {3, 5, 7};
-                    BottomRow = true;
-                    Row = new[] {6, 7, 2};
-                    ColumnOpposite = 3;
-                    break;
-                case 2:
-                    Corner = true;
-                    BottomRow = true;
-                    Row = new[] {6, 7, 2};
-                    RightColumn = true;
-                    Column = new[] {4, 9, 2};
-                    RowOpposite = 6;
-                    ColumnOpposite = 4;
-                    DiagonalOpposite = 8;
-                    Diagonals.Add(new[] { 8, 5, 2 });
-                    break;
-                default:
-                    throw new AccessViolationException();
-            }
+            case 8:
+                Corner = true;
+                TopRow = true;
+                Row = [8, 3, 4];
+                LeftColumn = true;
+                Column = [8, 1, 6];
+                RowOpposite = 4;
+                ColumnOpposite = 6;
+                DiagonalOpposite = 2;
+                Diagonals.Add([8, 5, 2]);
+                break;
+            case 3:
+                Side = true;
+                TopRow = true;
+                Row = [8, 3, 4];
+                MiddleColumn = true;
+                Column = [3, 5, 7];
+                ColumnOpposite = 7;
+                break;
+            case 4:
+                Corner = true;
+                TopRow = true;
+                Row = [8, 3, 4];
+                RightColumn = true;
+                Column = [4, 9, 2];
+                RowOpposite = 8;
+                ColumnOpposite = 2;
+                DiagonalOpposite = 6;
+                Diagonals.Add([6, 5, 4]);
+                break;
+            case 1:
+                Side = true;
+                MiddleRow = true;
+                Row = [1, 5, 9];
+                LeftColumn = true;
+                Column = [8, 1, 6];
+                RowOpposite = 9;
+                break;
+            case 5:
+                Center = true;
+                MiddleRow = true;
+                Row = [1, 5, 9];
+                MiddleColumn = true;
+                Column = [3, 5, 7];
+                Diagonals.Add([8, 5, 2]);
+                Diagonals.Add([6, 5, 4]);
+                break;
+            case 9:
+                Side = true;
+                MiddleRow = true;
+                Row = [1, 5, 9];
+                RightColumn = true;
+                Column = [4, 9, 2];
+                RowOpposite = 1;
+                break;
+            case 6:
+                Corner = true;
+                BottomRow = true;
+                Row = [6, 7, 2];
+                LeftColumn = true;
+                Column = [8, 1, 6];
+                RowOpposite = 2;
+                ColumnOpposite = 8;
+                DiagonalOpposite = 4;
+                Diagonals.Add([6, 5, 4]);
+                break;
+            case 7:
+                Side = true;
+                MiddleColumn = true;
+                Column = [3, 5, 7];
+                BottomRow = true;
+                Row = [6, 7, 2];
+                ColumnOpposite = 3;
+                break;
+            case 2:
+                Corner = true;
+                BottomRow = true;
+                Row = [6, 7, 2];
+                RightColumn = true;
+                Column = [4, 9, 2];
+                RowOpposite = 6;
+                ColumnOpposite = 4;
+                DiagonalOpposite = 8;
+                Diagonals.Add([8, 5, 2]);
+                break;
+            default:
+                throw new AccessViolationException();
         }
     }
 }

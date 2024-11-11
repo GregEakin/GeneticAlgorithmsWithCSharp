@@ -1,6 +1,6 @@
 ﻿/* File: OneMaxTests.cs
  *     from chapter 2 of _Genetic Algorithms with Python_
- *     writen by Clinton Sheppard
+ *     written by Clinton Sheppard
  *
  * Author: Greg Eakin <gregory.eakin@gmail.com>
  * Copyright (c) 2018 Greg Eakin
@@ -17,51 +17,47 @@
  * permissions and limitations under the License.
  */
 
-using System;
 using System.Diagnostics;
-using System.Linq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace GeneticAlgorithms.Password
+namespace GeneticAlgorithms.Password;
+
+[TestClass]
+public class OneMaxTests
 {
-    [TestClass]
-    public class OneMaxTests
+    private static int GetFitness(string genes)
     {
-        private static int GetFitness(string genes)
-        {
-            var sum = genes.Count(c => c == '1');
-            return sum;
-        }
+        var sum = genes.Count(c => c == '1');
+        return sum;
+    }
 
-        private static void Display(Chromosome candidate, Stopwatch stopwatch)
-        {
-            Console.WriteLine("{0}...{1}\t{2}\t{3} ms", candidate.Genes.Substring(0, 15),
-                candidate.Genes.Substring(candidate.Genes.Length - 15),
-                candidate.Fitness, stopwatch.ElapsedMilliseconds);
-        }
+    private static void Display(Chromosome candidate, Stopwatch stopwatch)
+    {
+        Console.WriteLine("{0}...{1}\t{2}\t{3} ms", candidate.Genes.Substring(0, 15),
+            candidate.Genes.Substring(candidate.Genes.Length - 15),
+            candidate.Fitness, stopwatch.ElapsedMilliseconds);
+    }
 
-        private static void Test(int length = 100)
-        {
-            var geneSet = new[] {'0', '1'};
-            var watch = Stopwatch.StartNew();
-            void FnDisplay(Chromosome candidate) => Display(candidate, watch);
-            int FnGetFitness(string genes) => GetFitness(genes);
+    private static void Test(int length = 100)
+    {
+        var geneSet = new[] {'0', '1'};
+        var watch = Stopwatch.StartNew();
+        void FnDisplay(Chromosome candidate) => Display(candidate, watch);
+        int FnGetFitness(string genes) => GetFitness(genes);
 
-            var optimalFitness = length;
-            var best = Genetic.GetBest(FnGetFitness, length, optimalFitness, geneSet, FnDisplay);
-            Assert.AreEqual(optimalFitness, best.Fitness);
-        }
+        var optimalFitness = length;
+        var best = Genetic.GetBest(FnGetFitness, length, optimalFitness, geneSet, FnDisplay);
+        Assert.AreEqual(optimalFitness, best.Fitness);
+    }
 
-        [TestMethod]
-        public void SingleTest()
-        {
-            Test(50);
-        }
+    [TestMethod]
+    public void SingleTest()
+    {
+        Test(50);
+    }
 
-        [TestMethod]
-        public void BenchmarkTest()
-        {
-            Benchmark.Run(() => Test(4000));
-        }
+    [TestMethod]
+    public void BenchmarkTest()
+    {
+        Benchmark.Run(() => Test(4000));
     }
 }

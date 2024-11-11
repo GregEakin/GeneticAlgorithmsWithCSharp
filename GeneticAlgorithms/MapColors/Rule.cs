@@ -1,6 +1,6 @@
 ﻿/* File: Rule.cs
  *     from chapter 5 of _Genetic Algorithms with Python_
- *     writen by Clinton Sheppard
+ *     written by Clinton Sheppard
  *
  * Author: Greg Eakin <gregory.eakin@gmail.com>
  * Copyright (c) 2018 Greg Eakin
@@ -17,52 +17,46 @@
  * permissions and limitations under the License.
  */
 
-using System;
-using System.Collections.Generic;
+namespace GeneticAlgorithms.MapColors;
 
-namespace GeneticAlgorithms.MapColors
+public class Rule
 {
-    public class Rule
+    public string Node { get; }
+    public string Adjacent { get; }
+
+    public Rule(string node, string adjacent)
     {
-        public string Node { get; }
-        public string Adjacent { get; }
-
-        public Rule(string node, string adjacent)
+        if (string.Compare(node, adjacent, StringComparison.Ordinal) < 0)
         {
-            if (string.Compare(node, adjacent, StringComparison.Ordinal) < 0)
-            {
-                var temp = node;
-                node = adjacent;
-                adjacent = temp;
-            }
-
-            Node = node;
-            Adjacent = adjacent;
+            (node, adjacent) = (adjacent, node);
         }
 
-        public override bool Equals(object obj)
+        Node = node;
+        Adjacent = adjacent;
+    }
+
+    public override bool Equals(object obj)
+    {
+        switch (obj)
         {
-            switch (obj)
-            {
-                case null:
-                    return false;
-                case Rule that:
-                    return Node == that.Node && Adjacent == that.Adjacent;
-                default:
-                    return false;
-            }
+            case null:
+                return false;
+            case Rule that:
+                return Node == that.Node && Adjacent == that.Adjacent;
+            default:
+                return false;
         }
+    }
 
-        public override int GetHashCode() => Node.GetHashCode() * 397 ^ Adjacent.GetHashCode();
+    public override int GetHashCode() => Node.GetHashCode() * 397 ^ Adjacent.GetHashCode();
 
-        public override string ToString() => $"{Node} -> {Adjacent}";
+    public override string ToString() => $"{Node} -> {Adjacent}";
 
-        public bool Valid(IReadOnlyList<char> genes, Dictionary<string, int> nodeIndexLookup)
-        {
-            var index = nodeIndexLookup[Node];
-            var adjacentNodeIndex = nodeIndexLookup[Adjacent];
+    public bool Valid(IReadOnlyList<char> genes, Dictionary<string, int> nodeIndexLookup)
+    {
+        var index = nodeIndexLookup[Node];
+        var adjacentNodeIndex = nodeIndexLookup[Adjacent];
 
-            return !Equals(genes[index], genes[adjacentNodeIndex]);
-        }
+        return !Equals(genes[index], genes[adjacentNodeIndex]);
     }
 }

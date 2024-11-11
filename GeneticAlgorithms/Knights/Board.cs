@@ -1,6 +1,6 @@
 ﻿/* File: Board.cs
  *     from chapter 6 of _Genetic Algorithms with Python_
- *     writen by Clinton Sheppard
+ *     written by Clinton Sheppard
  *
  * Author: Greg Eakin <gregory.eakin@gmail.com>
  * Copyright (c) 2018 Greg Eakin
@@ -17,46 +17,43 @@
  * permissions and limitations under the License.
  */
 
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 
-namespace GeneticAlgorithms.Knights
+namespace GeneticAlgorithms.Knights;
+
+public class Board
 {
-    public class Board
+    private readonly char[,] _board;
+    public int Width => _board.GetLength(0);
+    public int Height => _board.GetLength(1);
+
+    public char this[int x, int y] => _board[x, y];
+
+    public Board(IReadOnlyList<Position> positions, int width, int height)
     {
-        private readonly char[,] _board;
-        public int Width => _board.GetLength(0);
-        public int Height => _board.GetLength(1);
+        _board = new char[width, height];
 
-        public char this[int x, int y] => _board[x, y];
+        for (var x = 0; x < width; x++)
+        for (var y = 0; y < height; y++)
+            _board[x, y] = '.';
 
-        public Board(IReadOnlyList<Position> positions, int width, int height)
+        foreach (var position in positions)
+            _board[position.X, position.Y] = 'N';
+    }
+
+    public override string ToString()
+    {
+        var builder = new StringBuilder();
+
+        for (var y = Height - 1; y >= 0; y--)
         {
-            _board = new char[width, height];
-
-            for (var x = 0; x < width; x++)
-            for (var y = 0; y < height; y++)
-                _board[x, y] = '.';
-
-            foreach (var position in positions)
-                _board[position.X, position.Y] = 'N';
+            builder.AppendFormat("{0}\t", y);
+            for (var x = 0; x < Width; x++)
+                builder.AppendFormat("{0} ", _board[x, y]);
+            builder.AppendLine();
         }
 
-        public override string ToString()
-        {
-            var builder = new StringBuilder();
-
-            for (var y = Height - 1; y >= 0; y--)
-            {
-                builder.AppendFormat("{0}\t", y);
-                for (var x = 0; x < Width; x++)
-                    builder.AppendFormat("{0} ", _board[x, y]);
-                builder.AppendLine();
-            }
-
-            builder.AppendFormat(" \t{0}", string.Join(" ", Enumerable.Range(0, Width)));
-            return builder.ToString();
-        }
+        builder.AppendFormat(" \t{0}", string.Join(" ", Enumerable.Range(0, Width)));
+        return builder.ToString();
     }
 }

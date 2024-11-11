@@ -1,6 +1,6 @@
 ﻿/* File: Fitness.cs
  *     from chapter 3 of _Genetic Algorithms with Python_
- *     writen by Clinton Sheppard
+ *     written by Clinton Sheppard
  *
  * Author: Greg Eakin <gregory.eakin@gmail.com>
  * Copyright (c) 2018 Greg Eakin
@@ -17,41 +17,38 @@
  * permissions and limitations under the License.
  */
 
-using System;
+namespace GeneticAlgorithms.SortedNumbers;
 
-namespace GeneticAlgorithms.SortedNumbers
+public class Fitness : IComparable, IComparable<Fitness>
 {
-    public class Fitness : IComparable, IComparable<Fitness>
+    public int NumbersInSequenceCount { get; }
+    public int TotalGap { get; }
+
+    public Fitness(int numbersInSequenceCount, int totalGap)
     {
-        public int NumbersInSequenceCount { get; }
-        public int TotalGap { get; }
-
-        public Fitness(int numbersInSequenceCount, int totalGap)
-        {
-            NumbersInSequenceCount = numbersInSequenceCount;
-            TotalGap = totalGap;
-        }
-
-        public int CompareTo(object obj)
-        {
-            switch (obj)
-            {
-                case null:
-                    return 1;
-                case Fitness that:
-                    return CompareTo(that);
-                default:
-                    throw new ArgumentException("Object is not a Fitness");
-            }
-        }
-
-        public int CompareTo(Fitness that)
-        {
-            return NumbersInSequenceCount != that.NumbersInSequenceCount
-                ? NumbersInSequenceCount.CompareTo(that.NumbersInSequenceCount)
-                : -TotalGap.CompareTo(that.TotalGap);
-        }
-
-        public override string ToString() => $"{NumbersInSequenceCount} Sequential, {TotalGap} Total Gap";
+        NumbersInSequenceCount = numbersInSequenceCount;
+        TotalGap = totalGap;
     }
+
+    public int CompareTo(object obj)
+    {
+        switch (obj)
+        {
+            case null:
+                return 1;
+            case Fitness that:
+                return CompareTo(that);
+            default:
+                throw new ArgumentException("Object is not a Fitness");
+        }
+    }
+
+    public int CompareTo(Fitness that)
+    {
+        return NumbersInSequenceCount != that.NumbersInSequenceCount
+            ? NumbersInSequenceCount.CompareTo(that.NumbersInSequenceCount)
+            : -TotalGap.CompareTo(that.TotalGap);
+    }
+
+    public override string ToString() => $"{NumbersInSequenceCount} Sequential, {TotalGap} Total Gap";
 }

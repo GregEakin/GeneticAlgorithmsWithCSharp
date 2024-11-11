@@ -1,6 +1,6 @@
 ﻿/* File: CardTests.cs
  *     from chapter 6 of _Genetic Algorithms with Python_
- *     writen by Clinton Sheppard
+ *     written by Clinton Sheppard
  *
  * Author: Greg Eakin <gregory.eakin@gmail.com>
  * Copyright (c) 2018 Greg Eakin
@@ -18,96 +18,89 @@
  */
 
 using GeneticAlgorithms.Utilities;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 
-namespace GeneticAlgorithms.Cards
+namespace GeneticAlgorithms.Cards;
+
+[TestClass]
+public class CardTests
 {
-    [TestClass]
-    public class CardTests
+    private static Fitness GetFitness(IReadOnlyCollection<int> genes)
     {
-        private static Fitness GetFitness(IReadOnlyCollection<int> genes)
-        {
-            var group1Sum = genes.Take(5).Sum();
-            var group2Product = genes.Skip(5).Aggregate(1, (acc, val) => acc * val);
-            var duplicateCount = genes.Count - new HashSet<int>(genes).Count;
-            return new Fitness(group1Sum, group2Product, duplicateCount);
-        }
+        var group1Sum = genes.Take(5).Sum();
+        var group2Product = genes.Skip(5).Aggregate(1, (acc, val) => acc * val);
+        var duplicateCount = genes.Count - new HashSet<int>(genes).Count;
+        return new Fitness(group1Sum, group2Product, duplicateCount);
+    }
 
-        private static void Display(Chromosome<int, Fitness> candidate, Stopwatch watch)
-        {
-            Console.WriteLine("{0} - {1}\t{2},\t{3} ms",
-                string.Join(", ", candidate.Genes.Take(5)),
-                string.Join(", ", candidate.Genes.Skip(5)),
-                candidate.Fitness, watch.ElapsedMilliseconds);
-        }
+    private static void Display(Chromosome<int, Fitness> candidate, Stopwatch watch)
+    {
+        Console.WriteLine("{0} - {1}\t{2},\t{3} ms",
+            string.Join(", ", candidate.Genes.Take(5)),
+            string.Join(", ", candidate.Genes.Skip(5)),
+            candidate.Fitness, watch.ElapsedMilliseconds);
+    }
 
-        private static void Mutate(IList<int> genes, IReadOnlyList<int> geneSet)
+    private static void Mutate(IList<int> genes, IReadOnlyList<int> geneSet)
+    {
+        if (genes.Count == new HashSet<int>(genes).Count)
         {
-            if (genes.Count == new HashSet<int>(genes).Count)
+            var count = Rand.Random.Next(1, 4);
+            while (count-- > 0)
             {
-                var count = Rand.Random.Next(1, 4);
-                while (count-- > 0)
-                {
-                    var randomSample = Rand.RandomSample(Enumerable.Range(0, genes.Count).ToList(), 2);
-                    var indexA = randomSample[0];
-                    var indexB = randomSample[1];
-                    var temp = genes[indexA];
-                    genes[indexA] = genes[indexB];
-                    genes[indexB] = temp;
-                }
-            }
-            else
-            {
-                var indexA = Rand.Random.Next(genes.Count);
-                var indexB = Rand.Random.Next(geneSet.Count);
-                genes[indexA] = geneSet[indexB];
+                var randomSample = Rand.RandomSample(Enumerable.Range(0, genes.Count).ToList(), 2);
+                var indexA = randomSample[0];
+                var indexB = randomSample[1];
+                (genes[indexA], genes[indexB]) = (genes[indexB], genes[indexA]);
             }
         }
-
-        [TestMethod]
-        public void FitnessTest()
+        else
         {
-            var genes = new[] {1, 1, 1, 1, 1, 2, 2, 2, 2, 2};
-            var fitness = GetFitness(genes);
-            Assert.AreEqual(5, fitness.Group1Sum);
-            Assert.AreEqual(32, fitness.Group2Product);
-            Assert.AreEqual(8, fitness.DuplicateCount);
+            var indexA = Rand.Random.Next(genes.Count);
+            var indexB = Rand.Random.Next(geneSet.Count);
+            genes[indexA] = geneSet[indexB];
         }
+    }
 
-        [TestMethod]
-        public void DispalyTest()
-        {
-            var genes = new[] {1, 1, 1, 1, 1, 2, 2, 2, 2, 2};
-            var fitness = GetFitness(genes);
-            var chromosome = new Chromosome<int, Fitness>(genes, fitness);
-            var watch = Stopwatch.StartNew();
+    [TestMethod]
+    public void FitnessTest()
+    {
+        var genes = new[] {1, 1, 1, 1, 1, 2, 2, 2, 2, 2};
+        var fitness = GetFitness(genes);
+        Assert.AreEqual(5, fitness.Group1Sum);
+        Assert.AreEqual(32, fitness.Group2Product);
+        Assert.AreEqual(8, fitness.DuplicateCount);
+    }
 
-            Display(chromosome, watch);
-        }
+    [TestMethod]
+    public void DisplayTest()
+    {
+        var genes = new[] {1, 1, 1, 1, 1, 2, 2, 2, 2, 2};
+        var fitness = GetFitness(genes);
+        var chromosome = new Chromosome<int, Fitness>(genes, fitness);
+        var watch = Stopwatch.StartNew();
 
-        [TestMethod]
-        public void CardTest()
-        {
-            var geneSet = Enumerable.Range(1, 10).ToArray();
-            var watch = Stopwatch.StartNew();
+        Display(chromosome, watch);
+    }
 
-            void FnDisplay(Chromosome<int, Fitness> candidate) => Display(candidate, watch);
-            Fitness FnGetFitness(IReadOnlyList<int> genes) => GetFitness(genes);
-            void FnMutate(IList<int> genes) => Mutate(genes, geneSet);
+    [TestMethod]
+    public void CardTest()
+    {
+        var geneSet = Enumerable.Range(1, 10).ToArray();
+        var watch = Stopwatch.StartNew();
 
-            var optimalFitness = new Fitness(36, 360, 0);
-            var best = Genetic<int, Fitness>.GetBest(FnGetFitness, 10, optimalFitness, geneSet, FnDisplay, FnMutate);
-            Assert.IsTrue(optimalFitness.CompareTo(best.Fitness) <= 0);
-        }
+        void FnDisplay(Chromosome<int, Fitness> candidate) => Display(candidate, watch);
+        Fitness FnGetFitness(IReadOnlyList<int> genes) => GetFitness(genes);
+        void FnMutate(IList<int> genes) => Mutate(genes, geneSet);
 
-        [TestMethod]
-        public void BenchmarkTest()
-        {
-            Benchmark.Run(CardTest);
-        }
+        var optimalFitness = new Fitness(36, 360, 0);
+        var best = Genetic<int, Fitness>.GetBest(FnGetFitness, 10, optimalFitness, geneSet, FnDisplay, FnMutate);
+        Assert.IsTrue(optimalFitness.CompareTo(best.Fitness) <= 0);
+    }
+
+    [TestMethod]
+    public void BenchmarkTest()
+    {
+        Benchmark.Run(CardTest);
     }
 }

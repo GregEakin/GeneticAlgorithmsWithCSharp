@@ -1,6 +1,6 @@
 ﻿/* File: Chromosome.cs
  *     from chapter 8 of _Genetic Algorithms with Python_
- *     writen by Clinton Sheppard
+ *     written by Clinton Sheppard
  *
  * Author: Greg Eakin <gregory.eakin@gmail.com>
  * Copyright (c) 2018 Greg Eakin
@@ -17,22 +17,19 @@
  * permissions and limitations under the License.
  */
 
-using System.Collections.Generic;
+namespace GeneticAlgorithms.MagicSquare;
 
-namespace GeneticAlgorithms.MagicSquare
+public class Chromosome<TGene, TFitness>
 {
-    public class Chromosome<TGene, TFitness>
+    public IReadOnlyList<TGene> Genes { get; }
+
+    public TFitness Fitness { get; }
+
+    public int Age { get; set; }
+
+    public Chromosome(IReadOnlyList<TGene> genes, TFitness fitness)
     {
-        public IReadOnlyList<TGene> Genes { get; }
-
-        public TFitness Fitness { get; }
-
-        public int Age { get; set; }
-
-        public Chromosome(IReadOnlyList<TGene> genes, TFitness fitness)
-        {
-            Genes = genes;
-            Fitness = fitness;
-        }
+        Genes = genes;
+        Fitness = fitness;
     }
 }

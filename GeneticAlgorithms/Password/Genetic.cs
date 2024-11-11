@@ -1,6 +1,6 @@
 ﻿/* File: genetic.cs
  *     from chapter 1 of _Genetic Algorithms with Python_
- *     writen by Clinton Sheppard
+ *     written by Clinton Sheppard
  *
  * Author: Greg Eakin <gregory.eakin@gmail.com>
  * Copyright (c) 2018 Greg Eakin
@@ -18,62 +18,59 @@
  */
 
 using GeneticAlgorithms.Utilities;
-using System;
-using System.Collections.Generic;
 
-namespace GeneticAlgorithms.Password
+namespace GeneticAlgorithms.Password;
+
+public static class Genetic
 {
-    public static class Genetic
+    public delegate void DisplayDelegate(Chromosome child);
+
+    public delegate int GetFitnessDelegate(string guess);
+
+    private static Chromosome GenerateParent(IReadOnlyList<char> geneSet, int length, GetFitnessDelegate getFitness)
     {
-        public delegate void DisplayDelegate(Chromosome child);
-
-        public delegate int GetFitnessDelegate(string guess);
-
-        private static Chromosome GenerateParent(IReadOnlyList<char> geneSet, int length, GetFitnessDelegate getFitness)
+        var genes = string.Empty;
+        while (genes.Length < length)
         {
-            var genes = string.Empty;
-            while (genes.Length < length)
-            {
-                var sampleSize = Math.Min(length - genes.Length, geneSet.Count);
-                genes += Rand.RandomSample(geneSet, sampleSize);
-            }
-
-            var fitness = getFitness(genes);
-            return new Chromosome(genes, fitness);
+            var sampleSize = Math.Min(length - genes.Length, geneSet.Count);
+            genes += Rand.RandomSample(geneSet, sampleSize);
         }
 
-        private static Chromosome Mutate(Chromosome parent, IReadOnlyList<char> geneSet, GetFitnessDelegate getFitness)
+        var fitness = getFitness(genes);
+        return new Chromosome(genes, fitness);
+    }
+
+    private static Chromosome Mutate(Chromosome parent, IReadOnlyList<char> geneSet, GetFitnessDelegate getFitness)
+    {
+        var childGenes = parent.Genes.ToCharArray();
+        var index = Rand.Random.Next(parent.Genes.Length);
+        var randomSample = Rand.RandomSample(geneSet, 2);
+        var newGene = randomSample[0];
+        var alternate = randomSample[1];
+        childGenes[index] = newGene == childGenes[index] ? alternate : newGene;
+        var genes = new string(childGenes);
+        var fitness = getFitness(genes);
+        return new Chromosome(genes, fitness);
+    }
+
+    public static Chromosome GetBest(GetFitnessDelegate getFitness, int targetLen, int optimalFitness,
+        IReadOnlyList<char> geneSet, DisplayDelegate display)
+    {
+        var bestParent = GenerateParent(geneSet, targetLen, getFitness);
+        display(bestParent);
+
+        if (bestParent.Fitness >= optimalFitness)
+            return bestParent;
+
+        while (true)
         {
-            var childGenes = parent.Genes.ToCharArray();
-            var index = Rand.Random.Next(parent.Genes.Length);
-            var randomSample = Rand.RandomSample(geneSet, 2);
-            var newGene = randomSample[0];
-            var alternate = randomSample[1];
-            childGenes[index] = newGene == childGenes[index] ? alternate : newGene;
-            var genes = new string(childGenes);
-            var fitness = getFitness(genes);
-            return new Chromosome(genes, fitness);
-        }
-
-        public static Chromosome GetBest(GetFitnessDelegate getFitness, int targetLen, int optimalFitness,
-            IReadOnlyList<char> geneSet, DisplayDelegate display)
-        {
-            var bestParent = GenerateParent(geneSet, targetLen, getFitness);
-            display(bestParent);
-
-            if (bestParent.Fitness >= optimalFitness)
-                return bestParent;
-
-            while (true)
-            {
-                var child = Mutate(bestParent, geneSet, getFitness);
-                if (bestParent.Fitness >= child.Fitness)
-                    continue;
-                display(child);
-                if (child.Fitness >= optimalFitness)
-                    return child;
-                bestParent = child;
-            }
+            var child = Mutate(bestParent, geneSet, getFitness);
+            if (bestParent.Fitness >= child.Fitness)
+                continue;
+            display(child);
+            if (child.Fitness >= optimalFitness)
+                return child;
+            bestParent = child;
         }
     }
 }

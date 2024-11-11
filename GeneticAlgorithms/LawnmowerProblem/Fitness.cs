@@ -1,6 +1,6 @@
 ﻿/* File: Fitnes.cs
  *     from chapter 15 of _Genetic Algorithms with Python_
- *     writen by Clinton Sheppard
+ *     written by Clinton Sheppard
  *
  * Author: Greg Eakin <gregory.eakin@gmail.com>
  * Copyright (c) 2018 Greg Eakin
@@ -17,50 +17,47 @@
  * permissions and limitations under the License.
  */
 
-using System;
+namespace GeneticAlgorithms.LawnmowerProblem;
 
-namespace GeneticAlgorithms.LawnmowerProblem
+public class Fitness : IComparable, IComparable<Fitness>
 {
-    public class Fitness : IComparable, IComparable<Fitness>
+    public int TotalMowed { get; }
+    public int TotalInstructions { get; }
+    public int StepCount { get; }
+
+    public Fitness(int totalMowed, int totalInstructions, int stepCount)
     {
-        public int TotalMowed { get; }
-        public int TotalInstructions { get; }
-        public int StepCount { get; }
+        TotalMowed = totalMowed;
+        TotalInstructions = totalInstructions;
+        StepCount = stepCount;
+    }
 
-        public Fitness(int totalMowed, int totalInstructions, int stepCount)
+    public int CompareTo(object obj)
+    {
+        switch (obj)
         {
-            TotalMowed = totalMowed;
-            TotalInstructions = totalInstructions;
-            StepCount = stepCount;
+            case null:
+                return 1;
+            case Fitness that:
+                return CompareTo(that);
+            default:
+                throw new ArgumentException("Object is not a Fitness");
         }
+    }
 
-        public int CompareTo(object obj)
-        {
-            switch (obj)
-            {
-                case null:
-                    return 1;
-                case Fitness that:
-                    return CompareTo(that);
-                default:
-                    throw new ArgumentException("Object is not a Fitness");
-            }
-        }
+    public int CompareTo(Fitness that)
+    {
+        if (ReferenceEquals(this, that)) return 0;
+        if (that is null) return 1;
+        var totalMowedComparison = TotalMowed.CompareTo(that.TotalMowed);
+        if (totalMowedComparison != 0) return totalMowedComparison;
+        var stepCountComparison = -StepCount.CompareTo(that.StepCount);
+        if (stepCountComparison != 0) return stepCountComparison;
+        return -TotalInstructions.CompareTo(that.TotalInstructions);
+    }
 
-        public int CompareTo(Fitness that)
-        {
-            if (ReferenceEquals(this, that)) return 0;
-            if (that is null) return 1;
-            var totalMowedComparison = TotalMowed.CompareTo(that.TotalMowed);
-            if (totalMowedComparison != 0) return totalMowedComparison;
-            var stepCountComparison = -StepCount.CompareTo(that.StepCount);
-            if (stepCountComparison != 0) return stepCountComparison;
-            return -TotalInstructions.CompareTo(that.TotalInstructions);
-        }
-
-        public override string ToString()
-        {
-            return $"{TotalMowed} mowed with {TotalInstructions} instructions and {StepCount} steps";
-        }
+    public override string ToString()
+    {
+        return $"{TotalMowed} mowed with {TotalInstructions} instructions and {StepCount} steps";
     }
 }

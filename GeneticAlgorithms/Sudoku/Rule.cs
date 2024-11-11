@@ -1,32 +1,31 @@
-﻿namespace GeneticAlgorithms.Sudoku
+﻿namespace GeneticAlgorithms.Sudoku;
+
+public class Rule
 {
-    public class Rule
+    public int Index { get; }
+    public int OtherIndex { get; }
+
+    public Rule(int index, int otherIndex)
     {
-        public int Index { get; }
-        public int OtherIndex { get; }
+        Index = index;
+        OtherIndex = otherIndex;
+    }
 
-        public Rule(int index, int otherIndex)
+    public override bool Equals(object obj)
+    {
+        switch (obj)
         {
-            Index = index;
-            OtherIndex = otherIndex;
+            case null:
+                return false;
+            case Rule that:
+                return Index == that.Index && OtherIndex == that.OtherIndex;
+            default:
+                return false;
         }
+    }
 
-        public override bool Equals(object obj)
-        {
-            switch (obj)
-            {
-                case null:
-                    return false;
-                case Rule that:
-                    return Index == that.Index && OtherIndex == that.OtherIndex;
-                default:
-                    return false;
-            }
-        }
-
-        public override int GetHashCode()
-        {
-            return Index * 100 + OtherIndex;
-        }
+    public override int GetHashCode()
+    {
+        return Index * 100 + OtherIndex;
     }
 }

@@ -1,6 +1,6 @@
 ﻿/* File: Benchmark.cs
  *     from chapter 6 of _Genetic Algorithms with Python_
- *     writen by Clinton Sheppard
+ *     written by Clinton Sheppard
  *
  * Author: Greg Eakin <gregory.eakin@gmail.com>
  * Copyright (c) 2018 Greg Eakin
@@ -17,50 +17,47 @@
  * permissions and limitations under the License.
  */
 
-using System;
+namespace GeneticAlgorithms.Cards;
 
-namespace GeneticAlgorithms.Cards
+public class Fitness : IComparable, IComparable<Fitness>
 {
-    public class Fitness : IComparable, IComparable<Fitness>
+    public int Group1Sum { get; }
+    public int Group2Product { get; }
+    public int TotalDifference { get; }
+    public int DuplicateCount { get; }
+
+    public Fitness(int group1Sum, int group2Product, int duplicateCount)
     {
-        public int Group1Sum { get; }
-        public int Group2Product { get; }
-        public int TotalDifference { get; }
-        public int DuplicateCount { get; }
+        Group1Sum = group1Sum;
+        Group2Product = group2Product;
+        DuplicateCount = duplicateCount;
 
-        public Fitness(int group1Sum, int group2Product, int duplicateCount)
-        {
-            Group1Sum = group1Sum;
-            Group2Product = group2Product;
-            DuplicateCount = duplicateCount;
-
-            var sumDifference = Math.Abs(36 - group1Sum);
-            var productDifference = Math.Abs(360 - group2Product);
-            TotalDifference = sumDifference + productDifference;
-        }
-
-        public int CompareTo(object obj)
-        {
-            switch (obj)
-            {
-                case null:
-                    return 1;
-                case Fitness that:
-                    return CompareTo(that);
-                default:
-                    throw new ArgumentException("Object is not a Fitness");
-            }
-        }
-
-        public int CompareTo(Fitness that)
-        {
-            if (ReferenceEquals(this, that)) return 0;
-            if (that is null) return 1;
-            var duplicateComparison = -DuplicateCount.CompareTo(that.DuplicateCount);
-            if (duplicateComparison != 0) return duplicateComparison;
-            return -TotalDifference.CompareTo(that.TotalDifference);
-        }
-
-        public override string ToString() => $"sum: {Group1Sum} prod: {Group2Product} dups: {DuplicateCount}";
+        var sumDifference = Math.Abs(36 - group1Sum);
+        var productDifference = Math.Abs(360 - group2Product);
+        TotalDifference = sumDifference + productDifference;
     }
+
+    public int CompareTo(object obj)
+    {
+        switch (obj)
+        {
+            case null:
+                return 1;
+            case Fitness that:
+                return CompareTo(that);
+            default:
+                throw new ArgumentException("Object is not a Fitness");
+        }
+    }
+
+    public int CompareTo(Fitness that)
+    {
+        if (ReferenceEquals(this, that)) return 0;
+        if (that is null) return 1;
+        var duplicateComparison = -DuplicateCount.CompareTo(that.DuplicateCount);
+        if (duplicateComparison != 0) return duplicateComparison;
+        return -TotalDifference.CompareTo(that.TotalDifference);
+    }
+
+    public override string ToString() => $"sum: {Group1Sum} prod: {Group2Product} dups: {DuplicateCount}";
 }

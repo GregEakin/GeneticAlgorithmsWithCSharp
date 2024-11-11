@@ -1,6 +1,6 @@
 ﻿/* File: Fitness.cs
  *     from chapter 9 of _Genetic Algorithms with Python_
- *     writen by Clinton Sheppard
+ *     written by Clinton Sheppard
  *
  * Author: Greg Eakin <gregory.eakin@gmail.com>
  * Copyright (c) 2018 Greg Eakin
@@ -17,57 +17,54 @@
  * permissions and limitations under the License.
  */
 
-using System;
+namespace GeneticAlgorithms.Knapsack;
 
-namespace GeneticAlgorithms.Knapsack
+public class Fitness : IComparable, IComparable<Fitness>
 {
-    public class Fitness : IComparable, IComparable<Fitness>
+    public double TotalWeight { get; }
+
+    public double TotalVolume { get; }
+
+    public int TotalValue { get; }
+
+    public Fitness(double totalWeight, double totalVolume, int totalValue)
     {
-        public double TotalWeight { get; }
+        TotalWeight = totalWeight;
+        TotalVolume = totalVolume;
+        TotalValue = totalValue;
+    }
 
-        public double TotalVolume { get; }
-
-        public int TotalValue { get; }
-
-        public Fitness(double totalWeight, double totalVolume, int totalValue)
+    public int CompareTo(object obj)
+    {
+        switch (obj)
         {
-            TotalWeight = totalWeight;
-            TotalVolume = totalVolume;
-            TotalValue = totalValue;
+            case null:
+                return 1;
+            case Fitness that:
+                return CompareTo(that);
+            default:
+                throw new ArgumentException("Object is not a Fitness");
         }
+    }
 
-        public int CompareTo(object obj)
-        {
-            switch (obj)
-            {
-                case null:
-                    return 1;
-                case Fitness that:
-                    return CompareTo(that);
-                default:
-                    throw new ArgumentException("Object is not a Fitness");
-            }
-        }
+    public int CompareTo(Fitness that)
+    {
+        if (ReferenceEquals(this, that)) return 0;
+        if (that is null) return 1;
+        var value = TotalValue.CompareTo(that.TotalValue);
+        if (value != 0)
+            return value;
 
-        public int CompareTo(Fitness that)
-        {
-            if (ReferenceEquals(this, that)) return 0;
-            if (that is null) return 1;
-            var value = TotalValue.CompareTo(that.TotalValue);
-            if (value != 0)
-                return value;
+        var weight = -TotalWeight.CompareTo(that.TotalWeight);
+        if (weight != 0)
+            return weight;
 
-            var weight = -TotalWeight.CompareTo(that.TotalWeight);
-            if (weight != 0)
-                return weight;
+        var volume = -TotalVolume.CompareTo(that.TotalVolume);
+        return volume;
+    }
 
-            var volume = -TotalVolume.CompareTo(that.TotalVolume);
-            return volume;
-        }
-
-        public override string ToString()
-        {
-            return $"wt: {TotalWeight} vol: {TotalVolume} value {TotalValue}";
-        }
+    public override string ToString()
+    {
+        return $"wt: {TotalWeight} vol: {TotalVolume} value {TotalValue}";
     }
 }

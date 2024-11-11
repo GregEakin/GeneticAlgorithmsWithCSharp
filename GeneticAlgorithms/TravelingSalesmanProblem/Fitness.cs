@@ -1,6 +1,6 @@
 ﻿/* File: Fitness.cs
  *     from chapter 12 of _Genetic Algorithms with Python_
- *     writen by Clinton Sheppard
+ *     written by Clinton Sheppard
  *
  * Author: Greg Eakin <gregory.eakin@gmail.com>
  * Copyright (c) 2018 Greg Eakin
@@ -17,37 +17,34 @@
  * permissions and limitations under the License.
  */
 
-using System;
+namespace GeneticAlgorithms.TravelingSalesmanProblem;
 
-namespace GeneticAlgorithms.TravelingSalesmanProblem
+public class Fitness : IComparable, IComparable<Fitness>
 {
-    public class Fitness : IComparable, IComparable<Fitness>
+    public double TotalDistance { get; }
+
+    public Fitness(double totalDistance)
     {
-        public double TotalDistance { get; }
-
-        public Fitness(double totalDistance)
-        {
-            TotalDistance = totalDistance;
-        }
-
-        public int CompareTo(object obj)
-        {
-            switch (obj)
-            {
-                case null:
-                    return 1;
-                case Fitness that:
-                    return CompareTo(that);
-                default:
-                    throw new ArgumentException("Object is not a Fitness");
-            }
-        }
-
-        public int CompareTo(Fitness that)
-        {
-            return -TotalDistance.CompareTo(that.TotalDistance);
-        }
-
-        public override string ToString() => $"{TotalDistance:F2}";
+        TotalDistance = totalDistance;
     }
+
+    public int CompareTo(object obj)
+    {
+        switch (obj)
+        {
+            case null:
+                return 1;
+            case Fitness that:
+                return CompareTo(that);
+            default:
+                throw new ArgumentException("Object is not a Fitness");
+        }
+    }
+
+    public int CompareTo(Fitness that)
+    {
+        return -TotalDistance.CompareTo(that.TotalDistance);
+    }
+
+    public override string ToString() => $"{TotalDistance:F2}";
 }

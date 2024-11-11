@@ -7,27 +7,23 @@
 // All Rights Reserved.
 //
 
-using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+namespace GeneticAlgorithms.Utilities;
 
-namespace GeneticAlgorithms.Utilities
+public static class ExpectedException
 {
-    public static class ExpectedException
+    public static T AssertThrows<T>(Action action) where T : Exception
     {
-        public static T AssertThrows<T>(Action action) where T : Exception
+        try
         {
-            try
-            {
-                action.Invoke();
-            }
-            catch (T ex)
-            {
-                if (ex.GetType() != typeof(T)) throw;
-                return ex;
-            }
-
-            Assert.Fail("Failed to throw exception!");
-            return null;
+            action.Invoke();
         }
+        catch (T ex)
+        {
+            if (ex.GetType() != typeof(T)) throw;
+            return ex;
+        }
+
+        Assert.Fail("Failed to throw exception!");
+        return null;
     }
 }

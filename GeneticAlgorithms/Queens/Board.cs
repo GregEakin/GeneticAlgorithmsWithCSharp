@@ -1,6 +1,6 @@
 ﻿/* File: Benchmark.cs
  *     from chapter 4 of _Genetic Algorithms with Python_
- *     writen by Clinton Sheppard
+ *     written by Clinton Sheppard
  *
  * Author: Greg Eakin <gregory.eakin@gmail.com>
  * Copyright (c) 2018 Greg Eakin
@@ -17,45 +17,43 @@
  * permissions and limitations under the License.
  */
 
-using System.Collections.Generic;
 using System.Text;
 
-namespace GeneticAlgorithms.Queens
+namespace GeneticAlgorithms.Queens;
+
+public class Board
 {
-    public class Board
+    private readonly char[,] _board;
+
+    public char this[int x, int y] => _board[x, y];
+
+    public Board(IReadOnlyList<int> genes, int size)
     {
-        private readonly char[,] _board;
+        _board = new char[size, size];
 
-        public char this[int x, int y] => _board[x, y];
+        for (var i = 0; i < size; i++)
+        for (var j = 0; j < size; j++)
+            _board[i, j] = '.';
 
-        public Board(IReadOnlyList<int> genes, int size)
+        for (var i = 0; i < genes.Count; i += 2)
         {
-            _board = new char[size, size];
+            var row = genes[i];
+            var col = genes[i + 1];
+            _board[row, col] = 'Q';
+        }
+    }
 
-            for (var i = 0; i < size; i++)
-            for (var j = 0; j < size; j++)
-                _board[i, j] = '.';
+    public override string ToString()
+    {
+        var builder = new StringBuilder();
 
-            for (var i = 0; i < genes.Count; i += 2)
-            {
-                var row = genes[i];
-                var col = genes[i + 1];
-                _board[row, col] = 'Q';
-            }
+        for (var j = _board.GetLength(1) - 1; j >= 0; j--)
+        {
+            for (var i = 0; i < _board.GetLength(0); i++)
+                builder.AppendFormat("{0} ", _board[i, j]);
+            builder.AppendLine();
         }
 
-        public override string ToString()
-        {
-            var builder = new StringBuilder();
-
-            for (var j = _board.GetLength(1) - 1; j >= 0; j--)
-            {
-                for (var i = 0; i < _board.GetLength(0); i++)
-                    builder.AppendFormat("{0} ", _board[i, j]);
-                builder.AppendLine();
-            }
-
-            return builder.ToString();
-        }
+        return builder.ToString();
     }
 }

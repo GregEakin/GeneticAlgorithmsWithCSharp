@@ -1,6 +1,6 @@
 ﻿/* File: SearchTimeoutException.cs
  *     from chapter 16 of _Genetic Algorithms with Python_
- *     writen by Clinton Sheppard
+ *     written by Clinton Sheppard
  *
  * Author: Greg Eakin <gregory.eakin@gmail.com>
  * Copyright (c) 2018 Greg Eakin
@@ -17,22 +17,19 @@
  * permissions and limitations under the License.
  */
 
-using System;
+namespace GeneticAlgorithms.LogicCircuits;
 
-namespace GeneticAlgorithms.LogicCircuits
+public static partial class Genetic<TGene, TFitness>
+    where TFitness : IComparable<TFitness>
 {
-    public static partial class Genetic<TGene, TFitness>
-        where TFitness : IComparable<TFitness>
+    [Serializable]
+    private class SearchTimeoutException : Exception
     {
-        [Serializable]
-        private class SearchTimeoutException : Exception
-        {
-            public Chromosome<TGene, TFitness> Improvement { get; }
+        public Chromosome<TGene, TFitness> Improvement { get; }
 
-            public SearchTimeoutException(Chromosome<TGene, TFitness> improvement)
-            {
-                Improvement = improvement;
-            }
+        public SearchTimeoutException(Chromosome<TGene, TFitness> improvement)
+        {
+            Improvement = improvement;
         }
     }
 }
